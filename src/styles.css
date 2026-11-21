@@ -1,0 +1,1369 @@
+:root { font-family: 'RobotoMono Nerd Font', 'Cascadia Mono', 'SFMono-Regular', Consolas, monospace; color: var(--page-ink); background: var(--page-bg); font-synthesis: none; }
+* { box-sizing: border-box; }
+html, body, #root { width: 100%; min-width: 0; height: 100%; min-height: 0; margin: 0; }
+
+/* Page background = theme background, so resizing the window never uncovers white (dark is the default before the theme is known). */
+html, body { background: var(--page-bg); color-scheme: var(--color-scheme); }
+body { overflow: hidden; }
+button, input, textarea, select { font: inherit; }
+button { background: transparent; border: 0; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 1px solid var(--focus-ring); outline-offset: -1px; }
+.metroterm-shell { --dock-width: 268px; --sender-height: 166px; width: 100%; height: 100%; overflow: hidden; display: flex; flex-direction: column; color: var(--ink); background: var(--bg); }
+.window-chrome { height: 26px; min-height: 26px; display: grid; grid-template-columns: 240px 1fr 150px; align-items: center; border-bottom: 1px solid var(--window-chrome-line); background: var(--chrome); color: var(--window-chrome-ink); user-select: none; }
+.app-mark { padding-left: 10px; color: var(--n-e0); letter-spacing: 0.02em; }
+.app-mark b { font-weight: 500; }
+.window-name { text-align: center; color: var(--window-name-ink); }
+.window-controls { height: 100%; display: flex; justify-content: flex-end; }
+.window-controls button { color: var(--window-button-ink); font-size: 12px; }
+.window-controls button:hover { background: var(--window-button-hover-bg); color: var(--window-button-hover-ink); }
+.menu-bar { height: 27px; min-height: 27px; display: flex; align-items: stretch; justify-content: space-between; padding: 0 8px; border-bottom: 1px solid var(--menu-bar-line); background: var(--menu-bar-bg); user-select: none; }
+.menu-items, .menu-tools { display: flex; align-items: center; }
+.menu-items button { height: 100%; padding: 0 7px; color: var(--menu-item-ink); }
+.menu-items button:hover, .menu-tools button:hover, .menu-tools button.selected { background: var(--active); color: var(--ink-active); }
+.menu-tools { gap: 2px; }
+.menu-tools button { color: var(--muted); }
+.menu-tools button:first-child { font-size: 15px; padding: 0 5px; }
+.tab-bar { height: 27px; min-height: 27px; display: flex; border-bottom: 1px solid var(--bar-line); background: var(--tab-bar-bg); user-select: none; }
+.session-tab { position: relative; gap: 7px; border-right: 1px solid var(--line-soft); color: var(--session-tab-ink); }
+.session-tab:hover { background: var(--session-tab-hover-bg); color: var(--session-tab-hover-ink); }
+.session-tab.active { color: var(--ink-active); background: var(--session-tab-active-bg); box-shadow: var(--session-tab-active-shadow); }
+/* Active tab's top edge: a light runs across it (Gold: --session-tab-flow; other themes have none). */
+.session-tab.active::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--session-tab-flow); background-size: 200% 100%; animation: session-tab-flow 2.6s linear infinite; animation-name: var(--session-tab-flow-animation); pointer-events: none; }
+@keyframes session-tab-flow {
+  from { background-position: 0 0; }
+  to { background-position: -200% 0; }
+}
+.session-tab i { color: var(--icon-terminal-tab); font-style: normal; }
+.session-tab span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.session-tab b { font-weight: 400; }
+.session-tab b:hover { color: var(--tab-close-hover-ink); }
+.terminal-main { grid-template-rows: 39px minmax(0, 1fr); overflow: hidden; }
+.session-explorer { display: flex; flex-direction: column; }
+.pane-filter { height: 28px; display: flex; align-items: center; border-bottom: 1px solid var(--line-soft); }
+.pane-filter input { min-width: 0; flex: 1; padding: 0 5px; background: var(--field-bg); border: 1px solid var(--field-line); color: var(--ink); }
+.pane-filter input::placeholder { color: var(--n-66); }
+.pane-filter button { color: var(--muted); font-size: 13px; }
+.tree-list { flex: 1; overflow: auto; padding-bottom: 4px; }
+.tree-row { display: flex; align-items: center; width: 100%; height: 25px; color: var(--row-ink); text-align: left; }
+.tree-row:hover { background: var(--n-26); color: var(--tree-row-hover-ink); }
+.tree-row.active { border-left-color: var(--violet); color: var(--tree-row-active-ink); background: var(--tree-row-active-bg); }
+.tree-row i { color: var(--icon-session); font-size: 8px; font-style: normal; }
+.tree-row i.session-online { color: var(--status-online); }
+.tree-row span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tree-row small { color: var(--tree-row-small-ink); font-size: 9px; }
+.filer-pane { display: flex; flex-direction: column; overflow: hidden; }
+.pane-title { height: 27px; min-height: 27px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--bar-line); background: var(--pane-title-bg); color: var(--pane-title-ink); }
+.pane-title span { display: flex; gap: 6px; align-items: center; }
+.pane-title i { color: var(--n-7a); font-style: normal; }
+.pane-title button { color: var(--muted); }
+.pane-title button:hover { background: var(--active); color: var(--ink); }
+.filer-path { display: flex; align-items: center; color: var(--muted); border-bottom: 1px solid var(--line-soft); }
+.filer-path b { flex: 1; overflow: hidden; color: var(--filer-path-ink); font-weight: 400; white-space: nowrap; }
+.filer-path span { color: var(--n-aa); }
+.filer-head { display: grid; align-items: center; border-bottom: 1px solid var(--line); color: var(--n-85); }
+.filer-list { flex: 1; overflow: auto; }
+.filer-list button { width: 100%; display: grid; align-items: center; color: var(--n-a9); text-align: left; }
+.filer-list button:hover { color: var(--ink); background: var(--n-2b); }
+.filer-list span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.filer-list i { font-style: normal; }
+.filer-list time { white-space: nowrap; }
+.filer-foot { height: 28px; display: flex; align-items: center; border-top: 1px solid var(--bar-line); color: var(--filer-foot-ink); }
+.filer-foot span { margin-left: auto; color: var(--n-b0); }
+.terminal-toolbar { display: flex; border-bottom: 1px solid var(--bar-line); background: var(--terminal-toolbar-bg); }
+.toolbar-icons { display: flex; align-items: center; }
+.toolbar-icons button { min-width: 16px; font-size: 12px; }
+.terminal-breadcrumb { height: 25px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border: 1px solid var(--terminal-breadcrumb-line); background: var(--terminal-breadcrumb-bg); color: var(--terminal-breadcrumb-ink); }
+.terminal-breadcrumb strong { color: var(--strong-ink); font-weight: 400; }
+.toolbar-right { display: flex; }
+.toolbar-right button { font-size: 11px; }
+.terminal-stage { display: flex; background: var(--terminal); overflow: hidden; }
+.terminal-shell { flex: 1; height: 100%; display: flex; flex-direction: column; background: var(--terminal); }
+.terminal-meta { display: none; }
+.xterm-host { flex: 1; min-width: 0; min-height: 0; padding: 8px 9px; overflow: hidden; }
+.xterm { height: 100%; }
+.sender-pane { display: flex; flex-direction: column; background: var(--panel); overflow: hidden; }
+.sender-controls { display: flex; align-items: center; border-bottom: 1px solid var(--line-soft); color: var(--sender-controls-ink); white-space: nowrap; }
+.sender-controls .play { color: var(--sender-play); }
+.sender-controls > i { height: 14px; width: 1px; margin: 0 3px; background: var(--line); }
+.sender-controls label { display: flex; align-items: center; }
+.sender-controls input[type='radio'] { margin: 0; width: 10px; height: 10px; accent-color: var(--n-a0); }
+.sender-controls .counter, .sender-controls .interval, .sender-controls select { border: 1px solid var(--sender-field-line); background: var(--sender-field-bg); color: var(--sender-field-ink); }
+.sender-controls .interval { width: 75px; }
+.sender-controls select { width: 176px; }
+.sender-editor { display: grid; color: var(--n-a4); }
+.sender-editor > span { padding: 5px 7px; color: var(--sender-span-ink); text-align: right; background: var(--sender-bg); }
+.sender-editor textarea { width: 100%; height: 100%; resize: none; }
+.status-bar { height: 26px; min-height: 26px; display: flex; align-items: center; gap: 17px; border-top: 1px solid var(--status-bar-line); background: var(--status-bar-bg); color: var(--status-bar-ink); white-space: nowrap; }
+.status-bar span:first-child { color: var(--n-7a); }
+.status-spacer { flex: 1; }
+.status-bar a { color: var(--link); text-decoration: none; }
+.modal-backdrop { position: fixed; z-index: 20; inset: 0; display: grid; place-items: center; padding: 20px; background: var(--backdrop); }
+.connection-dialog { width: min(420px, 100%); border: 1px solid var(--dialog-line); background: var(--panel); box-shadow: 8px 8px 0 var(--shadow-dialog); }
+.dialog-title { height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-bottom: 1px solid var(--bar-line); background: var(--dialog-title-bg); }
+.dialog-title span { padding: 3px 5px; color: var(--dialog-title-span-ink); background: var(--dialog-title-span-bg); font-size: 9px; }
+.dialog-title b { color: var(--dialog-title-b-ink); font-size: 11px; letter-spacing: 0.08em; }
+.dialog-title button { margin-left: auto; color: var(--muted); font-size: 19px; }
+.connection-dialog label { display: grid; gap: 5px; padding: 10px 12px 0; color: var(--muted); letter-spacing: 0.08em; }
+.connection-dialog input { padding: 0 8px; border: 1px solid var(--dialog-input-line); border-radius: 0; color: var(--ink); background: var(--field-bg); }
+.form-grid { display: grid; grid-template-columns: 1fr 105px; }
+.connection-dialog p { padding: 4px 12px 0; color: var(--muted); line-height: 1.6; }
+.primary-button { width: calc(100% - 24px); height: 34px; margin: 12px; color: var(--primary-button-ink); background: var(--primary-button-bg); font-size: 10px; letter-spacing: 0.06em; }
+.primary-button:hover { background: var(--primary-button-hover-bg); }
+.primary-button:hover:disabled { background: var(--primary-button-disabled-hover-bg); }
+
+/* WindTerm-inspired session management */
+.session-quickbar { display: flex; align-items: center; border-bottom: 1px solid var(--line-soft); background: var(--session-quickbar-bg); }
+.session-quickbar button { color: var(--muted); }
+.session-quickbar button:first-child { color: var(--strong-ink); }
+.session-quickbar button:first-of-type { color: var(--quickbar-first-ink); }
+.session-quickbar button:hover { color: var(--quickbar-hover-ink); background: var(--active); }
+.group-row { width: 100%; height: 23px; display: flex; align-items: center; color: var(--group-row-ink); text-align: left; }
+.group-row:hover { color: var(--ink); background: var(--group-row-hover-bg); }
+.group-row i { width: 12px; color: var(--muted); font-style: normal; text-align: center; }
+.group-row span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.group-row small { color: var(--group-row-small-ink); font-size: 9px; }
+.tree-row { position: relative; cursor: pointer; }
+.tree-row-actions { opacity: 0; }
+.tree-row:hover .tree-row-actions { opacity: 1; }
+.tree-row-actions button { padding: 0; font-size: 11px; }
+.session-online { color: var(--accent-online) !important; }
+.session-connecting { color: var(--session-connecting-ink) !important; animation: session-pulse 1s ease-in-out infinite; }
+.session-tab em, .terminal-breadcrumb em { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--status-dot-bg); }
+.session-tab em.online, .terminal-breadcrumb em.online { background: var(--accent-online); box-shadow: 0 0 0 2px var(--status-dot-glow); }
+.session-tab em.connecting, .terminal-breadcrumb em.connecting { background: var(--session-connecting-ink); animation: session-pulse 1s ease-in-out infinite; }
+.session-tab em { margin-left: auto; }
+.session-tab b { margin-left: 6px; }
+.terminal-breadcrumb em { margin-left: 2px; }
+@keyframes session-pulse {
+  50% { opacity: 0.35; }
+}
+
+/* No child panel imposes a minimum dimension on its dock. */
+.terminal-main { display: flex; flex-direction: column; }
+.session-explorer, .filer-pane, .terminal-main, .terminal-stage, .terminal-shell, .sender-pane, .sender-editor, .tree-list, .filer-list { min-width: 0; min-height: 0; }
+.terminal-stage { flex: 1 1 0; }
+.sender-controls, .filer-path, .filer-head, .filer-foot, .pane-filter, .session-quickbar { min-height: 0; overflow: hidden; flex-shrink: 1; }
+.sender-editor { flex: 1 1 0; }
+
+/* Larger application chrome without reducing terminal information density. */
+.metroterm-shell { font-size: 15px; }
+.window-chrome { font-size: 14px; }
+.menu-items button { font-size: 13px; }
+.menu-tools button { font-size: 12px; }
+.terminal-toolbar { font-size: 13px; }
+.terminal-breadcrumb { font-size: 12px; }
+.status-bar { font-size: 11px; }
+
+/* Square, high-contrast Metro controls. */
+.metroterm-shell input:not([type='radio']), .metroterm-shell select, .metroterm-shell textarea { border: 1px solid var(--control-line); border-radius: 0; transition: border-color 0.12s ease, background-color 0.12s ease, box-shadow 0.12s ease; }
+.metroterm-shell input:not([type='radio']):focus, .metroterm-shell select:focus, .metroterm-shell textarea:focus { outline: 0; }
+.metroterm-shell input::placeholder, .metroterm-shell textarea::placeholder { color: var(--muted); opacity: 1; }
+.metroterm-shell input[type='number'] { appearance: textfield; }
+.metroterm-shell input[type='number']::-webkit-inner-spin-button, .metroterm-shell input[type='number']::-webkit-outer-spin-button { margin: 0; appearance: none; }
+.metroterm-shell select { appearance: none; padding-right: 25px; background-position: right 7px center; background-repeat: no-repeat; }
+.metroterm-shell input[type='radio'] { appearance: none; width: 12px; height: 12px; margin: 0; display: inline-grid; place-content: center; border: 1px solid var(--control-line); border-radius: 0; cursor: pointer; }
+.metroterm-shell input[type='radio']::after { content: ''; width: 5px; height: 5px; background: transparent; transform: scale(0); transition: transform 0.1s ease; }
+.metroterm-shell input[type='radio']:checked::after { transform: scale(1); }
+.metroterm-shell input[type='radio']:focus-visible { outline: 1px solid var(--focus-ring-control); outline-offset: 2px; }
+.sender-controls label { gap: 5px; padding: 0 2px; cursor: pointer; }
+.sender-controls .counter, .sender-controls .interval, .sender-controls select { padding: 0 7px; }
+.pane-filter input { height: 22px; }
+.connection-dialog input { height: 34px; }
+.sender-editor textarea { border: 0; box-shadow: none; }
+.sender-editor textarea:focus { border: 0; }
+
+/* Unified low-contrast controls: no bright border treatment. */
+.metroterm-shell input:not([type='radio']), .metroterm-shell select, .metroterm-shell textarea { border-color: var(--control-line); color: var(--control-text); background-color: var(--control-bg); box-shadow: none; caret-color: var(--control-text); }
+.metroterm-shell input:not([type='radio']):hover, .metroterm-shell select:hover, .metroterm-shell textarea:hover { border-color: var(--control-focus); background-color: var(--control-hover); }
+.metroterm-shell input:not([type='radio']):focus, .metroterm-shell select:focus, .metroterm-shell textarea:focus { border-color: var(--control-focus); background-color: var(--control-hover); box-shadow: none; }
+.metroterm-shell select { background-image: var(--select-arrow); }
+.metroterm-shell input[type='radio'] { border-color: var(--control-line); background: var(--control-bg); }
+.metroterm-shell input[type='radio']:hover, .metroterm-shell input[type='radio']:checked { border-color: var(--control-focus); }
+.metroterm-shell input[type='radio']:checked::after { background: var(--radio-dot); }
+.metroterm-shell input[type='radio']:focus-visible { outline-color: var(--focus-ring-control); }
+.sender-editor textarea:focus { box-shadow: none; }
+@media (max-width: 1150px) {
+  .status-bar { gap: 9px; }
+  .status-bar span:nth-of-type(5), .status-bar span:nth-of-type(6) { display: none; }
+}
+body.is-resizing, body.is-resizing * { cursor: inherit; }
+
+/* ===== Nested split layout: [left: top/bottom] | [right: top/bottom] ===== */
+.workbench-split { flex: 1; min-width: 0; min-height: 0; display: flex; background: var(--terminal); overflow: hidden; }
+.split { flex: 1; width: 100%; height: 100%; min-width: 0; min-height: 0; display: grid; overflow: hidden; }
+.split-horizontal { grid-template-rows: minmax(0, 1fr); }
+.split-vertical { grid-template-columns: minmax(0, 1fr); }
+.split-cell { min-width: 0; min-height: 0; display: flex; overflow: hidden; }
+.split-cell.is-hidden { display: none; }
+.split-cell > .panel, .split-cell > .split { flex: 1; }
+.split-handle { position: relative; z-index: 4; min-width: 0; min-height: 0; background: var(--line-soft); touch-action: none; }
+
+/* Own compositing layer: panels with GPU layers (scrollers with a sticky header, e.g. the Filer list) are clipped to whole device pixels — at 125 % / 150 % scaling their edge can round 1px into the handle while the overlap test (unrounded) leaves the handle in the base layer below them, so an opaque header covered the handle's first pixel column. A layer of its own keeps it on top. */
+.split-handle { will-change: transform; transform: translateZ(0); }
+.split-horizontal > .split-handle { cursor: col-resize; }
+.split-vertical > .split-handle { cursor: row-resize; }
+.split-handle::after { content: ''; position: absolute; inset: 0; }
+.split-horizontal > .split-handle::after { left: -3px; right: -3px; }
+.split-vertical > .split-handle::after { top: -3px; bottom: -3px; }
+.split-handle:hover, .split-handle:active { background: var(--split-handle-hover-bg); }
+.panel { min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; background: var(--panel); }
+.session-explorer { border-bottom: 0; }
+.panel.terminal-main { background: var(--terminal-main-bg); }
+.panel.terminal-main .terminal-stage { flex: 1; }
+.sender-pane { border-top: 0; }
+body.is-resizing, body.is-resizing * { user-select: none !important; }
+body.is-resizing-x, body.is-resizing-x * { cursor: col-resize !important; }
+body.is-resizing-y, body.is-resizing-y * { cursor: row-resize !important; }
+
+/* Explicit track placement: a hidden (display:none) cell must not shift the others into its track. */
+.split-horizontal > .split-first { grid-column: 1; grid-row: 1; }
+.split-horizontal > .split-handle { grid-column: 2; grid-row: 1; }
+.split-horizontal > .split-second { grid-column: 3; grid-row: 1; }
+.split-vertical > .split-first { grid-row: 1; grid-column: 1; }
+.split-vertical > .split-handle { grid-row: 2; grid-column: 1; }
+.split-vertical > .split-second { grid-row: 3; grid-column: 1; }
+
+/* ===== Tab strip (belongs to the terminal panel) ===== */
+.tab-bar { flex: 0 0 27px; min-width: 0; overflow: hidden; }
+.session-tabs { flex: 1 1 0; min-width: 0; display: flex; align-items: stretch; overflow: hidden; }
+.session-tab { flex: 0 1 148px; min-width: 88px; max-width: 148px; padding: 0 6px 0 9px; display: grid; grid-template-columns: auto minmax(0, 1fr) 6px 16px; align-items: center; font-size: 12px; text-align: left; }
+.session-tab i { font-size: 9px; line-height: 1; }
+.session-tab em { margin: 0; }
+.session-tab em.placeholder { visibility: hidden; }
+.session-tab b { width: 16px; height: 16px; margin: 0; display: grid; place-items: center; font-size: 12px; line-height: 1; }
+.session-tab b:hover { background: var(--tab-close-hover-bg); }
+.terminal-empty { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background: var(--terminal); color: var(--muted); font-size: 12px; }
+.terminal-empty b { color: var(--ink); font-size: 13px; font-weight: 500; letter-spacing: 0.04em; }
+.terminal-empty div { display: flex; gap: 6px; margin-top: 6px; }
+.terminal-empty button { height: 26px; padding: 0 12px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 12px; }
+.terminal-empty button:hover { background: var(--active); }
+
+/* ===== Line numbers ===== */
+.terminal-body { flex: 1; min-width: 0; min-height: 0; display: flex; }
+.terminal-body .xterm-host { padding-left: 6px; }
+.terminal-gutter { flex: 0 0 auto; padding: 8px 6px 0 8px; overflow: hidden; border-right: 1px solid var(--line-soft); background: var(--xterm-bg); color: var(--gutter-ink); font-family: 'RobotoMono Nerd Font', Consolas, 'SFMono-Regular', 'Cascadia Mono', monospace; font-size: 12px; text-align: right; user-select: none; }
+.terminal-gutter span { display: block; white-space: nowrap; }
+
+/* Text being composed by an input method, drawn at the cursor (lib/imeInput). */
+.metroterm-shell .xterm .composition-view { z-index: 6; padding: 0 1px; background: var(--xterm-bg); color: var(--composition-ink); text-decoration: underline; text-decoration-color: var(--composition-underline); text-underline-offset: 3px; }
+
+/* Chromium trims the spacing of adjacent full-width punctuation (（（, 。」) to half a character, both in xterm's width measurement (32 copies in a row) and in the rows; terminal cells must stay full. */
+.xterm { text-spacing-trim: space-all; }
+.xterm .xterm-rows .xterm-box { display: inline-block; vertical-align: top; overflow: hidden; height: calc(var(--xterm-box-h) + 2 * var(--xterm-box-pad, 0px)); margin: calc(-1 * var(--xterm-box-pad, 0px)) 0; -webkit-text-fill-color: transparent; background-color: currentColor; -webkit-mask-size: calc(100% / var(--xterm-box-n, 1)) 100%; mask-size: calc(100% / var(--xterm-box-n, 1)) 100%; -webkit-mask-repeat: repeat-x; mask-repeat: repeat-x; }
+.xterm .xterm-rows .xterm-snap { display: inline-block; }
+
+/* Row text moved to the visual middle of the row (lib/textCentering): a line box taller / shorter than the row moves the glyphs only; backgrounds, the cursor and box-drawing spans stay on the row. */
+.xterm .xterm-rows > div > span { line-height: var(--xterm-text-line); }
+.sender-editor { grid-template-columns: auto minmax(0, 1fr); font-size: 12px; }
+.sender-gutter { min-width: 34px; padding: 5px 7px 5px 8px; overflow: hidden; border-right: 1px solid var(--line-soft); background: var(--sender-bg); color: var(--gutter-ink); text-align: right; font-family: 'RobotoMono Nerd Font', Consolas, 'SFMono-Regular', 'Cascadia Mono', monospace; font-size: 12px; user-select: none; }
+.sender-gutter span { display: block; }
+.sender-editor textarea { padding: 5px 8px; font-family: 'RobotoMono Nerd Font', Consolas, 'SFMono-Regular', 'Cascadia Mono', monospace; font-size: 12px; white-space: pre; overflow: auto; }
+/* Sender → Targets: Select Session — the ticked open sessions, in a column right of the editor. */
+.sender-editor.has-targets { grid-template-columns: auto minmax(0, 1fr) minmax(150px, 30%); }
+.sender-targets { min-width: 0; min-height: 0; display: flex; flex-direction: column; border-left: 1px solid var(--line-soft); background: var(--panel); color: var(--ink); }
+.sender-targets label { display: flex; align-items: center; gap: 7px; min-width: 0; padding: 0 var(--pad-x); cursor: pointer; }
+.sender-targets-head { flex: none; height: 26px; border-bottom: 1px solid var(--line-soft); color: var(--muted); }
+.sender-targets-head span { flex: 1; min-width: 0; }
+.sender-targets-head em { color: var(--faint); font-style: normal; font-variant-numeric: tabular-nums; }
+.sender-targets-list { flex: 1; min-height: 0; overflow: auto; padding: 2px 0; }
+.sender-targets-list label { height: 24px; }
+.sender-targets-list label:hover { background: var(--hover); }
+.sender-targets-list label span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sender-targets-list label.is-current span { color: var(--ink-active); }
+.sender-targets-list p { margin: 0; padding: 6px var(--pad-x); color: var(--faint); }
+.sender-targets input[type='checkbox'] { flex: none; margin: 0; }
+
+/* Terminal gutter: [time][line number] | content */
+.terminal-gutter { width: auto; padding-left: 8px; padding-right: 6px; }
+.terminal-gutter > div { display: grid; column-gap: 10px; white-space: nowrap; }
+.terminal-gutter time { color: var(--gutter-time-ink); text-align: left; }
+.terminal-gutter span { text-align: right; }
+
+/* ===== Unified panel typography: every docked panel follows the app UI size ===== */
+.metroterm-shell { --ui-row: 25px; }
+.pane-filter input, .pane-title, .session-quickbar button, .group-row, .tree-row, .filer-path, .filer-path span, .filer-head, .filer-list button, .filer-foot, .sender-controls, .sender-controls .counter, .sender-controls .interval, .sender-controls select { font-size: var(--ui-font); }
+.filer-list time, .filer-list i, .filer-head span:last-child { font-size: var(--ui-font-small); }
+.filer-path { height: 30px; min-height: 30px; }
+.filer-path button { font-size: 13px; }
+.filer-head { height: var(--ui-row); min-height: var(--ui-row); grid-template-columns: minmax(0, 1fr) 132px; }
+.filer-list button { height: var(--ui-row); grid-template-columns: minmax(0, 1fr) 132px; }
+.sender-controls { height: 32px; min-height: 32px; gap: 7px; }
+.sender-controls > button { font-size: 13px; }
+.sender-controls .counter, .sender-controls .interval, .sender-controls select { height: 24px; }
+.sender-controls .counter { width: 52px; }
+
+/* Shell content: keep the original outer frame (gray margin around the black surface), and add an inner inset inside the black surface so text never touches its edges. */
+.terminal-body { background: var(--terminal); }
+.terminal-body .xterm-host { padding: var(--xterm-frame-y) var(--xterm-frame-x); background: var(--terminal); }
+.terminal-body .xterm { height: 100%; box-sizing: border-box; padding: var(--xterm-inset-y) var(--xterm-inset-x); background: var(--xterm-bg); }
+.terminal-gutter { padding-top: calc(var(--xterm-frame-y) + var(--xterm-inset-y)); }
+
+/* ===== Custom select (Metro, square, low-contrast gray) ===== */
+.ui-select { position: relative; display: inline-flex; }
+.ui-select-trigger { width: 100%; height: 24px; display: flex; align-items: center; gap: 8px; padding: 0 8px 0 9px; border: 1px solid var(--control-line); background: var(--control-bg); color: var(--control-text); font-size: var(--ui-font, 12px); text-align: left; cursor: pointer; }
+.ui-select-trigger span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ui-select-trigger svg { flex: 0 0 10px; width: 10px; height: 10px; stroke: var(--muted); stroke-width: 1.4; transition: transform 0.12s ease; }
+.ui-select-trigger:hover, .ui-select.is-open .ui-select-trigger { border-color: var(--control-focus); background: var(--control-hover); }
+.ui-select.is-open .ui-select-trigger svg { transform: rotate(180deg); }
+.ui-select-trigger:focus-visible { outline: 0; border-color: var(--control-focus); }
+.ui-select-menu { position: fixed; z-index: 1000; max-height: 260px; margin: 0; padding: 4px 0; overflow-y: auto; list-style: none; border: 1px solid var(--menu-line); background: var(--menu-bg); box-shadow: var(--menu-shadow); }
+.ui-select-menu li { height: 30px; display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; align-items: center; column-gap: 8px; padding: 0 12px 0 9px; color: var(--control-text); font-size: var(--ui-font, 12px); white-space: nowrap; cursor: pointer; }
+.ui-select-menu li i { color: var(--muted); font-size: 7px; font-style: normal; text-align: center; }
+.ui-select-menu li span { overflow: hidden; text-overflow: ellipsis; }
+.ui-select-menu li small { color: var(--muted); font-size: var(--ui-font-small, 11px); }
+.ui-select-menu li.is-selected { background: var(--menu-selected); color: var(--ink); }
+.ui-select-menu li.is-active { background: var(--menu-hover); color: var(--ink-active); border-left-color: var(--violet); }
+.ui-select-menu li.is-disabled { color: var(--faint); cursor: default; }
+.sender-target { width: 200px; }
+
+/* ===== Numeric input with steppers ===== */
+.ui-number { position: relative; height: 24px; display: inline-flex; align-items: stretch; border: 1px solid var(--control-line); background: var(--control-bg); color: var(--control-text); }
+.ui-number:hover { border-color: var(--control-focus); background: var(--control-hover); }
+.ui-number.is-focused { border-color: var(--control-focus); background: var(--control-hover); }
+.metroterm-shell .ui-number input { flex: 1; min-width: 0; height: 100%; padding: 0 2px 0 8px; border: 0; background: transparent; color: inherit; font-size: var(--ui-font, 12px); font-variant-numeric: tabular-nums; text-align: right; box-shadow: none; }
+.metroterm-shell .ui-number input:hover, .metroterm-shell .ui-number input:focus { border: 0; background: transparent; box-shadow: none; outline: 0; }
+.ui-number-suffix { display: flex; align-items: center; padding: 0 2px 0 1px; color: var(--muted); font-size: var(--ui-font, 12px); }
+.ui-number-steppers { flex: 0 0 16px; display: flex; flex-direction: column; margin-left: 4px; border-left: 1px solid var(--control-line); }
+.sender-controls .ui-number-steppers button, .ui-number-steppers button { flex: 1; width: 16px; height: auto; min-height: 0; display: grid; place-items: center; padding: 0; color: var(--muted); background: transparent; }
+.ui-number-steppers button + button { border-top: 1px solid var(--control-line); }
+.ui-number-steppers button:hover:not(:disabled) { color: var(--ink); background: var(--menu-hover); }
+.ui-number-steppers button:active:not(:disabled) { background: var(--control-line); }
+.ui-number-steppers button:disabled { opacity: 0.35; cursor: default; }
+.ui-number-steppers svg { width: 8px; height: 5px; stroke: currentColor; stroke-width: 1.3; }
+.sender-count { width: 64px; }
+.sender-interval { width: 84px; }
+
+/* ===== Unified icon alignment (SVG line icons, 16-grid) ===== */
+.icon { display: block; flex: 0 0 auto; overflow: visible; }
+.window-controls button, .menu-tools button, .pane-title button, .pane-filter button, .session-quickbar button, .tree-row-actions button, .filer-path button, .filer-foot-actions button, .toolbar-icons button, .toolbar-right button, .sender-controls > button, .status-bar button, .status-bar a, .status-bar span, .terminal-empty button, .icon-button, .primary-button, .dialog-title button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; line-height: 1; }
+.pane-title > span { display: inline-flex; align-items: center; }
+.pane-title > span .icon { color: var(--muted); }
+.window-controls button { width: 40px; height: 100%; }
+.menu-tools button { height: 100%; padding: 0 9px; }
+.menu-tools button .icon { color: var(--muted); }
+.menu-tools button:hover .icon { color: var(--ink); }
+.tree-row > i, .session-tab > i, .group-row > i, .filer-list i, .status-bar i, .app-mark i { display: inline-flex; align-items: center; justify-content: center; font-size: 0; line-height: 0; }
+.group-row > i { color: var(--muted); }
+.tree-row-actions { display: flex; align-items: center; }
+.tree-row-actions button { color: var(--row-dim-ink); }
+.tree-row-actions button:hover { color: var(--row-action-hover-ink); background: var(--row-action-hover-bg); }
+.filer-path b { margin-right: 4px; }
+.filer-path button { color: var(--muted); }
+.filer-path button:hover { color: var(--ink); background: var(--active); }
+.filer-list i { color: var(--filer-icon-ink); }
+.filer-foot-actions { margin-left: auto; display: inline-flex; }
+.filer-foot-actions button { color: var(--muted); }
+.filer-foot-actions button:hover { color: var(--ink); background: var(--active); }
+.toolbar-icons { gap: 2px; }
+.toolbar-icons button, .toolbar-right button { width: 26px; height: 26px; color: var(--muted); }
+.toolbar-icons button:hover, .toolbar-right button:hover { color: var(--ink); background: var(--button-hover-bg); }
+.toolbar-icons i { height: 16px; width: 1px; margin: 0 5px; background: var(--line); }
+.toolbar-right { gap: 2px; }
+.terminal-breadcrumb b { display: inline-flex; align-items: center; color: var(--faint); }
+.session-tab b { color: var(--muted); }
+.session-tab b .icon { width: 11px; height: 11px; }
+.sender-controls > button { color: var(--muted); }
+.sender-controls > button:hover { color: var(--sender-button-hover-ink); background: var(--active); }
+.sender-controls > button.play { color: var(--sender-play); }
+.status-bar span, .status-bar a { gap: 5px; }
+.status-bar span > span { display: inline; }
+.status-bar i, .status-bar .icon { color: var(--muted); }
+.status-bar button { width: 22px; height: 22px; color: var(--muted); }
+.status-bar button:hover { color: var(--ink); }
+.status-bar .status-theme { color: var(--status-theme-ink); }
+.status-bar .status-theme:hover { color: var(--status-theme-hover-ink); }
+.app-mark { display: flex; align-items: center; gap: 8px; }
+.app-mark i { color: var(--muted); }
+.terminal-empty button { gap: 6px; }
+.primary-button { gap: 8px; }
+.icon-button, .dialog-title button { width: 24px; height: 24px; }
+.filer-list button > span i { display: inline-flex; vertical-align: middle; position: relative; top: -1px; }
+
+/* ===================================================================== Global UI font settings — single source of truth. Sizes are rem-based, so they follow the OS / browser font-size setting (100% = 16px → 0.75rem = 12px). Filer and Sender inherit everything from here; they no longer carry their own font family or px sizes. ===================================================================== */
+html { font-size: 100%; }
+.metroterm-shell { --ui-font-family: 'RobotoMono Nerd Font', 'Cascadia Mono', 'SFMono-Regular', Consolas, monospace; --ui-font: 0.75rem; --ui-font-small: 0.75rem; --ui-line: 1.5; font-family: var(--ui-font-family); }
+.filer-pane, .sender-pane { font-family: var(--ui-font-family); font-size: var(--ui-font); }
+.filer-pane *, .sender-pane *, .sender-pane .ui-select-menu * { font-family: inherit !important; font-size: inherit !important; }
+.sender-gutter, .sender-editor textarea { line-height: calc(var(--ui-line) * 1em) !important; }
+.sender-gutter span { height: calc(var(--ui-line) * 1em); }
+.filer-list time, .filer-head span:last-child { color: var(--muted); }
+.filer-list time { color: var(--row-dim-ink); }
+
+/* ===================================================================== Horizontal icon alignment — one column grid for every panel row. - Leading icons/text start at --pad-x from the panel edge. - Trailing icon buttons are --btn wide; their icons end at --pad-x. - Tree levels indent by exactly one icon + gap, so a child's icon sits
+     under its parent's label text. ===================================================================== */
+.metroterm-shell { --pad-x: 8px; --icon: 14px; --icon-gap: 8px; --btn: 22px; --btn-inset: calc((var(--btn) - var(--icon)) / 2); --indent: calc(var(--icon) + var(--icon-gap)); }
+.tree-row > i .icon, .session-tab > i .icon, .filer-list i .icon, .group-row > i .icon { width: var(--icon); height: var(--icon); }
+
+/* panel headers */
+.pane-title { padding: 0 calc(var(--pad-x) - var(--btn-inset)) 0 var(--pad-x); }
+.pane-title > div { display: flex; align-items: center; gap: 0; }
+.pane-title button { width: var(--btn); height: var(--btn); }
+
+/* explorer */
+.pane-filter { gap: 4px; padding: 0 calc(var(--pad-x) - var(--btn-inset)) 0 var(--pad-x); }
+.pane-filter button { width: var(--btn); height: var(--btn); }
+.session-quickbar { gap: 4px; padding: 0 var(--pad-x) 0 calc(var(--pad-x) - var(--btn-inset)); }
+.session-quickbar button { min-width: var(--btn); height: var(--btn); padding: 0 var(--btn-inset); gap: var(--icon-gap); }
+.group-row { gap: var(--icon-gap); padding: 0 var(--pad-x) 0 calc(var(--pad-x) + var(--indent)); }
+.group-row > i { width: var(--icon); }
+.group-row small { margin-left: auto; padding-right: calc(var(--btn-inset)); }
+.tree-row, .tree-row.nested { gap: var(--icon-gap); padding: 0 calc(var(--pad-x) - var(--btn-inset)) 0 calc(var(--pad-x) + 2 * var(--indent) - 2px); }
+.tree-row > i { width: var(--icon); }
+.tree-row small { padding-right: 4px; }
+.tree-row-actions { gap: 0; }
+.tree-row-actions button { width: var(--btn); height: var(--btn); }
+
+/* filer */
+.filer-path { padding: 0 calc(var(--pad-x) - var(--btn-inset)) 0 var(--pad-x); }
+.filer-path button { width: var(--btn); height: var(--btn); }
+.filer-head, .filer-list button { padding: 0 var(--pad-x); }
+.filer-head span:first-child { padding-left: var(--indent); }
+.filer-list i { width: var(--icon); margin-right: var(--icon-gap); }
+.filer-foot { padding: 0 calc(var(--pad-x) - var(--btn-inset)) 0 var(--pad-x); }
+.filer-foot-actions { gap: 0; }
+.filer-foot-actions button { width: var(--btn); height: var(--btn); }
+
+/* sender */
+.sender-controls { padding: 0 var(--pad-x) 0 calc(var(--pad-x) - var(--btn-inset)); }
+.sender-controls > button { width: var(--btn); height: var(--btn); }
+.sender-gutter { padding-left: var(--pad-x); }
+
+/* terminal panel: tabs + toolbar */
+.session-tab { padding-left: var(--pad-x); column-gap: var(--icon-gap); }
+.toolbar-icons { padding: 0 0 0 calc(var(--pad-x) - 6px); }
+.toolbar-right { padding: 0 calc(var(--pad-x) - 6px) 0 0; }
+.status-bar { padding: 0 calc(var(--pad-x) - var(--btn-inset)) 0 var(--pad-x); }
+.tree-row-actions { padding-right: 0; margin-left: 0; }
+.tree-row small { margin-left: auto; }
+
+/* Selected / active states: background only, no left marker line. */
+.tree-row, .tree-row.nested { border-left: 0; padding-left: calc(var(--pad-x) + 2 * var(--indent)); }
+.tree-row.active { border-left: 0; }
+.ui-select-menu li { border-left: 0; padding-left: 11px; }
+.ui-select-menu li.is-active { border-left: 0; }
+.sender-pane .ui-select-menu li i { font-size: 7px !important; }
+
+/* Panel title marker: a plain color block instead of an icon (keeps the 14px icon column). */
+.pane-title > span { gap: 0; }
+.pane-swatch { flex: 0 0 auto; width: 8px; height: 8px; margin-right: 6px; background: var(--pane-swatch); }
+
+/* Title bar: logo mark only, no product text. */
+.app-mark { min-width: 0; padding-right: 4px; }
+
+/* ===== Panel Settings menu ===== */
+.menu-button { position: relative; display: inline-flex; }
+.menu-button.is-open > button { color: var(--ink); background: var(--active); }
+.ui-menu { min-width: 200px; }
+.ui-menu li i { display: inline-flex; align-items: center; justify-content: center; width: var(--icon, 14px); }
+.ui-menu li i .icon { width: var(--icon, 14px); height: var(--icon, 14px); color: var(--muted); }
+.ui-menu li.is-active i .icon { color: var(--ink); }
+.ui-menu-check { display: block; width: 6px; height: 6px; background: var(--menu-check); }
+.ui-select-menu li.ui-menu-separator { height: 1px; min-height: 1px; margin: 4px 0; padding: 0; background: var(--menu-line); cursor: default; }
+
+/* ===== Persistent panel hosts (panels survive split / close re-parenting) ===== */
+.panel-slot, .panel-host { flex: 1; min-width: 0; min-height: 0; display: flex; overflow: hidden; }
+.panel-host > .panel, .workbench-split > .panel-slot { flex: 1; min-width: 0; min-height: 0; }
+
+/* ===== Empty panel (new Split halves / closed panels) ===== */
+.pane-title-empty { color: var(--faint); }
+.empty-pane { background: var(--panel); }
+.panel-empty { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: var(--faint); font-size: var(--ui-font); user-select: none; }
+.panel-empty > div { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.panel-empty > span { max-width: 340px; padding: 0 16px; text-align: center; line-height: 1.5; }
+.panel-empty button { height: 24px; padding: 0 10px; border: 1px solid var(--panel-empty-button-line); background: transparent; color: var(--muted); font-size: var(--ui-font); }
+.panel-empty button:hover { border-color: var(--line); background: var(--button-hover-bg); color: var(--ink); }
+
+/* ===== Panel tabs (views opened from Settings) ===== */
+.content-pane > .pane-title { padding-left: 0; gap: 8px; }
+.pane-tabs { min-width: 0; height: 100%; display: flex; align-items: stretch; overflow: hidden; }
+.pane-tabs > .pane-title-empty { display: inline-flex; align-items: center; padding-left: var(--pad-x); }
+.pane-title .pane-tab { width: auto; height: 100%; display: inline-flex; align-items: center; gap: 0; padding: 0 4px 0 var(--pad-x); border-right: 1px solid var(--line-soft); color: var(--muted); white-space: nowrap; }
+.pane-title .pane-tab:hover { color: var(--ink); background: var(--button-hover-bg); }
+.pane-title .pane-tab.active { color: var(--ink-active); background: var(--panel); }
+.pane-title .pane-tab > b { width: 16px; height: 16px; margin-left: 6px; align-items: center; justify-content: center; color: var(--muted); visibility: hidden; }
+.pane-title .pane-tab:hover > b, .pane-title .pane-tab.active > b { visibility: visible; }
+.pane-title .pane-tab > b:hover { color: var(--ink); background: var(--active); }
+.pane-actions { flex: 0 0 auto; }
+.pane-tab-body { flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; border: 0; }
+.pane-tab-body[hidden], .tmux-pane[hidden], .terminal-instance[hidden] { display: none !important; }
+/* ===== tmux panes (lib/tmux.ts): each pane is a tab group with its own tab bar and toolbar ===== */
+/* Panes are placed by App (tmuxStyle); a pane off the left / top edge leaves 1px that shows --tmux-line. */
+.tmux-stage { position: relative; background: var(--tmux-line); }
+.tmux-pane { position: absolute; inset: 0; min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; background: var(--terminal); }
+.tmux-body { flex: 1 1 0; min-width: 0; min-height: 0; display: flex; }
+/* Each terminal is placed over its pane's body (measured), above the pane frames. */
+.terminal-instance { position: absolute; z-index: 1; min-width: 0; min-height: 0; display: flex; background: var(--terminal); }
+/* Pane letter (split only) at the right of the pane toolbar, before ☆: a 26px cell like the icon buttons, glyph centred. */
+/* Pane letter (components/PaneLetter): an SVG in the 26px button grid, its glyph placed from the measured ink so it centres on the icons' point whatever the font. */
+.tmux-letter { width: 26px; height: 26px; display: inline-flex; flex: none; font-size: 12px; color: var(--tmux-letter-ink); user-select: none; }
+.tmux-letter svg { display: block; overflow: visible; }
+.tmux-letter text { font: inherit; }
+.tmux-stage.is-split .tmux-pane.is-focused .tmux-letter { color: var(--tmux-focus-line); font-weight: 600; }
+.tmux-stage.is-split .tmux-pane:not(.is-focused) .session-tab.active { color: var(--tmux-idle-tab-ink); }
+.tmux-splitter { position: absolute; z-index: 7; }
+.tmux-splitter.is-row { width: 6px; margin-left: -3px; cursor: col-resize; }
+.tmux-splitter.is-column { height: 6px; margin-top: -3px; cursor: row-resize; }
+/* No visible handle: only the resize cursor (kept on the whole page while dragging). */
+html.is-tmux-resizing-row, html.is-tmux-resizing-row * { cursor: col-resize !important; user-select: none; }
+html.is-tmux-resizing-column, html.is-tmux-resizing-column * { cursor: row-resize !important; user-select: none; }
+.status-bar .status-prefix { padding: 1px 6px; font-style: normal; font-weight: 600; color: var(--status-prefix-ink); background: var(--status-prefix-bg); }
+.tree-row { user-select: none; }
+
+/* Tabs shrink (label ellipsis) when the panel is narrow, instead of being cut off. */
+.pane-title .pane-tab { flex: 0 1 auto; min-width: 52px; overflow: hidden; }
+.pane-title .pane-tab > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.pane-title .pane-tab > b, .pane-title .pane-tab > .pane-swatch { flex: 0 0 auto; }
+
+/* Close × only takes space on the active tab, so inactive labels keep their room. */
+.pane-title .pane-tab > b { display: none; }
+.pane-title .pane-tab.active > b { display: inline-flex; visibility: visible; }
+.pane-title .pane-tab:not(.active) { padding-right: 8px; }
+.pane-title .pane-tab.active { flex-shrink: 0; }
+.pane-title .pane-tab:not(.active) { min-width: 40px; }
+
+/* Split-created splitters disappear completely while one side is hidden. */
+.split-handle.is-hidden { visibility: hidden; pointer-events: none; }
+
+/* Select options (e.g. Targets / Current Session): no marker block on the left; the selected option is shown by its background only. (Panel Settings menus keep their own check column.) */
+.ui-select-menu:not(.ui-menu) li { grid-template-columns: minmax(0, 1fr) auto; padding-left: 11px; }
+
+/* ===== Terminal toolbar: icon groups wrap to new rows when the panel is narrow ===== */
+.terminal-toolbar { height: auto; min-height: 39px; flex: 0 0 auto; flex-wrap: wrap; align-items: center; align-content: center; row-gap: 6px; padding: 6px 0; overflow: visible; }
+.toolbar-icons, .toolbar-right { height: auto; flex: 0 0 auto; flex-wrap: wrap; row-gap: 4px; }
+.terminal-breadcrumb { flex: 1 1 220px; min-width: 160px; overflow: hidden; white-space: nowrap; }
+.terminal-breadcrumb > span, .terminal-breadcrumb > strong { overflow: hidden; text-overflow: ellipsis; }
+.toolbar-right { margin-left: auto; }
+
+/* Explorer quick actions wrap the same way. */
+.session-quickbar { height: auto; min-height: 29px; flex-wrap: wrap; row-gap: 2px; padding-top: 3px; padding-bottom: 3px; }
+.terminal-breadcrumb { margin: 0 8px; }
+
+/* ===== Filer path input ===== */
+.filer-path { gap: 2px; }
+.filer-path .filer-path-input { flex: 1; min-width: 0; height: 22px; margin-right: 4px; padding: 0 6px; font: inherit; font-size: inherit; }
+.filer-path button:disabled { opacity: 0.4; cursor: default; background: transparent; }
+
+/* ===== Unified row hover (Explorer = reference; SFTP file rows and Filer rows match it) ===== */
+.metroterm-shell .tree-row:hover, .metroterm-shell .filer-list button:hover { background: var(--hover); }
+
+/* ===== Larger file / folder icons in Filer ===== */
+.metroterm-shell { --file-icon: 18px; }
+.metroterm-shell .filer-list button > span i { width: var(--file-icon); height: var(--file-icon); margin-right: var(--icon-gap); }
+.metroterm-shell .filer-list i .icon { width: var(--file-icon); height: var(--file-icon); }
+.metroterm-shell .filer-list button > span i { vertical-align: middle; top: 0; }
+.metroterm-shell .filer-head span:first-child { padding-left: 0; }
+
+/* ===== Window controls: clear hover / pressed states (esp. light theme) ===== */
+.metroterm-shell .window-controls button { transition: background-color 0.08s linear, color 0.08s linear; }
+.metroterm-shell .window-controls button:active { background: var(--window-button-active-bg); color: var(--n-ff); }
+.metroterm-shell .window-controls button:last-child:hover { background: var(--window-close-hover); color: var(--window-close-ink); }
+.metroterm-shell .window-controls button:last-child:active { background: var(--window-close-active); color: var(--window-close-ink); }
+
+/* ===== SFTP: live browser (selection, messages, dialogs, transfers) ===== */
+.metroterm-shell .status-dot { display: inline-block; flex: 0 0 auto; width: 6px; height: 6px; border-radius: 50%; background: var(--faint); }
+.metroterm-shell .status-dot.online { background: var(--accent-online); }
+.metroterm-shell .status-dot.error { background: var(--error-dot); }
+.metroterm-shell .file-message { display: flex; align-items: center; gap: 8px; padding: 14px 12px; color: var(--muted); font-size: var(--ui-font); }
+.metroterm-shell .file-message.is-error { color: var(--file-error-ink); line-height: 1.5; }
+.metroterm-shell .file-message.is-error b { font-weight: 400; }
+.metroterm-shell .file-message button { margin-left: auto; height: 22px; padding: 0 8px; border: 1px solid var(--line); color: var(--muted); font-size: var(--ui-font); white-space: nowrap; }
+.metroterm-shell .file-message button:hover { color: var(--ink); background: var(--active); }
+/* Filer transfers (components/FilerTransfers): one notice per batch above the footer — title, overall bar, the files (multi-file), then the result. */
+.metroterm-shell .filer-transfers:empty { display: none; }
+.metroterm-shell .filer-transfers { flex: none; display: flex; flex-direction: column; container-type: inline-size; border-top: 1px solid var(--bar-line); font-size: var(--ui-font-small); }
+.metroterm-shell .filer-transfer + .filer-transfer { border-top: 1px solid var(--line-soft); }
+.metroterm-shell .filer-transfer header { height: 28px; display: flex; align-items: center; gap: 6px; padding: 0 calc(var(--pad-x) - var(--btn-inset)) 0 var(--pad-x); }
+.metroterm-shell .filer-transfer-title { flex: 1 1 auto; min-width: 0; height: 22px; display: inline-flex; align-items: center; gap: 6px; padding: 0; color: var(--ink); font-size: var(--ui-font-small); text-align: left; }
+.metroterm-shell .filer-transfer-title:disabled { cursor: default; opacity: 1; }
+.metroterm-shell .filer-transfer-title span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.metroterm-shell .filer-transfer-title svg { flex: none; color: var(--muted); }
+.metroterm-shell .filer-transfer-icon { flex: none; width: 12px; display: inline-flex; justify-content: center; color: var(--transfer-bar); font-style: normal; }
+.metroterm-shell .filer-transfer.is-done .filer-transfer-icon { color: var(--transfer-ok-ink); }
+.metroterm-shell .filer-transfer.is-error .filer-transfer-icon, .metroterm-shell .filer-transfer.is-error .filer-transfer-title span { color: var(--transfer-error-ink); }
+.metroterm-shell .filer-transfer.is-warning .filer-transfer-icon { color: var(--muted); }
+.metroterm-shell .filer-transfer header small { flex: none; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.metroterm-shell .filer-transfer-action { flex: none; height: 20px; padding: 0 7px; border: 1px solid var(--line); color: var(--muted); font-size: var(--ui-font-small); white-space: nowrap; }
+.metroterm-shell .filer-transfer-action:hover:not(:disabled) { color: var(--ink); background: var(--active); }
+.metroterm-shell .filer-transfer-close { flex: none; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; color: var(--muted); }
+.metroterm-shell .filer-transfer-close:hover { color: var(--ink); background: var(--active); }
+.metroterm-shell .filer-transfer-bar { height: 2px; margin: 0 var(--pad-x); background: var(--transfer-track); }
+.metroterm-shell .filer-transfer-bar i { display: block; height: 100%; background: var(--transfer-bar); transition: width 0.15s linear; }
+.metroterm-shell .filer-transfer.is-done .filer-transfer-bar i { background: var(--transfer-ok-ink); }
+.metroterm-shell .filer-transfer.is-error .filer-transfer-bar i { background: var(--transfer-error-ink); }
+.metroterm-shell .filer-transfer-list { max-height: 132px; margin: 4px 0 0; padding: 0 0 4px; overflow-y: auto; overscroll-behavior: contain; list-style: none; }
+.metroterm-shell .filer-transfer-list li { position: relative; height: 22px; display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; align-items: center; column-gap: 6px; padding: 0 var(--pad-x); color: var(--muted); }
+.metroterm-shell .filer-transfer-list li > i { font-style: normal; text-align: center; }
+.metroterm-shell .filer-transfer-list li > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.metroterm-shell .filer-transfer-list li > small { max-width: 60cqi; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.metroterm-shell .filer-transfer-list li.is-running { color: var(--ink); }
+.metroterm-shell .filer-transfer-list li.is-running > i::before { content: ''; display: inline-block; width: 7px; height: 7px; border: 1.5px solid var(--transfer-track); border-top-color: var(--transfer-bar); border-radius: 50%; animation: transfer-spin 0.8s linear infinite; }
+.metroterm-shell .filer-transfer-list li.is-done > i { color: var(--transfer-ok-ink); }
+.metroterm-shell .filer-transfer-list li.is-error, .metroterm-shell .filer-transfer-list li.is-error > i { color: var(--transfer-error-ink); }
+.metroterm-shell .filer-transfer-item-bar { position: absolute; left: var(--pad-x); bottom: 1px; height: 1px; background: var(--transfer-bar); transition: width 0.15s linear; }
+.metroterm-shell .filer-transfer-reason { margin: 4px 0 0; padding: 0 var(--pad-x) 6px calc(var(--pad-x) + 18px); color: var(--transfer-error-ink); overflow-wrap: anywhere; }
+@keyframes transfer-spin { to { transform: rotate(360deg); } }
+/* Narrow Filer: the title wins over the byte count. */
+@container (max-width: 340px) { .metroterm-shell .filer-transfer header small { display: none; } }
+.metroterm-shell .file-dialog { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; padding: 16px; background: var(--file-dialog-backdrop); }
+.metroterm-shell .file-dialog form { width: min(360px, 100%); display: grid; gap: 10px; padding: 14px; border: 1px solid var(--line); background: var(--panel); box-shadow: 8px 8px 0 var(--shadow-file-form); font-size: var(--ui-font); }
+.metroterm-shell .file-dialog b { color: var(--muted); font-weight: 500; letter-spacing: 0.08em; }
+.metroterm-shell .file-dialog p { color: var(--ink); line-height: 1.6; }
+.metroterm-shell .file-dialog code { padding: 0 4px; background: var(--active); }
+.metroterm-shell .file-dialog input { height: 30px; padding: 0 8px; border: 1px solid var(--control-line); background: var(--control-bg); color: var(--ink); font: inherit; outline: 0; }
+.metroterm-shell .file-dialog input:focus { border-color: var(--control-focus); }
+.metroterm-shell .file-dialog form > div { display: flex; justify-content: flex-end; gap: 6px; }
+.metroterm-shell .file-dialog button { height: 26px; padding: 0 12px; border: 1px solid var(--line); color: var(--muted); font-size: var(--ui-font); }
+.metroterm-shell .file-dialog button:hover { color: var(--ink); background: var(--active); }
+.metroterm-shell .file-dialog button.danger { border-color: var(--danger); background: var(--danger); color: var(--n-ff); }
+.metroterm-shell .file-dialog button.danger:hover { background: var(--danger-hover); }
+
+/* ===== New session dialog: session type switch ===== */
+.connection-dialog .segmented { display: flex; margin: 12px 12px 0; border: 1px solid var(--control-line); }
+.connection-dialog .segmented button { flex: 1; height: 28px; color: var(--muted); font-size: 11px; letter-spacing: 0.06em; }
+.connection-dialog .segmented button + button { border-left: 1px solid var(--control-line); }
+.connection-dialog .segmented button:hover { color: var(--ink); background: var(--control-hover); }
+.connection-dialog .segmented button.is-active { color: var(--ink-active); background: var(--active); box-shadow: var(--choice-active-shadow); }
+.connection-dialog .ui-select { width: 100%; }
+.connection-dialog label { font-size: 11px; }
+.connection-dialog p { font-size: 11px; }
+
+/* ===== Auth prompt (password / passphrase / host key) ===== */
+.auth-backdrop { z-index: 40; }
+.auth-dialog .auth-target { display: flex; align-items: center; gap: 8px; margin: 12px 12px 0; padding: 8px 10px; border: 1px solid var(--line-soft); color: var(--ink); font-size: 12px; }
+.auth-dialog .auth-target .icon { color: var(--muted); }
+.auth-dialog .auth-target small { margin-left: auto; color: var(--muted); font-size: 11px; }
+.connection-dialog .auth-message { padding: 10px 12px 0; color: var(--ink); font-size: 12px; line-height: 1.6; white-space: normal; word-break: break-word; }
+.auth-dialog .auth-message code { padding: 0 4px; background: var(--active); font-size: 11px; }
+.auth-dialog .auth-actions { display: flex; justify-content: flex-end; align-items: center; gap: 6px; padding: 12px; }
+.auth-dialog .auth-actions > button:not(.primary-button) { height: 34px; padding: 0 12px; border: 1px solid var(--line); color: var(--muted); font-size: 10px; letter-spacing: 0.06em; }
+.auth-dialog .auth-actions > button:not(.primary-button):hover { color: var(--ink); background: var(--active); }
+.auth-dialog .auth-actions .primary-button { width: auto; margin: 0; padding: 0 14px; display: inline-flex; align-items: center; }
+.auth-dialog .auth-queue { display: block; padding: 0 12px 10px; color: var(--faint); font-size: 10px; }
+
+/* SFTP error banner: sits above the listing, which still shows the folder in the path box */
+.metroterm-shell .file-message.is-error { padding: 7px 8px 7px 12px; border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--error-dot) 9%, transparent); align-items: center; }
+.metroterm-shell .file-message.is-error .file-message-text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.metroterm-shell .file-message.is-error button { margin-left: 0; }
+.metroterm-shell .file-message .file-message-close { border-color: transparent; }
+
+/* Tooltip: replaces every native title tooltip (see TooltipLayer). Same surface as dropdown menus. */
+.ui-tip { position: fixed; z-index: 200; display: flex; align-items: center; gap: 12px; max-width: min(420px, calc(100vw - 12px)); min-height: 24px; padding: 4px 8px; border: 1px solid var(--tip-line); border-radius: 0; background: var(--tip-bg); color: var(--tip-ink); box-shadow: var(--tip-shadow); font-family: var(--ui-font-family); font-size: var(--ui-font-small); line-height: 16px; pointer-events: none; user-select: none; }
+.ui-tip-text { min-width: 0; white-space: pre-line; overflow-wrap: anywhere; }
+.ui-tip kbd { flex: none; margin-left: auto; padding: 0 4px; border: 1px solid var(--tip-line); color: var(--tip-key); font: inherit; font-size: 10px; line-height: 14px; }
+/* Popups (menus, menu search, tooltips, dialogs, transfer notices) animate in and out from lib/popupMotion; a closing one keeps .is-leaving while it fades. */
+.is-leaving { pointer-events: none; }
+@media (prefers-reduced-motion: reduce) {
+  .session-tab.active::before { animation: none; }
+  .filer-transfer-list li.is-running > i::before { animation: none; }
+}
+
+/* Filer: the real file browser (local disk or SFTP, following the active session) */
+.filer-pane { container-type: inline-size; }
+.metroterm-shell .filer-browser { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.metroterm-shell .filer-path button.is-on { color: var(--ink); background: var(--active); }
+.metroterm-shell .filer-path .menu-button > button { width: var(--btn); height: var(--btn); display: inline-flex; align-items: center; justify-content: center; color: var(--muted); }
+.metroterm-shell .filer-path .menu-button > button:hover, .metroterm-shell .filer-path .menu-button.is-open > button { color: var(--ink); background: var(--active); }
+.metroterm-shell .filer-path button:disabled { opacity: 0.35; }
+.metroterm-shell .filer-list { position: relative; outline: 0; }
+/* Rows show selection by their background only (no outline / border, also with several picked). */
+.metroterm-shell .filer-list button:focus-visible { outline: 0; }
+.metroterm-shell .filer-list button > time { color: var(--muted); font-size: var(--ui-font-small); white-space: nowrap; }
+.metroterm-shell .filer-list button:hover { background: var(--hover); }
+.metroterm-shell .filer-list button.selected, .metroterm-shell .filer-list button.selected:hover { background: var(--filer-selected-bg); }
+.metroterm-shell .xterm-host { position: relative; }
+/* Files from the file manager hovering a drop target (lib/fileDrop): a mask over the target with what dropping does, no outline. */
+.file-drop-overlay { position: fixed; z-index: 900; display: flex; align-items: center; justify-content: center; padding: 12px; background: var(--file-drop-mask); color: var(--file-drop-ink); pointer-events: none; text-align: center; font-family: var(--ui-font-family); font-size: var(--ui-font); animation: file-drop-in 0.08s ease-out; }
+@keyframes file-drop-in { from { opacity: 0; } }
+.file-drop-overlay[hidden] { display: none; }
+.file-drop-overlay span { max-width: 100%; font-size: var(--ui-font-small); letter-spacing: 0.02em; overflow-wrap: anywhere; }
+.metroterm-shell .filer-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.metroterm-shell .filer-name.is-hidden-file { opacity: 0.62; }
+.metroterm-shell .filer-list .file-message { white-space: normal; }
+.metroterm-shell .filer-foot { position: relative; gap: 6px; }
+.metroterm-shell .filer-foot-text { min-width: 0; flex: 1; display: flex; align-items: center; gap: 6px; overflow: hidden; color: var(--muted); text-overflow: ellipsis; white-space: nowrap; }
+.metroterm-shell .filer-foot .filer-foot-actions { flex: none; margin-left: 0; color: inherit; }
+.metroterm-shell .filer-foot .menu-button > button { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; color: var(--muted); }
+.metroterm-shell .filer-foot .menu-button > button:hover, .metroterm-shell .filer-foot .menu-button.is-open > button { color: var(--ink); background: var(--active); }
+.metroterm-shell .filer-browser .file-dialog form { width: min(320px, 100%); }
+.metroterm-shell .tree-row.is-missing > span, .metroterm-shell .tree-row.is-missing > i { opacity: 0.45; }
+.ui-context-menu { outline: 0; }
+.terminal-gutter > .terminal-gutter-sizer { height: 0; overflow: hidden; visibility: hidden; margin-top: var(--gutter-shift, 0px); }
+
+/* Filer dialogs (new folder / rename / delete): window-level, same look as the auth / new-session dialogs */
+.file-op-backdrop { z-index: 30; }
+.file-op-dialog .auth-target span { flex: none; }
+.file-op-dialog .auth-target small { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-op-dialog .primary-button.is-danger { background: var(--danger-button-bg); color: var(--danger-button-ink); }
+.file-op-dialog .primary-button.is-danger:hover { background: var(--danger-button-hover-bg); }
+
+/* Filer details table: Name · Date Modified · Type · Size · Permissions · Owner · Group. All columns are always shown; a narrow panel scrolls horizontally, the header stays on top. */
+.metroterm-shell .filer-browser { --filer-cols: minmax(150px, 1fr) 124px 104px 64px 88px 68px 68px; --filer-min: 760px; }
+.metroterm-shell .filer-list { overflow: auto; scroll-padding-top: var(--ui-row); }
+.metroterm-shell .filer-head, .metroterm-shell .filer-list > button { display: grid; grid-template-columns: var(--filer-cols); column-gap: 12px; min-width: var(--filer-min); }
+.metroterm-shell .filer-head { position: sticky; top: 0; z-index: 1; border-bottom: 1px solid var(--line-soft); background: var(--panel); color: var(--filer-head-ink); }
+.metroterm-shell .filer-head span, .metroterm-shell .filer-list > button > span, .metroterm-shell .filer-list > button > time { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.metroterm-shell .filer-head span:last-child { color: var(--muted); }
+.metroterm-shell .filer-list > button .filer-col-size, .metroterm-shell .filer-list > button .filer-col-modified { text-align: right; }
+.metroterm-shell .filer-list > button > :not(.filer-col-name) { color: var(--muted); font-size: var(--ui-font-small); }
+.metroterm-shell .filer-list .filer-col-permissions { font-family: 'RobotoMono Nerd Font', Consolas, 'SFMono-Regular', 'Cascadia Mono', monospace !important; letter-spacing: 0.02em; }
+.metroterm-shell .filer-list > .file-message { position: sticky; left: 0; width: 100cqw; box-sizing: border-box; }
+.metroterm-shell .filer-pane .filer-list { container-type: inline-size; }
+
+/* Error banner sits between the path bar and the table */
+.metroterm-shell .filer-browser > .file-message.is-error { flex: none; }
+
+/* Close button: same as the panel tab close (16 × 16 box, 12 px icon, centred) */
+.metroterm-shell .file-message .file-message-close { flex: none; width: 16px; height: 16px; min-width: 16px; padding: 0; border: 0; display: inline-flex; align-items: center; justify-content: center; align-self: center; color: var(--muted); background: transparent; line-height: 0; }
+.metroterm-shell .file-message .file-message-close:hover { color: var(--ink); background: var(--active); }
+.metroterm-shell .file-message .file-message-close .icon { width: 12px; height: 12px; display: block; }
+
+/* Property-table tooltip (Filer rows): labels right-aligned on the left, values on the right */
+.ui-tip.is-table { padding: 6px 10px; }
+.ui-tip-table { margin: 0; display: grid; grid-template-columns: max-content minmax(0, auto); column-gap: 12px; row-gap: 2px; }
+.ui-tip-table > div { display: contents; }
+.ui-tip-table dt { color: var(--tip-key); text-align: right; white-space: nowrap; }
+.ui-tip-table dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+
+/* Session rows have no trailing label: the hover actions sit at the right edge, the name takes the rest */
+.metroterm-shell .tree-row > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.metroterm-shell .tree-row > .tree-row-actions { margin-left: auto; flex: none; }
+
+/* ---------- Explorer session tree (folders nested to any depth) ---------- */
+
+/* Toolbar above the tree: buttons aligned right */
+.metroterm-shell .session-quickbar { justify-content: flex-end; }
+
+/* One indent step per level: a folder's chevron and a session's icon sit in the same column at the same depth */
+.metroterm-shell .session-tree .group-row, .metroterm-shell .session-tree .tree-row { padding-left: calc(var(--pad-x) + var(--depth, 0) * var(--indent)); }
+.metroterm-shell .session-tree .group-row { cursor: default; user-select: none; outline: 0; }
+.metroterm-shell .session-tree .group-row > span { flex: 1; min-width: 0; }
+.metroterm-shell .session-tree { position: relative; flex: 1; overflow: auto; outline: 0; }
+.metroterm-shell .session-tree .tree-empty { padding: 12px var(--pad-x); color: var(--muted); font-size: var(--ui-font-small); line-height: 1.5; }
+
+/* Drag & drop */
+.metroterm-shell .session-tree .is-dragged { opacity: 0.4; }
+.metroterm-shell .session-tree .drop-into { background: var(--active); box-shadow: inset 0 0 0 1px var(--control-focus); color: var(--ink); }
+.metroterm-shell .session-tree .drop-before { box-shadow: inset 0 2px 0 var(--control-focus); }
+.metroterm-shell .session-tree .drop-after { box-shadow: inset 0 -2px 0 var(--control-focus); }
+.metroterm-shell .session-tree.drop-root { box-shadow: inset 0 0 0 1px var(--control-focus); }
+body.is-tree-dragging, body.is-tree-dragging * { cursor: grabbing !important; user-select: none !important; }
+.tree-drag-ghost { position: fixed; z-index: 300; display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border: 1px solid var(--tip-line); background: var(--tip-bg); color: var(--tip-ink); box-shadow: var(--tip-shadow); font-family: var(--ui-font-family); font-size: var(--ui-font-small); pointer-events: none; white-space: nowrap; }
+.tree-drag-ghost .icon { color: var(--tip-key); }
+.tree-drag-ghost.is-blocked { opacity: 0.55; }
+.metroterm-shell .is-tab-dragged { opacity: 0.4; }
+body.is-tab-dragging, body.is-tab-dragging * { cursor: grabbing !important; user-select: none !important; }
+body.is-tab-dragging.is-tab-drop-blocked, body.is-tab-dragging.is-tab-drop-blocked * { cursor: no-drop !important; }
+.tab-drag-ghost { position: fixed; left: 0; top: 0; z-index: 300; display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border: 1px solid var(--tip-line); background: var(--tip-bg); color: var(--tip-ink); box-shadow: var(--tip-shadow); font-family: var(--ui-font-family); font-size: var(--ui-font-small); pointer-events: none; white-space: nowrap; will-change: transform; }
+body.is-tab-drop-blocked .tab-drag-ghost { opacity: 0.55; }
+.tab-drop-marker { position: fixed; z-index: 299; background: var(--control-focus); pointer-events: none; }
+
+/* Explorer dialogs */
+.tree-dialog .auth-message code { word-break: break-all; }
+.tree-dialog .primary-button:disabled { opacity: 0.45; cursor: default; }
+
+/* Action menus (MenuButton / context menus): as tall as their items, as wide as their labels */
+.ui-select-menu.ui-menu { max-height: calc(100vh - 12px); width: max-content; min-width: 180px; max-width: min(360px, calc(100vw - 12px)); }
+
+/* ---------- Scrollbars: drawn by the app (src/lib/customScrollbars.ts) ---------- The native scrollbar of every scrolling area is hidden and replaced by a square track + thumb in `.sb-layer`, so the look is identical in Chromium, WebView2, WebKit and Firefox. 10px track with a 6px thumb that keeps its width; hover / drag only change its colour. No arrows, no radius. */
+.metroterm-shell, .sb-layer { --sb-size: 10px; --sb-pad: 2px; }
+.sb-custom { scrollbar-width: none !important; }
+.sb-custom::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+/* Reserve the bar's space like a native (non-overlay) scrollbar: a transparent border outside the
+   scrollport, so content, the caret and the last line never slide under the bar. */
+.sb-custom:is(.tree-list, .filer-list, .monitor-body, textarea) { --sb-reserve: 1; }
+.sb-custom.sb-has-y:is(.tree-list, .filer-list, .monitor-body, textarea) { border-right: var(--sb-size) solid transparent !important; }
+.sb-custom.sb-has-x:is(.tree-list, .filer-list, .monitor-body, textarea) { border-bottom: var(--sb-size) solid transparent !important; }
+
+/* Terminal: text stops one inset before the bar, the bar sits on the frame edge. */
+.metroterm-shell .xterm { padding-right: calc(var(--xterm-inset-x) + var(--sb-size)); }
+
+/* FitAddon reads the host's computed width/height; with border-box that includes the host's padding and the terminal overflowed it by one or two columns/rows. */
+.metroterm-shell .xterm-host { box-sizing: content-box; }
+
+/* Areas with a sticky header row (Filer columns) start the vertical bar below it automatically; `--sb-inset-top` on an element overrides that. */
+
+/* Static on purpose: a fixed (or z-indexed) layer would form a stacking context of its own, and the bars' z-index (the surface they belong to: menus, dialogs) would then only count inside it — a dialog
+   or menu would cover its own scrollbar. The tracks themselves are position: fixed. */
+.sb-layer { position: static; width: 0; height: 0; overflow: visible; pointer-events: none; }
+.sb-track { position: fixed; display: none; box-sizing: border-box; background: var(--sb-track); pointer-events: auto; cursor: default; touch-action: none; user-select: none; }
+.sb-thumb { position: absolute; box-sizing: border-box; background: var(--sb-thumb); transition: background-color 0.12s ease; }
+.sb-y .sb-thumb { left: var(--sb-pad); right: var(--sb-pad); }
+.sb-x .sb-thumb { top: var(--sb-pad); bottom: var(--sb-pad); }
+.sb-track.is-near .sb-thumb { background: var(--sb-thumb-near); }
+.sb-track:hover .sb-thumb, .sb-track.is-dragging .sb-thumb { background: var(--sb-thumb-hover); }
+.sb-track.is-dragging .sb-thumb, .sb-thumb:active { background: var(--sb-thumb-active); }
+
+/* While dragging a scrollbar: no text selection. Body only — a `body.x *` rule restyled the whole document at the start and end of every drag; pointer capture keeps the cursor on the thumb. */
+body.is-scrollbar-dragging { -webkit-user-select: none !important; user-select: none !important; cursor: default !important; }
+
+/* Terminal gutter: [time] + line number (default gutter grey); the cursor's line is highlighted */
+.terminal-gutter > div { grid-template-columns: 10ch calc(var(--line-digits, 3) * 1ch); }
+.metroterm-shell .terminal-gutter > div.is-current time, .metroterm-shell .terminal-gutter > div.is-current span { color: var(--gutter-current); }
+
+/* Explorer filter + Filer path: larger header inputs (same size in both panels) */
+.metroterm-shell { --header-input: 28px; }
+.metroterm-shell .pane-filter, .metroterm-shell .filer-path { height: calc(var(--header-input) + 10px); min-height: calc(var(--header-input) + 10px); }
+
+/* Text stays at the system UI size (Filer fonts follow the system setting); only the box grows. */
+.metroterm-shell .pane-filter input, .metroterm-shell .filer-path .filer-path-input { height: var(--header-input); padding: 0 8px; line-height: calc(var(--header-input) - 2px); }
+.metroterm-shell .pane-filter input { font-size: var(--ui-font); }
+
+/* ---------- Menu bar dropdowns (Session …) ---------- */
+.menu-items button.is-open { background: var(--active); color: var(--menu-item-open-ink); }
+.menu-items button.is-open:hover { color: var(--ink-active); }
+.ui-select-menu.menu-bar-menu { min-width: 250px; max-width: min(420px, calc(100vw - 8px)); outline: 0; }
+.ui-select-menu.menu-bar-menu li { grid-template-columns: var(--icon, 14px) minmax(0, 1fr) auto 12px; column-gap: 0; padding: 0 8px 0 11px; }
+.ui-select-menu.menu-bar-menu li > span { padding-left: 10px; }
+.ui-select-menu.menu-bar-menu li > small { padding-left: 28px; text-align: right; }
+.ui-select-menu.menu-bar-menu li > small:empty { padding-left: 0; }
+.ui-select-menu.menu-bar-menu li > .menu-bar-chevron { grid-column: 4; display: inline-flex; align-items: center; justify-content: flex-end; color: var(--muted); }
+.ui-select-menu.menu-bar-menu li > small { grid-column: 3; }
+.ui-select-menu.menu-bar-menu li.is-active > .menu-bar-chevron { color: var(--ink); }
+.ui-select-menu.menu-bar-menu li.is-disabled i .icon, .ui-select-menu.menu-bar-menu li.is-disabled small, .ui-select-menu.menu-bar-menu li.is-disabled .menu-bar-chevron { opacity: 0.45; }
+
+/* ---------- Dialog panels: one layout and ONE control height for every dialog ---------- New session / Properties / Save as, Explorer and Filer prompts, SSH password / host key, Session manager. Inputs, dropdowns, the SSH | LOCAL SHELL switch and all action buttons are --dialog-control tall. */
+.metroterm-shell { --dialog-control: 32px; --dialog-pad: 16px; --dialog-gap: 14px; }
+.metroterm-shell .connection-dialog { width: min(440px, 100%); max-height: calc(100vh - 40px); display: flex; flex-direction: column; overflow: auto; scroll-padding-block: 48px 64px; /* a focused field is never left under the sticky title / buttons */ }
+.metroterm-shell .connection-dialog > * { flex: none; }
+/* Every dialog keeps its title bar and its button row on screen: when the window is too low and the dialog scrolls, only what is between them moves (sticky in the scrolling dialog; the custom scrollbar runs between them, see customScrollbars stickyInsets). */
+.metroterm-shell .connection-dialog > .dialog-title { position: sticky; top: 0; z-index: 3; }
+.metroterm-shell .connection-dialog > .dialog-actions { position: sticky; bottom: 0; z-index: 3; }
+
+/* title bar */
+.metroterm-shell .connection-dialog .dialog-title { height: 42px; min-height: 42px; gap: 10px; padding: 0 7px 0 var(--dialog-pad); }
+.metroterm-shell .dialog-title span { padding: 2px 6px; font-size: 10px; letter-spacing: 0.06em; line-height: 16px; }
+.metroterm-shell .dialog-title b { font-size: 12px; letter-spacing: 0.08em; }
+.metroterm-shell .dialog-title button { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; color: var(--muted); }
+.metroterm-shell .dialog-title button:hover { color: var(--ink); background: var(--control-hover); }
+
+/* fields */
+.metroterm-shell .connection-dialog label { gap: 6px; padding: var(--dialog-gap) var(--dialog-pad) 0; color: var(--muted); font-size: 11px; letter-spacing: 0.06em; }
+.metroterm-shell .connection-dialog .form-grid { grid-template-columns: minmax(0, 1fr) 110px; column-gap: 12px; padding: 0 var(--dialog-pad); }
+.metroterm-shell .connection-dialog .form-grid label { padding-left: 0; padding-right: 0; }
+.metroterm-shell .connection-dialog input:not([type='checkbox']):not([type='radio']), .metroterm-shell .connection-dialog .ui-select-trigger { box-sizing: border-box; width: 100%; height: var(--dialog-control); min-height: var(--dialog-control); padding: 0 10px; border: 1px solid var(--control-line); border-radius: 0; background: var(--control-bg); color: var(--control-text); font-family: inherit; font-size: 12px; letter-spacing: 0; outline: 0; }
+.metroterm-shell .connection-dialog input:not([type='checkbox']):not([type='radio']):hover { background: var(--control-hover); }
+.metroterm-shell .connection-dialog input:not([type='checkbox']):not([type='radio']):focus, .metroterm-shell .connection-dialog .ui-select.is-open .ui-select-trigger { border-color: var(--control-focus); background: var(--control-bg); }
+.metroterm-shell .connection-dialog input::placeholder { color: var(--faint); }
+
+/* SSH | LOCAL SHELL switch: same outer height as the inputs */
+.metroterm-shell .connection-dialog .segmented { box-sizing: border-box; height: var(--dialog-control); margin: var(--dialog-pad) var(--dialog-pad) 0; }
+.metroterm-shell .connection-dialog .segmented button { height: 100%; font-size: 11px; }
+
+/* text blocks */
+.metroterm-shell .connection-dialog .auth-message { padding: var(--dialog-gap) var(--dialog-pad) 0; font-size: 12px; line-height: 1.65; }
+.metroterm-shell .connection-dialog .auth-target { box-sizing: border-box; min-height: var(--dialog-control); margin: var(--dialog-pad) var(--dialog-pad) 0; padding: 0 10px; background: var(--panel-2); }
+.metroterm-shell .connection-dialog .dialog-note { margin: var(--dialog-gap) var(--dialog-pad) 0; padding: 9px 11px; border: 1px solid var(--line-soft); background: var(--panel-2); color: var(--muted); font-size: 11px; line-height: 1.6; }
+.metroterm-shell .connection-dialog .auth-queue { padding: 8px var(--dialog-pad) 0; }
+
+/* action bar: Cancel + primary on the right, separated from the content */
+.metroterm-shell .dialog-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin: 0; padding: 12px var(--dialog-pad); border-top: 1px solid var(--line-soft); background: var(--panel-2); }
+.metroterm-shell .connection-dialog .dialog-actions { margin-top: var(--dialog-pad); }
+.metroterm-shell .dialog-actions > button, .metroterm-shell .connection-dialog .dialog-actions > button:not(.primary-button) { box-sizing: border-box; height: var(--dialog-control); min-width: 88px; margin: 0; padding: 0 16px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 11px; letter-spacing: 0.06em; }
+.metroterm-shell .dialog-actions > button:not(.primary-button) { border: 1px solid var(--control-line); background: transparent; color: var(--control-text); }
+.metroterm-shell .dialog-actions > button:not(.primary-button):hover { border-color: var(--control-focus); background: var(--control-hover); color: var(--ink); }
+.metroterm-shell .dialog-actions > .primary-button { width: auto; border: 1px solid transparent; }
+.metroterm-shell .dialog-actions > .primary-button:focus-visible, .metroterm-shell .dialog-actions > button:focus-visible { outline: 1px solid var(--focus-ring-control); outline-offset: 2px; }
+.metroterm-shell .dialog-actions > .primary-button:focus-visible { outline-color: var(--control-focus); }
+.metroterm-shell .dialog-actions > .primary-button.is-danger { background: var(--danger-button-bg); color: var(--danger-button-ink); }
+.metroterm-shell .dialog-actions > .primary-button.is-danger:hover { background: var(--danger-button-hover-bg); }
+.metroterm-shell .dialog-actions > .primary-button:disabled { opacity: 0.45; cursor: default; }
+
+/* ---------- Terminal: no blank frame around the terminal area; clicked line highlight ---------- */
+.metroterm-shell { --xterm-frame-y: 0px; --xterm-frame-x: 0px; }
+.metroterm-shell .xterm .terminal-line-highlight { position: absolute; left: 0; right: 0; z-index: 0; pointer-events: none; background: var(--terminal-line-highlight); }
+.metroterm-shell .xterm .terminal-line-highlight[hidden] { display: none; }
+
+/* the clicked line in the gutter: one strip, edge to edge, placed from the same rendered row as the band (TerminalView placeBand) — under the labels, over the gutter's background */
+.metroterm-shell .terminal-gutter { position: relative; z-index: 0; }
+.metroterm-shell .terminal-gutter > .terminal-gutter-band { display: none; position: absolute; left: 0; right: 0; z-index: -1; pointer-events: none; background: var(--terminal-line-highlight); }
+.metroterm-shell .terminal-gutter > div.is-picked:not(.is-current) span, .metroterm-shell .terminal-gutter > div.is-picked:not(.is-current) time { color: var(--ink); }
+
+/* ---------- Terminal: shorter block cursor ---------- * xterm's block cursor fills the whole cell (13px font × line-height 1.32 ≈ 19px). It is drawn
+ * again as a centred ::before, so it can be shorter. xterm still owns the colour and the blinking
+ * (the span's animated background-color): the ::before inherits that value. The span's own background
+ * is clipped to the glyph (background-clip: text) and hidden under the glyph's accent colour. */
+.metroterm-shell { --terminal-cursor-height: 17px; --terminal-cursor-shift: 1px; /* the cursor box sits 1px below the cell centre (optically centred on the text) */ }
+.metroterm-shell .xterm .xterm-rows .xterm-cursor.xterm-cursor-block { position: relative; z-index: 0; -webkit-background-clip: text; background-clip: text; }
+.metroterm-shell .xterm .xterm-rows .xterm-cursor.xterm-cursor-block::before { content: ''; position: absolute; z-index: -1; left: 0; right: 0; top: calc((100% - var(--xterm-row-overlap, 0px) - var(--terminal-cursor-height)) / 2 + var(--terminal-cursor-shift)); top: calc(round(down, (100% - var(--xterm-row-overlap, 0px) - var(--terminal-cursor-height)) / 2, 1px) + var(--terminal-cursor-shift)); height: var(--terminal-cursor-height); background-color: inherit; pointer-events: none; }
+
+/* Unfocused cursor (xterm's outline style): same 16px height as the block, centred. The span's own * full-height outline is hidden; the ::before draws it, taking xterm's cursor colour via inherit. */
+.metroterm-shell .xterm .xterm-rows .xterm-cursor.xterm-cursor-outline { position: relative; z-index: 0; outline-style: none !important; }
+.metroterm-shell .xterm .xterm-rows .xterm-cursor.xterm-cursor-outline::before { content: ''; position: absolute; z-index: -1; left: 0; right: 0; top: calc((100% - var(--xterm-row-overlap, 0px) - var(--terminal-cursor-height)) / 2 + var(--terminal-cursor-shift)); top: calc(round(down, (100% - var(--xterm-row-overlap, 0px) - var(--terminal-cursor-height)) / 2, 1px) + var(--terminal-cursor-shift)); height: var(--terminal-cursor-height); box-sizing: border-box; border: 1px solid var(--terminal-cursor-color); pointer-events: none; }
+
+/* Unfocused = focused geometry: the same box (whole-pixel top, no transform) for both, the unfocused one drawn as a 1px border inside it — an outline was rounded differently by WebKit and came out 1px taller. */
+
+/* Bar / underline cursor (Settings → CURSOR): drawn by a ::before in the same centred var(--terminal-cursor-height) box as the block, in the theme's cursor colour — bar 2px wide on the cell's left edge, underline 3px at the bottom of the box. xterm's own box-shadow / border-bottom are switched off; blinking is a ::before animation (xterm's one animates the switched-off properties). Unfocused they stay, steady (cursorInactiveStyle = the same shape). */
+.metroterm-shell .xterm .xterm-rows .xterm-cursor.xterm-cursor-bar, .metroterm-shell .xterm .xterm-rows .xterm-cursor.xterm-cursor-underline { position: relative; z-index: 0; box-shadow: none !important; border-bottom: 0 !important; }
+.metroterm-shell .xterm .xterm-rows .xterm-cursor.xterm-cursor-underline { height: 100% !important; /* xterm: calc(100% - 1px) for its border, which would lift the box 1px */ }
+.metroterm-shell .xterm .xterm-rows .xterm-cursor.xterm-cursor-bar::before, .metroterm-shell .xterm .xterm-rows .xterm-cursor.xterm-cursor-underline::before { content: ''; position: absolute; z-index: 1; left: 0; top: calc((100% - var(--xterm-row-overlap, 0px) - var(--terminal-cursor-height)) / 2 + var(--terminal-cursor-shift)); top: calc(round(down, (100% - var(--xterm-row-overlap, 0px) - var(--terminal-cursor-height)) / 2, 1px) + var(--terminal-cursor-shift)); width: 2px; height: var(--terminal-cursor-height); background: var(--terminal-cursor-color); pointer-events: none; }
+
+/* Underline: --terminal-cursor-underline-height (3px) tall; its top edge stays where the raised 2px line had it (3px above the box bottom, close to the text baseline), the extra pixel goes down to the box bottom. */
+.metroterm-shell { --terminal-cursor-underline-height: 3px; --terminal-cursor-underline-lift: 0px; }
+.metroterm-shell .xterm .xterm-rows .xterm-cursor.xterm-cursor-underline::before { right: 0; width: auto; top: calc(calc((100% - var(--xterm-row-overlap, 0px) - var(--terminal-cursor-height)) / 2) + var(--terminal-cursor-height) - var(--terminal-cursor-underline-height) - var(--terminal-cursor-underline-lift) + var(--terminal-cursor-shift)); top: calc(calc(round(down, (100% - var(--xterm-row-overlap, 0px) - var(--terminal-cursor-height)) / 2, 1px)) + var(--terminal-cursor-height) - var(--terminal-cursor-underline-height) - var(--terminal-cursor-underline-lift) + var(--terminal-cursor-shift)); height: var(--terminal-cursor-underline-height); }
+/* Bar / underline: shown only while the terminal has focus (the block turns into the hollow box instead). */
+.metroterm-shell .xterm .xterm-rows:not(.xterm-focus) .xterm-cursor.xterm-cursor-bar::before, .metroterm-shell .xterm .xterm-rows:not(.xterm-focus) .xterm-cursor.xterm-cursor-underline::before { display: none; }
+.metroterm-shell .xterm .xterm-rows.xterm-focus .xterm-cursor.xterm-cursor-blink.xterm-cursor-bar::before, .metroterm-shell .xterm .xterm-rows.xterm-focus .xterm-cursor.xterm-cursor-blink.xterm-cursor-underline::before { animation: metro-cursor-blink 1s step-end infinite; }
+@keyframes metro-cursor-blink {
+  50% { opacity: 0; }
+}
+
+/* Smaller blank margin inside the terminal area (was 10px top/bottom, 14px left/right). The gutter * follows automatically (its padding-top is frame-y + inset-y), so line numbers stay aligned. */
+.metroterm-shell { --xterm-inset-y: 4px; --xterm-inset-x: 8px; }
+
+/* Sender editor background (--sender-text-*): light theme = its gutter's background, with no hover / focus change. */
+.metroterm-shell .sender-editor textarea { background-color: var(--sender-text-bg); }
+.metroterm-shell .sender-editor textarea:hover, .metroterm-shell .sender-editor textarea:focus { background-color: var(--sender-text-active-bg); }
+
+/* Preferences dialogs: headings over a segmented switch, number inputs at the dialog control height */
+.metroterm-shell .connection-dialog .field-label { padding: var(--dialog-gap) var(--dialog-pad) 0; color: var(--muted); font-size: 11px; letter-spacing: 0.06em; }
+.metroterm-shell .connection-dialog .field-label + .segmented { margin-top: 6px; }
+
+/* Settings → CURSOR: shape switch (with a small sample of each shape) above the blinking switch */
+.metroterm-shell .connection-dialog .segmented.cursor-blink { margin-top: 6px; }
+.metroterm-shell .connection-dialog .cursor-shapes button { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.metroterm-shell .connection-dialog .cursor-sample { flex: none; position: relative; width: 8px; height: 13px; }
+.metroterm-shell .connection-dialog .cursor-sample::before { content: ''; position: absolute; left: 0; bottom: 0; width: 8px; height: 13px; background: var(--terminal-cursor-color); }
+.metroterm-shell .connection-dialog .cursor-sample.is-bar::before { width: 2px; }
+.metroterm-shell .connection-dialog .cursor-sample.is-underline::before { height: 3px; }
+.metroterm-shell .connection-dialog .form-grid.even { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.metroterm-shell .connection-dialog .ui-number { box-sizing: border-box; width: 100%; height: var(--dialog-control); }
+.metroterm-shell .connection-dialog .ui-number input:not([type='checkbox']):not([type='radio']) { height: 100%; min-height: 0; padding: 0 2px 0 10px; border: 0; background: transparent; text-align: left; }
+.metroterm-shell .connection-dialog .ui-number input:not([type='checkbox']):not([type='radio']):hover, .metroterm-shell .connection-dialog .ui-number input:not([type='checkbox']):not([type='radio']):focus { border: 0; background: transparent; }
+.metroterm-shell .connection-dialog .ui-number-suffix { padding-right: 6px; }
+.metroterm-shell .connection-dialog:focus { outline: none; }
+
+/* Filer text colours follow the Explorer tree */
+.metroterm-shell .filer-list button, .metroterm-shell .filer-list button:hover { color: var(--n-b9); }
+.metroterm-shell .filer-list button:hover { color: var(--filer-row-hover-ink); }
+.metroterm-shell .filer-list button { color: var(--row-ink); }
+.metroterm-shell .filer-list button.selected, .metroterm-shell .filer-list button.selected:hover { color: var(--ink); }
+
+/* Explorer-folder picker drawn as a tree (components/FolderTreeSelect). */
+.metroterm-shell .folder-tree-select .ui-select-trigger { gap: 8px; }
+.folder-tree-select .folder-tree-icon { flex: none; display: inline-flex; color: var(--ft-folder); }
+.metroterm-shell .folder-tree-select .ui-select-trigger .folder-tree-icon svg, .metroterm-shell .folder-tree-select .ui-select-trigger .folder-tree-path svg { flex: none; width: auto; height: auto; stroke: currentColor; transform: none; }
+.folder-tree-select .folder-tree-path { flex: 1; min-width: 0; display: flex; align-items: center; gap: 2px; overflow: hidden; white-space: nowrap; letter-spacing: 0; }
+.folder-tree-select .folder-tree-path em { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-style: normal; color: var(--muted); }
+.folder-tree-select .folder-tree-path em:last-child { flex: none; max-width: 100%; color: var(--control-text); }
+.folder-tree-select .folder-tree-path em.is-root { color: var(--control-text); }
+.folder-tree-select .folder-tree-path b { flex: none; display: inline-flex; color: var(--faint); font-weight: normal; }
+.ui-select-menu.folder-tree-menu { padding: 5px 0; letter-spacing: 0; overscroll-behavior: contain; }
+.ui-select-menu.folder-tree-menu li { position: relative; height: 26px; display: flex; align-items: stretch; gap: 0; padding: 0 10px 0 8px; border-left: 0; color: var(--control-text); }
+.ui-select-menu.folder-tree-menu li > * { flex: none; }
+.ui-select-menu.folder-tree-menu li > .ft-name { flex: 1 1 auto; }
+.ui-select-menu.folder-tree-menu li.is-active { background: var(--menu-hover); color: var(--ink-active); }
+.ui-select-menu.folder-tree-menu li.is-selected { background: var(--menu-selected); color: var(--ink); }
+.ui-select-menu.folder-tree-menu li.is-selected.is-active { background: var(--menu-hover); color: var(--ink-active); }
+
+/* indent guides: 16px per level, the line runs through the parent's chevron centre */
+.folder-tree-menu .ft-guide { position: relative; width: 16px; }
+.folder-tree-menu .ft-guide.line::before, .folder-tree-menu .ft-guide.tee::before, .folder-tree-menu .ft-guide.end::before { content: ''; position: absolute; left: 7px; top: 0; bottom: 0; border-left: 1px solid var(--ft-guide); }
+.folder-tree-menu .ft-guide.end::before { bottom: 50%; }
+.folder-tree-menu .ft-guide.tee::after, .folder-tree-menu .ft-guide.end::after { content: ''; position: absolute; left: 7px; right: 1px; top: 50%; border-top: 1px solid var(--ft-guide); }
+.folder-tree-menu li:first-child .ft-guide { display: none; }
+.folder-tree-menu .ft-twisty { width: 14px; display: inline-flex; align-items: center; justify-content: center; color: var(--muted); cursor: pointer; }
+.folder-tree-menu .ft-twisty:hover { color: var(--ink); background: var(--control-hover); }
+.folder-tree-menu .ft-twisty.is-leaf { cursor: inherit; background: none; }
+.folder-tree-menu .ft-twisty.is-leaf::before { content: ''; width: 3px; height: 3px; background: var(--ft-guide); }
+.folder-tree-menu .ft-icon { width: 16px; margin: 0 6px 0 4px; display: inline-flex; align-items: center; justify-content: center; color: var(--ft-folder); font-style: normal; }
+.folder-tree-menu li.is-root .ft-icon { color: var(--muted); }
+.folder-tree-menu .ft-name { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 14px; }
+.folder-tree-menu li.is-root .ft-name { color: var(--muted); }
+.folder-tree-menu li.is-root.is-active .ft-name, .folder-tree-menu li.is-root.is-selected .ft-name { color: var(--ink); }
+.ui-select-menu.folder-tree-menu li small { display: flex; align-items: center; min-width: 16px; justify-content: flex-end; color: var(--faint); font-size: 10px; }
+.folder-tree-menu .ft-check { width: 18px; display: inline-flex; align-items: center; justify-content: flex-end; color: var(--ink); }
+.folder-tree-menu li:not(.is-selected) small { margin-right: 18px; }
+
+/* Filer hover: background only — text colour and weight stay as they are. */
+.metroterm-shell .filer-list > button:hover:not(.selected) { color: var(--row-ink); }
+
+/* Session panel: the open terminal tabs (components/SessionsPanel). */
+.sessions-pane { min-height: 0; }
+.metroterm-shell .open-tabs-bar { justify-content: flex-start; padding: 0 var(--pad-x); color: var(--muted); font-size: var(--ui-font-small); }
+.metroterm-shell .open-tabs .tree-row.open-tab { gap: var(--icon-gap); padding: 0 var(--pad-x); cursor: default; outline: 0; }
+.metroterm-shell .open-tabs .tree-row.open-tab:focus-visible { box-shadow: inset 0 0 0 1px var(--control-line); }
+.metroterm-shell .open-tabs .tree-row.open-tab.is-current { background: var(--active); color: var(--ink); }
+.open-tab-title { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.metroterm-shell .open-tabs .open-tab-detail { flex: 1 1 0; min-width: 0; margin-left: 0; padding: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--faint); font-size: var(--ui-font-small); }
+.open-tab-status { flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--n-69); }
+.open-tab-status.online { background: var(--status-online); box-shadow: 0 0 0 2px var(--status-online-glow); }
+.open-tab-status.connecting { background: var(--status-connecting); animation: session-pulse 1s ease-in-out infinite; }
+.metroterm-shell .open-tab-input, .metroterm-shell .session-tab-input { flex: 1; min-width: 0; height: 20px; padding: 0 5px; border: 1px solid var(--control-focus); border-radius: 0; background: var(--control-bg); color: var(--ink); font: inherit; outline: 0; }
+.metroterm-shell .session-tab-input { width: 100%; height: 18px; }
+.open-tabs-empty { padding: 10px var(--pad-x); color: var(--muted); font-size: var(--ui-font-small); line-height: 1.5; }
+
+/* Filer: file and folder names in medium weight (text colour / weight unchanged on hover). */
+.metroterm-shell .filer-list .filer-name { font-weight: 500; }
+
+/* Sender: Stop (right of Send) — cancels the lines / repeats not typed yet. */
+.metroterm-shell .sender-controls > button.stop { color: var(--sender-stop); }
+.metroterm-shell .sender-controls > button.stop:disabled { color: var(--sender-stop-disabled-ink); opacity: 0.6; cursor: default; background: transparent; }
+
+/* Text caret in every input / textarea: the theme's foreground (light grey on dark, dark grey on light). */
+.metroterm-shell input, .metroterm-shell textarea, .metroterm-shell [contenteditable='true'] { caret-color: var(--caret) !important; }
+.metroterm-shell input:not([type]), .metroterm-shell input[type='text'], .metroterm-shell input[type='search'], .metroterm-shell input[type='number'], .metroterm-shell input[type='password'], .metroterm-shell textarea { cursor: text; }
+.metroterm-shell .xterm-helper-textarea { caret-color: transparent !important; }
+
+/* Checkboxes: same square control as the radios (Session dialog → Remember password). */
+.metroterm-shell input[type='checkbox'] { appearance: none; width: 12px; height: 12px; margin: 0; flex: none; display: inline-grid; place-content: center; border: 1px solid var(--control-line); border-radius: 0; background: var(--control-bg); cursor: pointer; }
+.metroterm-shell input[type='checkbox']::after { content: ''; width: 6px; height: 6px; background: transparent; transform: scale(0); transition: transform 0.1s ease; }
+.metroterm-shell input[type='checkbox']:hover, .metroterm-shell input[type='checkbox']:checked { border-color: var(--control-focus); }
+.metroterm-shell input[type='checkbox']:checked { border-color: var(--checkbox-checked-line); }
+.metroterm-shell input[type='checkbox']:checked::after { background: var(--checkbox-mark); transform: scale(1); }
+.metroterm-shell input[type='checkbox']:focus-visible { outline: 1px solid var(--focus-ring-control); outline-offset: 2px; }
+.metroterm-shell .connection-dialog label.dialog-check { display: flex; align-items: center; gap: 8px; width: max-content; color: var(--ink); letter-spacing: 0; font-size: 12px; cursor: pointer; user-select: none; }
+.metroterm-shell .connection-dialog input:disabled { opacity: 0.55; cursor: not-allowed; }
+.metroterm-shell .connection-dialog .dialog-note.is-error { color: var(--error-note-ink); border-color: var(--error-note-border); }
+.metroterm-shell .connection-dialog label.dialog-check input[type='checkbox'] { width: 12px; min-width: 12px; height: 12px; min-height: 12px; padding: 0; }
+
+/* ComboBox (SHELL field): text input + suggestion list in the dropdown style, replaces <datalist>. */
+.metroterm-shell .ui-combobox { position: relative; display: flex; width: 100%; }
+.metroterm-shell .ui-combobox > input { flex: 1; width: 100%; min-width: 0; padding-right: 32px; }
+.metroterm-shell .ui-combobox-toggle { position: absolute; top: 1px; right: 1px; bottom: 1px; width: 30px; display: grid; place-items: center; padding: 0; border: 0; background: transparent; color: var(--muted); cursor: pointer; }
+.metroterm-shell .ui-combobox-toggle svg { width: 10px; height: 10px; stroke: var(--muted); stroke-width: 1.4; transition: transform 0.12s ease; }
+.metroterm-shell .ui-combobox-toggle:hover svg { stroke: var(--ink); }
+.metroterm-shell .ui-combobox.is-open .ui-combobox-toggle svg { transform: rotate(180deg); }
+.metroterm-shell .connection-dialog .ui-combobox.is-open > input { border-color: var(--control-focus); }
+.ui-select-menu.ui-combobox-menu li small { font-family: inherit; overflow: hidden; text-overflow: ellipsis; max-width: 260px; }
+
+/* Filer column headers: separator lines, click to sort (again = reverse), drag a line to resize, double-click a line for the default width. Widths and sort live in sessions.json → filer. */
+.metroterm-shell .filer-head .filer-th { position: relative; min-width: 0; align-self: stretch; display: flex; align-items: center; gap: 4px; color: var(--muted); cursor: default; user-select: none; }
+.metroterm-shell .filer-head .filer-th > b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: inherit; }
+.metroterm-shell .filer-head .filer-th:hover { color: var(--ink); }
+.metroterm-shell .filer-head .filer-th.filer-col-name { padding-left: 0; }
+
+/* Size and Date Modified: header and values right-aligned. The sort chevron stays at the end of the column like in every other column; the label sits right-aligned just before it. */
+.metroterm-shell .filer-head .filer-th.filer-col-size, .metroterm-shell .filer-head .filer-th.filer-col-modified { justify-content: flex-end; text-align: right; }
+.metroterm-shell .filer-list .filer-head .filer-th.filer-col-size > i.filer-sort, .metroterm-shell .filer-list .filer-head .filer-th.filer-col-modified > i.filer-sort { margin-left: 0; }
+
+/* Sorted column: its name is highlighted, with a small chevron for the direction. */
+.metroterm-shell .filer-head .filer-th.is-sorted { color: var(--filer-sorted-ink); }
+.metroterm-shell .filer-sort { flex: none; display: inline-flex; align-items: center; color: var(--filer-sort-ink); opacity: 0.75; }
+.metroterm-shell .filer-th:hover .filer-sort { opacity: 1; }
+
+/* Sort arrow: at the end of the column, next to its separator line (every column). */
+
+/* (`.filer-list i` sizes the file icons: 14px box + 8px gap — not for this arrow.) */
+.metroterm-shell .filer-list .filer-head .filer-th > i.filer-sort { width: auto; min-width: 0; margin: 0 -3px 0 auto; /* the chevron keeps its distance from the separator line, in the column gap */ padding-left: 4px; justify-content: flex-end; }
+.metroterm-shell .filer-sort .icon { transform: rotate(180deg); }
+.metroterm-shell .filer-list .filer-head .filer-sort .icon { width: 12px; height: 12px; }
+.metroterm-shell .filer-sort.is-descending .icon { transform: none; }
+
+/* The handle sits centred in the 12px column gap, the line in its middle. */
+.metroterm-shell .filer-col-resizer { position: absolute; top: 0; bottom: 0; right: -10.5px; margin: 0; /* not the file icons' gap from `.filer-list i`: it pulled every line 8px into its column */ width: 9px; z-index: 1; cursor: col-resize; touch-action: none; }
+.metroterm-shell .filer-col-resizer::after { content: ''; position: absolute; left: 4px; top: 5px; bottom: 5px; width: 1px; background: var(--line); }
+.metroterm-shell .filer-col-resizer:hover::after, .metroterm-shell .filer-head.is-resizing .filer-col-resizer:active::after { top: 0; bottom: 0; background: var(--muted); }
+.metroterm-shell .filer-head.is-resizing, .metroterm-shell .filer-head.is-resizing .filer-th { cursor: col-resize; }
+
+/* Filer footer: "Follow terminal" is a toggle — on = pressed background + full-contrast icon. */
+.metroterm-shell .filer-foot-actions button.is-on { color: var(--ink); background: var(--active); }
+.metroterm-shell .filer-foot-actions button.is-on:hover { background: var(--active); }
+.metroterm-shell .filer-foot-actions button:disabled { opacity: 0.4; }
+
+/* Text caret (lib/appCaret): the native 1px caret is hidden in text fields and a 2px bar, ≈1.45× the font size tall, is drawn in its place. Not in the terminal (xterm keeps its block cursor). */
+html.app-caret-on input:is([type='text'], [type='search'], [type='password'], [type='url'], [type='tel'], :not([type])), html.app-caret-on textarea:not(.xterm-helper-textarea) { caret-color: transparent !important; }
+.app-caret { position: fixed; left: 0; top: 0; width: 2px; z-index: 2147483000; pointer-events: none; will-change: transform; }
+.app-caret[hidden] { display: none; }
+.app-caret.app-caret-blink { animation: app-caret-blink 1.06s steps(1, end) infinite; }
+@keyframes app-caret-blink {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Sender toolbar: every control stays (Interval was hidden below 1150px); a narrow panel wraps the row onto a second line instead of cutting it off. */
+.metroterm-shell .sender-controls { height: auto; min-height: 32px; flex-wrap: wrap; row-gap: 4px; padding-top: 4px; padding-bottom: 4px; }
+
+/* Filer name search (Ctrl+F / ⋮ → Search…): a row under the path bar like Explorer's filter; the
+   matching part of each name gets a neutral grey fill (no yellow, no outline), like terminal selection matches. */
+.metroterm-shell .filer-search { border-bottom: 1px solid var(--line-soft); }
+.metroterm-shell .filer-search button { display: inline-flex; align-items: center; justify-content: center; color: var(--muted); }
+.metroterm-shell .filer-search button:hover { color: var(--ink); background: var(--active); }
+.metroterm-shell .filer-list mark.filer-match { color: var(--ink); background: var(--match-bg); border-radius: 0; padding: 0; }
+
+/* ---------- Terminal header: Fullscreen on ---------- */
+.metroterm-shell .toolbar-icons button.is-on { color: var(--ink); background: var(--active); }
+
+/* ---------- Terminal find bar (Ctrl+F / header Find) ---------- */
+.terminal-body { position: relative; }
+.metroterm-shell .terminal-find { position: absolute; top: 0; right: 14px; z-index: 30; display: flex; align-items: center; gap: 2px; height: 32px; padding: 0 4px 0 6px; background: var(--panel); border: 1px solid var(--line); border-top: 0; box-shadow: 0 4px 12px var(--shadow-find); font-size: var(--ui-font); }
+.metroterm-shell .terminal-find input { width: 210px; height: 22px; padding: 0 6px; border: 1px solid var(--line); background: var(--terminal); color: var(--ink); font: inherit; font-size: 12px; outline: none; }
+.metroterm-shell .terminal-find input:focus { border-color: var(--muted); }
+.metroterm-shell .terminal-find-count { min-width: 64px; padding: 0 6px; color: var(--muted); font-size: 11px; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.metroterm-shell .terminal-find-count.is-empty { color: var(--find-empty-ink); }
+.metroterm-shell .terminal-find button { width: 24px; height: 24px; display: grid; place-items: center; color: var(--muted); }
+.metroterm-shell .terminal-find button:hover:not(:disabled) { color: var(--ink); background: var(--active); }
+.metroterm-shell .terminal-find button.is-on { color: var(--ink); background: var(--active); }
+.metroterm-shell .terminal-find button:disabled { opacity: 0.4; }
+
+/* Find frames: border only, the text keeps its colours. */
+.xterm .terminal-find-match { pointer-events: none; box-sizing: border-box; }
+.xterm .terminal-find-match.is-current { z-index: 8 !important; }
+
+/* ---------- Lock Screen ---------- */
+.metroterm-shell .lock-screen { position: fixed; inset: 0; z-index: 1500; display: grid; place-items: center; background: var(--lock-screen-bg); color: var(--ink); outline: 0; user-select: none; }
+.metroterm-shell .lock-card { width: min(340px, calc(100vw - 40px)); display: flex; flex-direction: column; align-items: center; text-align: center; }
+.metroterm-shell .lock-icon { width: 56px; height: 56px; display: grid; place-items: center; margin-bottom: 18px; border: 1px solid var(--line); color: var(--muted); }
+.metroterm-shell .lock-time { font-size: 64px; font-weight: 300; line-height: 1; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
+.metroterm-shell .lock-date { margin-top: 10px; color: var(--muted); font-size: 13px; }
+.metroterm-shell .lock-title { margin: 30px 0 14px; color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; }
+.metroterm-shell .lock-field { width: 100%; display: flex; }
+.metroterm-shell .lock-field input { box-sizing: border-box; flex: 1; min-width: 0; height: 34px; padding: 0 10px; font-size: 13px; }
+.metroterm-shell .lock-field .primary-button { width: 34px; height: 34px; margin: 0 0 0 -1px; display: grid; place-items: center; }
+.metroterm-shell .lock-field .primary-button:disabled { opacity: 0.5; }
+.metroterm-shell .lock-error { min-height: 18px; margin-top: 8px; color: var(--danger-ink); font-size: 12px; visibility: hidden; }
+.metroterm-shell .lock-error.is-shown { visibility: visible; }
+.metroterm-shell .lock-unlock { width: 160px; margin: 0; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.metroterm-shell .lock-hint { margin-top: 14px; color: var(--muted); font-size: 11px; line-height: 1.6; }
+.metroterm-shell .connection-dialog .dialog-error { margin: var(--dialog-gap) var(--dialog-pad) 0; padding: 0; min-height: 0; color: var(--danger-ink); font-size: 12px; display: none; }
+.metroterm-shell .connection-dialog .dialog-error.is-shown { display: block; }
+.metroterm-shell .is-danger-text { color: var(--danger-ink); }
+.metroterm-shell .lock-dialog .dialog-check { margin-top: var(--dialog-gap); padding: 0 var(--dialog-pad); }
+
+/* Preferences → LOCK PASSWORD row */
+.metroterm-shell .lock-password-row { display: flex; height: var(--dialog-control); }
+.metroterm-shell .lock-password-row > span { flex: 1; min-width: 0; display: flex; align-items: center; padding: 0 10px; border: 1px solid var(--control-line); border-right: 0; background: var(--panel-2); color: var(--muted); font-size: 12px; letter-spacing: 0; }
+.metroterm-shell .lock-password-row > span.is-set { color: var(--ink); }
+.metroterm-shell .lock-password-row > button { padding: 0 12px; border: 1px solid var(--control-line); color: var(--control-text); font-size: 11px; letter-spacing: 0.06em; }
+.metroterm-shell .lock-password-row > button:hover { border-color: var(--control-focus); background: var(--control-hover); color: var(--ink); }
+.metroterm-shell .connection-dialog > .dialog-check { margin-top: var(--dialog-gap); }
+
+/* status bar: the Local / Remote Mode switch is a text button (Lock Screen is an icon button like Theme) */
+.metroterm-shell .status-bar .status-mode { width: auto; height: 100%; display: inline-flex; align-items: center; gap: 5px; padding: 0 2px; font-size: inherit; }
+/* Window menu: the windows in the status bar (click = show, double-click = rename, + = New Window). */
+.metroterm-shell .status-bar .status-windows { height: 100%; display: flex; align-items: center; gap: 1px; }
+.metroterm-shell .status-bar .status-windows[hidden] { display: none; }
+.metroterm-shell .status-bar .status-window { width: auto; max-width: 140px; height: 20px; padding: 0 8px; display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 20px; font-size: inherit; color: var(--status-window-ink); }
+.metroterm-shell .status-bar .status-window:hover { color: var(--status-window-hover-ink); background: var(--status-window-hover-bg); }
+.metroterm-shell .status-bar .status-window.is-active { color: var(--status-window-active-ink); background: var(--status-window-active-bg); }
+.metroterm-shell .status-bar .status-window-new { width: 20px; height: 20px; }
+
+/* ---------- Focus Mode dialog ---------- */
+.metroterm-shell .focus-dialog { width: min(480px, 100%); }
+.metroterm-shell .focus-section { padding: var(--dialog-gap) var(--dialog-pad) 6px; color: var(--muted); font-size: 11px; letter-spacing: 0.08em; }
+.metroterm-shell .focus-group { margin: 0 var(--dialog-pad); border: 1px solid var(--line-soft); background: var(--panel-2); }
+.metroterm-shell .focus-row { display: flex; align-items: center; gap: 10px; min-height: 36px; padding: 0 10px; }
+.metroterm-shell .focus-row + .focus-row { border-top: 1px solid var(--line-soft); }
+.metroterm-shell .focus-row.is-disabled { opacity: 0.5; }
+.metroterm-shell .focus-label { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; color: var(--ink); font-size: 12px; }
+.metroterm-shell .pane-swatch { width: 10px; height: 10px; flex: none; }
+.metroterm-shell .focus-choice { display: flex; flex: none; }
+.metroterm-shell .focus-choice button { min-width: 64px; height: 24px; padding: 0 8px; border: 1px solid var(--control-line); color: var(--muted); font-size: 11px; }
+.metroterm-shell .focus-choice button + button { margin-left: -1px; }
+.metroterm-shell .focus-choice button:hover:not(:disabled) { color: var(--ink); background: var(--control-hover); }
+.metroterm-shell .focus-choice button.is-active { color: var(--ink-active); background: var(--focus-choice-active-bg); box-shadow: var(--choice-active-shadow); }
+.metroterm-shell .focus-choice button:disabled { cursor: default; }
+.metroterm-shell .focus-foot { margin-top: var(--dialog-pad); display: flex; flex-direction: column; }
+.metroterm-shell .focus-foot .dialog-check { padding: 0 var(--dialog-pad) var(--dialog-gap); }
+.metroterm-shell .focus-foot .dialog-actions { margin-top: 0; }
+.metroterm-shell .focus-dialog .dialog-actions .primary-button { display: inline-flex; align-items: center; gap: 6px; }
+
+/* ---------- Focus Mode: running ---------- */
+.metroterm-shell .menu-tools button.is-on { background: var(--active); color: var(--ink); }
+.metroterm-shell .menu-tools button.is-on .icon { color: var(--ink); }
+
+/* menu bar hidden: an exit button slides in when the mouse reaches the top edge */
+.metroterm-shell .focus-exit-zone { position: fixed; top: 0; left: 50%; z-index: 900; width: 360px; height: 8px; transform: translateX(-50%); display: flex; justify-content: center; }
+.metroterm-shell .focus-exit-zone:hover { height: 48px; }
+.metroterm-shell .focus-exit-zone button { height: 30px; display: inline-flex; align-items: center; gap: 8px; padding: 0 12px; border: 1px solid var(--line); border-top: 0; background: var(--chrome); color: var(--ink); font-size: 12px; box-shadow: 0 4px 12px var(--shadow-focus-exit); transform: translateY(-100%); opacity: 0; transition: transform 0.14s ease, opacity 0.14s ease; }
+.metroterm-shell .focus-exit-zone:hover button, .metroterm-shell .focus-exit-zone button:focus-visible { transform: translateY(0); opacity: 1; }
+.metroterm-shell .focus-exit-zone button:hover { background: var(--active); }
+.metroterm-shell .focus-exit-zone small { color: var(--muted); font-size: 11px; }
+.metroterm-shell .menu-bar[hidden], .metroterm-shell .status-bar[hidden], .metroterm-shell .terminal-toolbar[hidden] { display: none !important; }
+
+/* Terminal gutter columns (toolbar ⋮ → Show time / Show line numbers). Both off: no gutter. */
+.metroterm-shell .terminal-gutter[hidden] { display: none !important; }
+.metroterm-shell .terminal-gutter.no-time > div { grid-template-columns: calc(var(--line-digits, 3) * 1ch); }
+.metroterm-shell .terminal-gutter.no-line > div { grid-template-columns: 10ch; }
+.metroterm-shell .terminal-gutter.no-time time, .metroterm-shell .terminal-gutter.no-line span { display: none; }
+.metroterm-shell .toolbar-right .menu-button > button { display: inline-flex; align-items: center; justify-content: center; }
+
+/* Filer → Move to… / Copy to…: destination folder picker (path box + ↑, folder list, resulting path) */
+.file-dest-dialog { width: min(520px, calc(100vw - 32px)); }
+.file-dest-dialog .file-dest-path { display: flex; align-items: center; gap: 4px; }
+.file-dest-dialog .file-dest-path input { flex: 1; min-width: 0; }
+.file-dest-dialog .file-dest-path .icon-button { flex: none; width: 28px; height: 28px; }
+.file-dest-dialog .file-dest-list { height: 220px; margin: 6px 16px 0; overflow: auto; border: 1px solid var(--line-soft); background: var(--panel); }
+.file-dest-dialog .file-dest-list > button { display: flex; align-items: center; gap: 8px; width: 100%; height: var(--ui-row, 24px); padding: 0 8px; border: 0; background: transparent; color: var(--ink); font-size: 12px; text-align: left; }
+.file-dest-dialog .file-dest-list > button:hover:not(:disabled) { background: var(--hover); }
+.file-dest-dialog .file-dest-list > button:disabled { color: var(--faint); }
+.file-dest-dialog .file-dest-list > button .icon { flex: none; color: var(--muted); }
+.file-dest-dialog .file-dest-list > button span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-dest-dialog .file-dest-empty { margin: 0; padding: 10px; color: var(--muted); font-size: 12px; }
+.file-dest-dialog .file-dest-empty.is-error, .file-dest-dialog .file-dest-result.is-problem { color: var(--danger-ink); }
+.file-dest-dialog .file-dest-result { margin: 0; padding: 8px 16px 0; overflow: hidden; color: var(--muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.file-dest-dialog .file-dest-result code { color: var(--ink); font-size: 11px; }
+
+/* ---------- Session types (SSH · Telnet · TCP · Serial · Local), Proxy…, Log…, About, Settings window / fonts ---------- */
+.metroterm-shell .connection-dialog .segmented.session-types button { min-width: 0; padding: 0 4px; letter-spacing: 0.04em; }
+.metroterm-shell .connection-dialog label.dialog-check.is-disabled { color: var(--muted); cursor: default; }
+.metroterm-shell .serial-port-row, .metroterm-shell .log-path-row { display: flex; height: var(--dialog-control); }
+.metroterm-shell .serial-port-row .ui-combobox, .metroterm-shell .log-path-row > input { flex: 1; min-width: 0; }
+.metroterm-shell .serial-port-row > .icon-button, .metroterm-shell .log-path-row > .icon-button { flex: none; width: var(--dialog-control); height: var(--dialog-control); border: 1px solid var(--control-line); border-left: 0; color: var(--muted); }
+.metroterm-shell .serial-port-row > .icon-button:hover:not(:disabled), .metroterm-shell .log-path-row > .icon-button:hover:not(:disabled) { background: var(--control-hover); color: var(--ink); }
+.metroterm-shell .serial-port-row > .icon-button:disabled, .metroterm-shell .log-path-row > .icon-button:disabled { opacity: 0.5; cursor: default; }
+.metroterm-shell .connection-dialog .proxy-test button { box-sizing: border-box; width: 100%; height: var(--dialog-control); border: 1px solid var(--control-line); color: var(--control-text); font-size: 11px; letter-spacing: 0.06em; }
+.metroterm-shell .connection-dialog .proxy-test button:hover:not(:disabled) { border-color: var(--control-focus); background: var(--control-hover); color: var(--ink); }
+.metroterm-shell .connection-dialog .proxy-test button:disabled { opacity: 0.5; cursor: default; }
+.metroterm-shell .connection-dialog .log-sample { box-sizing: border-box; margin: 6px var(--dialog-pad) 0; padding: 7px 10px; overflow: hidden; border: 1px solid var(--line-soft); background: var(--terminal); color: var(--muted); font-family: 'RobotoMono Nerd Font', Consolas, 'SFMono-Regular', 'Cascadia Mono', monospace; font-size: 11px; line-height: 1.5; white-space: pre; text-overflow: ellipsis; }
+.metroterm-shell .opacity-slider { display: flex; align-items: center; gap: 10px; flex: none; width: 210px; }
+.metroterm-shell .opacity-slider > span { width: 46px; color: var(--muted); font-size: 11px; text-align: right; font-variant-numeric: tabular-nums; }
+.metroterm-shell .opacity-slider input[type='range'] { flex: 1; height: 16px; margin: 0; padding: 0; border: 0 !important; background: transparent !important; box-shadow: none !important; appearance: none; cursor: pointer; }
+.metroterm-shell .opacity-slider input[type='range']::-webkit-slider-runnable-track { height: 2px; background: var(--control-line); }
+.metroterm-shell .opacity-slider input[type='range']::-webkit-slider-thumb { appearance: none; width: 10px; height: 14px; margin-top: -6px; border: 0; border-radius: 0; background: var(--range-thumb); }
+.metroterm-shell .opacity-slider input[type='range']::-moz-range-track { height: 2px; background: var(--control-line); }
+.metroterm-shell .opacity-slider input[type='range']::-moz-range-thumb { width: 10px; height: 14px; border: 0; border-radius: 0; background: var(--range-thumb); }
+.metroterm-shell .opacity-slider input[type='range']:disabled { cursor: default; }
+.metroterm-shell .settings-opacity { box-sizing: border-box; width: auto; height: var(--dialog-control); margin: 6px var(--dialog-pad) 0; }
+.metroterm-shell .connection-dialog .settings-hint { margin-top: 6px; padding: 5px 11px; }
+.metroterm-shell .connection-dialog .settings-fonts label { padding-top: 6px; }
+.metroterm-shell .font-preview { display: flex; flex-direction: column; gap: 4px; margin: 8px var(--dialog-pad) 0; padding: 8px 10px; overflow: hidden; border: 1px solid var(--line-soft); background: var(--terminal); color: var(--ink); }
+.metroterm-shell .font-preview > span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height: 1.45; }
+.metroterm-shell .font-preview > span + span { color: var(--muted); font-size: 12px; }
+.metroterm-shell .about-dialog { width: min(400px, 100%); }
+.metroterm-shell .about-head { display: flex; align-items: baseline; gap: 10px; padding: var(--dialog-pad) var(--dialog-pad) 0; }
+.metroterm-shell .about-head b { color: var(--ink-active); font-size: 18px; font-weight: 500; letter-spacing: 0.04em; }
+.metroterm-shell .about-head span { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.metroterm-shell .about-rows { margin: var(--dialog-gap) var(--dialog-pad) 0; border-top: 1px solid var(--line-soft); }
+.metroterm-shell .about-rows > div { display: flex; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--line-soft); font-size: 12px; }
+.metroterm-shell .about-rows dt { flex: none; width: 76px; color: var(--muted); }
+.metroterm-shell .about-rows dd { flex: 1; min-width: 0; margin: 0; color: var(--ink); overflow-wrap: anywhere; }
+
+/* ---------- Explorer: the session filter in the New Session row ---------- */
+.metroterm-shell .session-quickbar { height: calc(var(--header-input) + 10px); min-height: calc(var(--header-input) + 10px); flex-wrap: nowrap; justify-content: flex-start; gap: 4px; padding: 0 calc(var(--pad-x) - var(--btn-inset)) 0 var(--pad-x); }
+.metroterm-shell .session-quickbar .session-filter { min-width: 0; flex: 1; height: var(--header-input); padding: 0 8px; border: 1px solid var(--field-line); background: var(--field-bg); color: var(--ink); font-size: var(--ui-font); line-height: calc(var(--header-input) - 2px); }
+.metroterm-shell .session-quickbar .session-filter::placeholder { color: var(--n-66); }
+.metroterm-shell .session-quickbar button { flex: none; height: var(--header-input); }
+
+/* Monitor panel: CPU / memory / network / disks / processes of the active session's host (components/MonitorPanel). */
+.monitor-pane { font-family: var(--ui-font-family); font-size: var(--ui-font); }
+.monitor { flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; outline: 0; background: var(--panel); color: var(--ink); }
+.monitor-toolbar { height: 30px; min-height: 30px; display: flex; align-items: center; gap: 6px; padding: 0 6px 0 var(--pad-x, 10px); border-bottom: 1px solid var(--line-soft); }
+.monitor-target { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); }
+.monitor-target em { margin-left: 8px; color: var(--muted); font-style: normal; }
+.monitor-interval { width: 64px; flex: 0 0 64px; }
+.monitor-interval .ui-select-trigger { height: 22px; }
+.monitor-toolbar > button { width: 24px; height: 22px; display: inline-flex; align-items: center; justify-content: center; padding: 0; border: 1px solid var(--control-line); background: var(--control-bg); color: var(--muted); }
+.monitor-toolbar > button:hover:not(:disabled), .monitor-toolbar > button.on { background: var(--control-hover); color: var(--ink); }
+.monitor-toolbar > button:disabled { opacity: 0.4; }
+.monitor-error { padding: 4px var(--pad-x, 10px); border-bottom: 1px solid var(--line-soft); color: var(--mon-hot); font-size: var(--ui-font-small, 11px); overflow-wrap: anywhere; }
+.monitor-body { --sb-inset-top: 0; flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 6px var(--pad-x, 10px) 10px; }
+.monitor-info { display: flex; flex-wrap: wrap; gap: 2px 12px; padding-bottom: 6px; color: var(--muted); font-size: var(--ui-font-small, 11px); }
+.monitor-info span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.monitor section { padding: 7px 0 8px; border-top: 1px solid var(--line-soft); }
+.monitor section header { display: flex; align-items: baseline; gap: 8px; min-width: 0; margin-bottom: 5px; }
+.monitor section header.sub { margin: 8px 0 5px; }
+.monitor section header b { flex: 0 0 auto; color: var(--ink); font-weight: 600; }
+.monitor section header span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: var(--ui-font-small, 11px); }
+.monitor section header span i { font-style: normal; margin-right: 8px; }
+.monitor section header strong { flex: 0 0 auto; font-weight: 600; font-variant-numeric: tabular-nums; }
+.monitor i.rx { color: var(--mon-rx); }
+.monitor i.tx { color: var(--mon-tx); }
+.monitor-meter { display: block; height: 6px; background: var(--mon-track); overflow: hidden; }
+.monitor-meter i { display: block; height: 100%; background: var(--mon-cpu); transition: width 0.3s ease; }
+.monitor-meter.hot i { background: var(--mon-hot); }
+.monitor section.mem .monitor-meter i { background: var(--mon-mem); }
+.monitor section.mem .monitor-meter.hot i { background: var(--mon-hot); }
+.monitor-spark { display: block; width: 100%; height: 36px; margin-top: 5px; background: var(--panel-2); fill: none; stroke-width: 1.4; stroke-linejoin: round; }
+.monitor-spark.cpu polyline { stroke: var(--mon-cpu); }
+.monitor-spark.mem polyline { stroke: var(--mon-mem); }
+.monitor-spark.net .s0 { stroke: var(--mon-rx); }
+.monitor-spark.net .s1 { stroke: var(--mon-tx); }
+.monitor-cores { display: flex; gap: 2px; height: 22px; margin-top: 5px; }
+.monitor-cores span { flex: 1; min-width: 2px; display: flex; align-items: flex-end; background: var(--mon-track); }
+.monitor-cores i { display: block; width: 100%; background: var(--mon-cpu); transition: height 0.3s ease; }
+.monitor-cores i.hot { background: var(--mon-hot); }
+.monitor-disk { display: grid; grid-template-columns: minmax(40px, 1fr) minmax(40px, 1.4fr) auto; align-items: center; gap: 8px; height: 20px; }
+.monitor-disk > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.monitor-disk > em { color: var(--muted); font-size: var(--ui-font-small, 11px); font-style: normal; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.monitor section.monitor-procs-section { padding-bottom: 0; }
+.monitor .monitor-procs-head { position: sticky; top: -6px; z-index: 2; height: 32px; margin: 0; align-items: center; background: var(--panel); }
+.monitor-procs-spacer { flex: 1; }
+.metroterm-shell .monitor .pane-filter.monitor-procs-searchbar { position: sticky; top: 26px; z-index: 2; height: 34px; min-height: 34px; padding: 0 0 6px; border-bottom: 0; background: var(--panel); }
+.metroterm-shell .monitor-procs-searchbar button { display: inline-flex; align-items: center; justify-content: center; margin-right: -4px; padding: 0; border: 0; background: transparent; color: var(--muted); }
+.metroterm-shell .monitor-procs-searchbar button:hover { color: var(--ink); background: var(--active); }
+.monitor-procs-section.is-searching .monitor-procs-th { top: 60px; }
+.monitor-procs-search { flex: 0 0 22px; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; margin-right: -4px; padding: 0; border: 0; background: transparent; color: var(--muted); }
+.monitor-procs-search:hover, .monitor-procs-search.on { color: var(--ink); background: var(--active); }
+.monitor .monitor-procs-head > em { flex: 0 0 auto; color: var(--muted); font-size: var(--ui-font-small, 11px); font-style: normal; font-variant-numeric: tabular-nums; }
+.monitor-procs { outline: 0; font-variant-numeric: tabular-nums; }
+.monitor-procs-row { scroll-margin: 50px 0 4px; display: grid; grid-template-columns: 54px minmax(40px, 1fr) minmax(36px, 72px) 46px 64px; column-gap: 6px; align-items: center; height: 21px; padding: 0 4px; cursor: default; user-select: none; }
+.monitor-procs-row > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.monitor-procs-row:not(.monitor-procs-th):hover { background: var(--hover); }
+.monitor-procs-row.is-selected, .monitor-procs-row.is-selected:hover { background: var(--active); color: var(--ink); }
+.monitor-procs:focus-visible .monitor-procs-row.is-selected { box-shadow: inset 0 0 0 1px var(--control-line); }
+.monitor-procs-row.is-busy { opacity: 0.5; }
+.monitor-procs-row .col-pid, .monitor-procs-row .col-user { color: var(--muted); }
+.monitor-procs-row .col-cpu, .monitor-procs-row .col-memory { text-align: right; }
+.monitor-procs-row .col-cpu.hot { color: var(--mon-hot); }
+.monitor-procs-th { position: sticky; top: 26px; z-index: 1; height: 22px; border-bottom: 1px solid var(--line-soft); background: var(--panel); color: var(--muted); font-size: var(--ui-font-small, 11px); }
+.monitor-procs-th > span { display: flex; align-items: center; gap: 3px; height: 100%; cursor: pointer; }
+.monitor-procs-th > span > b { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-weight: 400; }
+.monitor-procs-th > span:hover, .monitor-procs-th > span.is-sorted { color: var(--ink); }
+.monitor-procs-th > span.col-cpu, .monitor-procs-th > span.col-memory { justify-content: flex-end; }
+.monitor-sort { flex: none; display: inline-flex; align-items: center; color: var(--muted); }
+.monitor-sort .icon { transform: rotate(180deg); }
+.monitor-sort.is-descending .icon { transform: none; }
+.monitor-procs mark.filer-match { color: var(--ink); background: var(--match-bg); padding: 0; }
+.monitor-procs-empty { padding: 14px 4px; color: var(--faint); text-align: center; }
+
+/* ---------- Tunnels (menu bar → Tunnels: SSH port forwarding) ---------- */
+.metroterm-shell .menu-tools-count { min-width: 16px; height: 16px; padding: 0 4px; display: inline-flex; align-items: center; justify-content: center; background: var(--active); color: var(--ink); font-size: 10px; font-style: normal; font-variant-numeric: tabular-nums; }
+.metroterm-shell .connection-dialog.tunnels-dialog { width: min(640px, 100%); }
+.metroterm-shell .connection-dialog.tunnel-form { width: min(520px, 100%); }
+.tunnels-list { min-height: 120px; max-height: min(360px, calc(100vh - 260px)); margin: var(--dialog-pad) var(--dialog-pad) 0; overflow-y: auto; border: 1px solid var(--line-soft); background: var(--panel-2); }
+.tunnels-empty { padding: 28px 18px; color: var(--muted); font-size: 12px; line-height: 1.7; text-align: center; }
+.tunnels-empty b { color: var(--ink); font-weight: 600; }
+.tunnel-row { display: grid; grid-template-columns: 8px minmax(0, 1fr) auto auto; align-items: center; column-gap: 12px; min-height: 52px; padding: 7px 8px 7px 12px; border-bottom: 1px solid var(--line-soft); }
+.tunnel-row:hover { background: var(--hover); }
+.tunnel-dot { width: 8px; height: 8px; background: var(--faint); }
+.tunnel-row.is-running .tunnel-dot { background: var(--tunnel-running); }
+.tunnel-row.is-starting .tunnel-dot { background: var(--tunnel-starting); animation: tunnel-blink 0.9s steps(2, start) infinite; }
+.tunnel-row.is-error .tunnel-dot { background: var(--tunnel-error); }
+@keyframes tunnel-blink {
+  to { visibility: hidden; }
+}
+.tunnel-main { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.tunnel-title { display: flex; align-items: center; gap: 7px; min-width: 0; }
+.tunnel-title em { flex: 0 0 auto; padding: 1px 4px; border: 1px solid var(--line); color: var(--muted); font-size: 10px; font-style: normal; line-height: 1.2; }
+.tunnel-title b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); font-size: 12px; font-weight: 600; }
+.tunnel-rule, .tunnel-message { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 11px; }
+.tunnel-missing { color: var(--tunnel-missing-ink); }
+.tunnel-message.is-error { color: var(--error-note-ink); }
+.tunnel-traffic { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tunnel-row.is-running .tunnel-traffic span:first-child { color: var(--ink); }
+.tunnel-buttons { display: flex; align-items: center; gap: 2px; }
+.tunnel-buttons button { width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; padding: 0; border: 0; background: transparent; color: var(--muted); }
+.tunnel-buttons button:hover:not(:disabled) { color: var(--ink); background: var(--active); }
+.tunnel-buttons button:disabled { opacity: 0.4; cursor: default; }
+.metroterm-shell .tunnels-actions { justify-content: space-between; }
+.metroterm-shell .tunnels-actions .tunnels-new { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border: 1px solid var(--line); color: var(--ink); font-size: 11px; letter-spacing: 0.06em; }
+.metroterm-shell .tunnels-actions .tunnels-new:hover { background: var(--active); }
+.metroterm-shell .tunnel-form .segmented button small { margin-left: 4px; color: var(--faint); font-size: 10px; }
+.metroterm-shell .tunnel-form .dialog-note code { padding: 0 4px; background: var(--active); color: var(--ink); font-size: 11px; }
+
+/* Filter fields (Explorer / Filer / Monitor search): rest, hover and focus colours per theme (--filter-*, --field-*). */
+.metroterm-shell .pane-filter input { background-color: var(--filter-bg); border-color: var(--filter-line); }
+.metroterm-shell .session-quickbar .session-filter:hover, .metroterm-shell .pane-filter input:hover { background-color: var(--field-hover-bg); border-color: var(--field-hover-line); }
+.metroterm-shell .session-quickbar .session-filter:focus, .metroterm-shell .pane-filter input:focus { background-color: var(--field-focus-bg); border-color: var(--field-focus-line); }
+.metroterm-shell .connection-dialog .segmented button.theme-gold-option { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.metroterm-shell .theme-gold-option .icon { color: var(--gold-option); }
+.metroterm-shell .theme-gold-option em { padding: 1px 4px; border: 1px solid currentColor; color: var(--gold-option); font-size: 9px; font-style: normal; letter-spacing: 0.06em; line-height: 1; }
+
+/* ===== Menu search (components/CommandPalette): 🔍 left of Tunnels, Ctrl+Shift+P ===== */
+.command-palette { position: fixed; z-index: 1000; top: 44px; left: 0; right: 0; margin-inline: auto; width: min(600px, calc(100vw - 24px)); display: flex; flex-direction: column; border: 1px solid var(--menu-line); background: var(--menu-bg); box-shadow: var(--menu-shadow); color: var(--ink); font-family: var(--ui-font-family); font-size: var(--ui-font); }
+.command-palette-field { display: flex; align-items: stretch; gap: 0; padding: 6px; border-bottom: 1px solid var(--menu-line); }
+.command-palette-field input { flex: 1 1 auto; min-width: 0; height: 28px; padding: 0 8px; border: 1px solid var(--field-focus-line); background: var(--field-bg); color: var(--ink); font: inherit; outline: 0; }
+.command-palette-field button { flex: 0 0 auto; width: 28px; height: 28px; margin-left: 6px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--field-line); background: transparent; color: var(--muted); font: inherit; font-weight: 600; line-height: 1; }
+.command-palette-field button:hover, .command-palette-field button.is-on { border-color: var(--field-hover-line); color: var(--ink); background: var(--active); }
+.command-palette-help { margin: 0; padding: 6px 12px; border-bottom: 1px solid var(--menu-line); color: var(--muted); font-size: var(--ui-font-small, 11px); line-height: 16px; }
+.command-palette-list { max-height: min(420px, calc(100vh - 140px)); margin: 0; padding: 4px 0; overflow-y: auto; overscroll-behavior: contain; list-style: none; }
+.command-palette-list li { height: 28px; display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; align-items: center; column-gap: 8px; padding: 0 12px 0 10px; cursor: default; white-space: nowrap; }
+.command-palette-list li > span { overflow: hidden; text-overflow: ellipsis; color: var(--muted); }
+.command-palette-list li > span .is-leaf { color: var(--ink); }
+.command-palette-list li > i { display: inline-flex; align-items: center; justify-content: center; color: var(--muted); }
+.command-palette-list li > small { color: var(--muted); font-size: var(--ui-font-small, 11px); }
+.command-palette-list li.is-active { background: var(--menu-hover); }
+.command-palette-list li.is-active > span .is-leaf, .command-palette-list li.is-active > i { color: var(--ink-active); }
+.command-palette-list li.command-palette-empty { display: block; height: auto; padding: 8px 12px; color: var(--muted); }
+.command-palette-check { display: inline-block; width: 6px; height: 6px; margin-left: 8px; vertical-align: middle; background: var(--menu-check); }

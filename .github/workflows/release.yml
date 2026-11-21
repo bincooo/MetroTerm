@@ -1,0 +1,466 @@
+name: Release
+
+# Everything that turns a tag into something a person can install.
+#
+# The tag is the whole decision: the version is bumped on `main` (`npm run sync:versions -- X.Y.Z`),
+# the changelog sections are written (CHANGELOG.md and CHANGELOG.zh-CN.md), and the tag `vX.Y.Z` is
+# pushed. Verifying that the three agree is the first job and the only reason it exists — a release
+# whose notes were never written, or whose tag disagrees with the version in the manifests, is a
+# release that cannot be repaired after the fact.
+#
+# A version is numbers and periods only. A candidate is not a version with a suffix but this release
+# marked as one: the artefacts are attached to a draft, the draft is published as a prerelease, and a
+# person promotes it once they are satisfied (the `promote` input below). An MSI carries at most a
+# numeric pre-release identifier, so a suffixed version could not be built as an installer at all.
+#
+# Nothing here builds from a working tree: every artefact comes from the tagged commit, on the
+# platform it is for (macOS Intel on an Intel runner, Linux ARM64 on an ARM runner …).
+#
+#   Linux    deb, rpm, AppImage                         x86_64 (ubuntu-22.04)   ARM64 (ubuntu-22.04-arm)
+#   Windows  -setup.exe, .msi, -offline-setup.exe,      x64 and ARM64 (windows-2022)
+#            -portable.zip
+#   macOS    .dmg                                       Apple silicon (macos-latest)   Intel (macos-15-intel)
+#   Browser  -web.tar.gz (metroterm-server + the UI)    x86_64 and ARM64, glibc 2.28 (web-package.yml)
+#
+# Ubuntu 22.04 keeps the Linux desktop packages on glibc 2.35, like scripts/build-deb.sh. The local
+# scripts (scripts/build-*.sh) remain for building without GitHub.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to build, or to promote when `promote` is set (for example v0.1.0)"
+        required: true
+      promote:
+        description: "Publish an existing prerelease as the latest release. Nothing is built."
+        type: boolean
+        default: false
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  verify:
+    name: The tag, the version and the notes agree
+    # Promoting builds nothing: it is a decision about a release that already exists.
+    if: ${{ !inputs.promote }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Every manifest carries the version the tag names
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
+        # package.json, package-lock.json, Cargo.toml, Cargo.lock and tauri.conf.json: the installers'
+        # names come from one, `metroterm --version` from another, and they must say the same thing.
+        run: node scripts/versions.mjs verify --tag "$TAG"
+
+      - name: The release notes exist
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
+        # A release with an empty body is a release nobody can decide about, and the moment to find
+        # out is now rather than after six builds have run.
+        run: node scripts/release-notes.mjs "$TAG" --check
+
+  build:
+    name: ${{ matrix.name }}
+    needs: verify
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows (x86_64)
+            os: windows-2022
+            platform: windows-x86_64
+            target: x86_64-pc-windows-msvc
+            arch: x64
+          - name: Windows (ARM64)
+            os: windows-2022
+            platform: windows-aarch64
+            target: aarch64-pc-windows-msvc
+            arch: arm64
+          - name: macOS (Apple silicon)
+            os: macos-latest
+            platform: darwin-aarch64
+            target: aarch64-apple-darwin
+          - name: macOS (Intel)
+            os: macos-15-intel
+            platform: darwin-x86_64
+            target: x86_64-apple-darwin
+          - name: Linux (x86_64)
+            os: ubuntu-22.04
+            platform: linux-x86_64
+            target: x86_64-unknown-linux-gnu
+          - name: Linux (ARM64)
+            os: ubuntu-22.04-arm
+            platform: linux-aarch64
+            target: aarch64-unknown-linux-gnu
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+
+      # Asked of the toolchain Cargo will actually run, so a later rust-toolchain.toml cannot make the
+      # installed target and the used toolchain drift apart.
+      - name: Add the release target
+        shell: bash
+        run: rustup target add "${{ matrix.target }}"
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-rust -> target
+          key: release-${{ matrix.platform }}
+
+      # WebKit, GTK, and the tooling the AppImage and RPM bundles are made with.
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends build-essential pkg-config file xdg-utils \
+            libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev libssl-dev \
+            patchelf rpm lld
+
+      # The hosted ARM runner has less headroom than the x64 one; the release build and the final
+      # link are the two places that notice. The swap file pages the peak to disk instead of letting
+      # the runner lose its agent.
+      - name: Add swap on the ARM runner
+        if: matrix.platform == 'linux-aarch64'
+        run: |
+          sudo fallocate -l 8G /mnt/swapfile || sudo dd if=/dev/zero of=/mnt/swapfile bs=1M count=8192
+          sudo chmod 600 /mnt/swapfile
+          sudo mkswap /mnt/swapfile
+          sudo swapon /mnt/swapfile
+          free -h
+
+      - run: npm ci
+
+      # Signing is a secret, so it decides what kind of build this is rather than failing one. The
+      # Apple variables are the platform's own signing and notarization, absent until somebody holds
+      # the certificates: without them the app is signed ad hoc (an Apple-silicon binary must carry
+      # at least that to start at all), and the release body says Gatekeeper will warn.
+      - name: Build the bundles
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+          CARGO_BUILD_JOBS: ${{ matrix.platform == 'linux-aarch64' && '1' || 'default' }}
+          RUSTFLAGS: ${{ matrix.platform == 'linux-aarch64' && '-C link-arg=-fuse-ld=lld' || '' }}
+          # linuxdeploy is itself an AppImage; runners have no FUSE, so it unpacks itself instead.
+          APPIMAGE_EXTRACT_AND_RUN: "1"
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          # An unfilled secret arrives as an empty string, and an empty string is not "unset" to the
+          # tools that read these: signing with nothing is a build that fails in the middle.
+          for name in APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD APPLE_SIGNING_IDENTITY \
+                      APPLE_ID APPLE_PASSWORD APPLE_TEAM_ID; do
+            if [ -z "${!name}" ]; then unset "$name"; fi
+          done
+          if [ "$RUNNER_OS" = "macOS" ]; then
+            if [ -z "${APPLE_SIGNING_IDENTITY:-}" ]; then
+              export APPLE_SIGNING_IDENTITY="-"
+              echo "signing: no Apple certificate, so the macOS app is signed ad hoc" >> "$GITHUB_STEP_SUMMARY"
+            fi
+            if [ -z "${APPLE_ID:-}" ]; then
+              echo "notarization: no Apple credentials, so the macOS build is not notarized" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          fi
+
+          # The bundler's last step for macOS builds a DMG by mounting a volume and asking Finder to
+          # lay it out, and on a runner neither of those is reliable: it fails with "Resource busy" or
+          # with Finder refusing the AppleScript, neither of which is about what is being built, and
+          # then succeeds on the next try. So this tries three times, and before each retry detaches
+          # the volume a failed attempt left mounted. Nothing else is masked: a compile error fails
+          # three times and the step still fails, with the last attempt's output in the log.
+          for attempt in 1 2 3; do
+            if npx tauri build --target "$TARGET" -- --locked; then
+              break
+            fi
+            if [ "$attempt" = "3" ]; then
+              echo "::error::the build failed three times; the last attempt is what failed"
+              exit 1
+            fi
+            echo "::warning::the build failed (attempt $attempt of 3); clearing up and trying again"
+            if [ "$RUNNER_OS" = "macOS" ]; then
+              hdiutil detach "/Volumes/MetroTerm" -force > /dev/null 2>&1 || true
+            fi
+            sleep 10
+          done
+
+      # The platform's own files, read back from what the bundler wrote rather than predicted here.
+      # Only the files directly in bundle/<format>/ — the folders beside them (the AppDir, the deb's
+      # unpacked tree) are the bundler's working material.
+      - name: Collect the installers
+        shell: bash
+        run: |
+          mkdir -p release-artifacts
+          shopt -s nullglob
+          for file in src-rust/target/${{ matrix.target }}/release/bundle/*/*.{msi,exe,dmg,AppImage,deb,rpm}; do
+            if [ -f "$file" ]; then cp "$file" release-artifacts/; fi
+          done
+          if [ -z "$(ls -A release-artifacts)" ]; then
+            echo "::error::the bundler wrote no installer"
+            exit 1
+          fi
+          ls -l release-artifacts
+
+      # The two Windows formats Tauri does not make itself: a copy that runs without an installer,
+      # and an installer that carries the WebView2 runtime for machines without it (and without the
+      # internet). Both come from the binary this leg just built, not from another checkout.
+      - name: Package the Windows portable build and offline installer
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $target = "${{ matrix.target }}"
+          $arch = "${{ matrix.arch }}"
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+
+          # The normal NSIS installer has already been copied into release-artifacts. This second
+          # bundle run replaces the file in the target tree with one that embeds WebView2, so the new
+          # file is copied out under a name that says which one it is.
+          $bundleDir = "src-rust/target/$target/release/bundle/nsis"
+          $before = @{}
+          if (Test-Path $bundleDir) {
+            Get-ChildItem $bundleDir -Filter "*.exe" | ForEach-Object { $before[$_.FullName] = $_.LastWriteTimeUtc }
+          }
+
+          npx tauri bundle --bundles nsis --target $target --config src-rust/tauri.webview2-offline.conf.json
+          if ($LASTEXITCODE -ne 0) { throw "tauri bundle (offline installer) failed" }
+
+          $offline = Get-ChildItem $bundleDir -Filter "*.exe" |
+            Where-Object { !$before.ContainsKey($_.FullName) -or $_.LastWriteTimeUtc -gt $before[$_.FullName] } |
+            Sort-Object LastWriteTimeUtc -Descending |
+            Select-Object -First 1
+          if (!$offline) {
+            throw "Missing WebView2 offline installer in $bundleDir"
+          }
+          Copy-Item $offline.FullName (Join-Path "release-artifacts" "MetroTerm_${version}_${arch}-offline-setup.exe") -Force
+
+          $portableDir = Join-Path "portable" "MetroTerm_${version}_${arch}"
+          New-Item -ItemType Directory -Force -Path $portableDir | Out-Null
+          $binary = "src-rust/target/$target/release/MetroTerm.exe"
+          if (!(Test-Path $binary)) {
+            # The crate's own binary name; the installer renames it to the product name.
+            $binary = "src-rust/target/$target/release/metroterm.exe"
+          }
+          if (!(Test-Path $binary)) {
+            throw "Missing Windows executable for $target"
+          }
+          Copy-Item $binary (Join-Path $portableDir "MetroTerm.exe") -Force
+          Copy-Item "LICENSE" (Join-Path $portableDir "LICENSE") -Force
+          Copy-Item "README.md" (Join-Path $portableDir "README.md") -Force
+
+          # The marker is what moves settings, sessions, known hosts and logs into the copy's own
+          # data folder (src-rust/src/config.rs, PORTABLE_MARKER).
+          Set-Content -Path (Join-Path $portableDir "portable.metroterm") -Value "" -NoNewline
+          Set-Content -Path (Join-Path $portableDir "README-portable.txt") -Encoding utf8NoBOM -Value @(
+            "MetroTerm portable build",
+            "",
+            "Run MetroTerm.exe. Settings, sessions, known hosts and logs are kept in the data folder beside it.",
+            "Remembered passwords are encrypted for this computer and user: on another computer, enter them again.",
+            "The Microsoft Edge WebView2 runtime is required; it is part of Windows 11 and of current Windows 10.",
+            "",
+            "便携版：运行 MetroTerm.exe。设置、会话、已知主机和日志保存在旁边的 data 文件夹里。",
+            "记住的密码按这台电脑和用户加密，换一台电脑需要重新输入。需要 Microsoft Edge WebView2（Windows 11 和较新的 Windows 10 自带）。"
+          )
+
+          $zip = Join-Path "release-artifacts" "MetroTerm_${version}_${arch}-portable.zip"
+          Compress-Archive -Path (Join-Path $portableDir "*") -DestinationPath $zip -Force
+
+          Get-ChildItem release-artifacts | Format-Table Name, Length
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.platform }}
+          path: release-artifacts
+          if-no-files-found: error
+
+  # The browser package, built in the Debian 10 image a glibc 2.28 system needs. It runs beside the
+  # desktop legs rather than in their matrix: the toolchain image is the whole point of the package.
+  web:
+    name: Browser package
+    needs: verify
+    uses: ./.github/workflows/web-package.yml
+    with:
+      tag: ${{ inputs.tag || github.ref_name }}
+
+  release:
+    name: Publish the release
+    needs: [build, web]
+    runs-on: ubuntu-latest
+    permissions:
+      # The release and its assets are written with the token this job is given. Nothing else in the
+      # repository needs write access.
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: desktop-*
+          path: artifacts
+          merge-multiple: true
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: web-linux-*
+          path: artifacts
+          merge-multiple: true
+
+      # What the release carries: the installers a person runs. `|| true` on the `ls` because a glob
+      # that matches nothing makes it exit 2 under `-e -o pipefail`; what is missing is reported by
+      # name just below instead.
+      - name: Choose the assets
+        shell: bash
+        run: |
+          mkdir -p release
+          {
+            ls artifacts/*.msi artifacts/*.exe artifacts/*.dmg artifacts/*.AppImage artifacts/*.deb artifacts/*.rpm 2>/dev/null || true
+            ls artifacts/*-portable.zip 2>/dev/null || true
+            ls artifacts/*-web.tar.gz 2>/dev/null || true
+          } | sort -u > release-assets.txt
+          while read -r file; do cp "$file" release/; done < release-assets.txt
+          ls -l release
+
+          # Every platform must have arrived: a release missing one is a release somebody installs
+          # and finds the wrong file in.
+          missing=0
+          for pattern in '_amd64.deb' '_arm64.deb' '.x86_64.rpm' '.aarch64.rpm' '_amd64.AppImage' '_aarch64.AppImage' \
+                         '_x64-setup.exe' '_arm64-setup.exe' '_x64-offline-setup.exe' '_arm64-offline-setup.exe' \
+                         '_x64-portable.zip' '_arm64-portable.zip' '_x64_en-US.msi' \
+                         '_aarch64.dmg' '_x64.dmg' '_linux-x86_64-web.tar.gz' '_linux-aarch64-web.tar.gz'; do
+            if ! grep -q -- "$pattern\$" release-assets.txt; then
+              echo "::error::no asset ending in $pattern"
+              missing=1
+            fi
+          done
+          exit $missing
+
+      - name: Hash what was actually built
+        run: |
+          # The chosen files rather than everything the builds produced: these are the hashes of the
+          # downloads, published beside them and in the release body.
+          (cd release && sha256sum -- * > ../SHA256SUMS.txt)
+          cat SHA256SUMS.txt
+
+      - name: The release body
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          {
+            node scripts/release-notes.mjs "$TAG" --lang zh
+            echo ""
+            echo "---"
+            echo ""
+            echo "### 文件与校验和"
+            echo ""
+            echo '```'
+            # From the files themselves rather than from a table somebody typed.
+            cat SHA256SUMS.txt
+            echo '```'
+            echo ""
+            echo "### 安装"
+            echo ""
+            echo "- **Windows：** 运行 \`-setup.exe\`（装到当前用户）或 \`.msi\`。安装包尚未代码签名，Windows 会在运行前给出警告。\`-offline-setup.exe\` 自带 WebView2 运行时，适合离线的电脑；\`-portable.zip\` 解压即用，设置和会话保存在旁边的 \`data\` 文件夹里。"
+            echo "- **macOS：** 打开 \`.dmg\`，把 MetroTerm 拖进应用程序文件夹。Apple 芯片用 \`_aarch64.dmg\`，Intel 用 \`_x64.dmg\`。构建尚未公证，第一次打开请在 Finder 里右键 → 打开。"
+            echo "- **Linux：** \`.deb\`（Ubuntu 22.04 及更新、Debian 12 及更新）用 \`sudo apt install ./文件名.deb\`；\`.rpm\` 用 \`sudo dnf install ./文件名.rpm\`；AppImage 先 \`chmod +x\` 再运行。"
+            echo "- **浏览器版：** \`-web.tar.gz\` 适合没有图形界面的 Linux 服务器（glibc 2.28 及更新）：解压后运行 \`./metroterm-server\`，在浏览器打开 \`http://127.0.0.1:7681/\`（远程服务器请用 SSH 隧道访问，不要直接对外监听）。"
+            echo ""
+            echo "英文更新日志（English changelog）：https://github.com/${REPOSITORY}/blob/${TAG}/CHANGELOG.md"
+          } > body.md
+          cat body.md
+
+      - name: Attach the files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          mapfile -t files < release-assets.txt
+          files+=(SHA256SUMS.txt)
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            # Re-running a release is normal — a build failed, a note was wrong — so an existing
+            # release is filled in rather than treated as an error.
+            gh release upload "$TAG" "${files[@]}" --clobber
+            gh release edit "$TAG" --notes-file body.md
+          else
+            # As a draft: it exists while the next step runs and is not on the releases page until
+            # everything is attached, so nobody opens a release that is still being filled.
+            gh release create "$TAG" --draft --verify-tag --title "MetroTerm $TAG" --notes-file body.md "${files[@]}"
+          fi
+
+      - name: Publish it as a candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          # Every release goes out marked as a prerelease, and somebody promotes it when they are
+          # satisfied — with the `promote` input of this workflow, or by hand:
+          #   gh release edit <tag> --prerelease=false --latest
+          #
+          # Asked once, into a variable, so a `gh` that cannot answer fails the step instead of being
+          # read as "not a draft".
+          draft="$(gh release view "$TAG" --json isDraft --jq .isDraft)"
+          if [ "$draft" = "true" ]; then
+            gh release edit "$TAG" --draft=false --prerelease
+            echo "**$TAG is published as a candidate (prerelease).** Promote it when it is good." >> "$GITHUB_STEP_SUMMARY"
+          else
+            # Re-running a release that is already out there: its flags are somebody's decision about
+            # it, and a build job has no business changing them back.
+            echo "**$TAG is already published**; its files were replaced and its flags were left alone." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  promote:
+    name: Promote a release
+    # The other half of "candidate": the release already exists, its files were built by the run that
+    # made it, and this only says that a person considers it good.
+    if: ${{ inputs.promote }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      # `gh` infers the repository from git: without a checkout the first command stops with
+      # "not a git repository".
+      - uses: actions/checkout@v4
+
+      - name: Promote it
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          prerelease="$(gh release view "$TAG" --json isPrerelease,isDraft --jq 'if .isDraft then "draft" else (.isPrerelease | tostring) end')"
+          case "$prerelease" in
+            draft) echo "::error::$TAG is still a draft — its release run has not finished"; exit 1 ;;
+            false) echo "$TAG is already a full release; marking it latest" ;;
+          esac
+          gh release edit "$TAG" --prerelease=false --latest
+          echo "**$TAG is the latest release.**" >> "$GITHUB_STEP_SUMMARY"

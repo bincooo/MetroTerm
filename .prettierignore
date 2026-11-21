@@ -1,0 +1,11 @@
+dist
+release
+node_modules
+src-rust
+src/lib/vendor
+package-lock.json
+uploads
+*.md
+wiki
+# Compact one-rule-per-line layout, not Prettier-formatted
+src/styles.css

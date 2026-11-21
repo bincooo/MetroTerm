@@ -1,0 +1,78 @@
+[package]
+name = "metroterm"
+version = "0.0.1"
+license = "Apache-2.0"
+description = "Metro-style SSH, SFTP and terminal workspace"
+authors = ["MetroTerm"]
+edition = "2021"
+rust-version = "1.85"
+default-run = "metroterm"
+
+[lib]
+name = "metroterm_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+# desktop = Tauri app (default) · server = headless WebSocket backend for the browser UI
+[features]
+default = ["desktop"]
+# (desktop includes server for `metroterm --web`)
+desktop = ["server", "dep:tauri", "dep:tauri-plugin-dialog", "dep:tauri-build", "dep:gtk", "dep:webkit2gtk"]
+server = ["dep:axum", "dep:tokio-util", "dep:futures-util"]
+
+[[bin]]
+name = "metroterm"
+path = "src/main.rs"
+required-features = ["desktop"]
+
+[[bin]]
+name = "metroterm-server"
+path = "src/bin/metroterm-server.rs"
+required-features = ["server"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [], optional = true }
+
+[dependencies]
+# desktop shell
+tauri = { version = "2", features = [], optional = true }
+tauri-plugin-dialog = { version = "2", optional = true }
+# web backend
+axum = { version = "0.8", features = ["ws"], optional = true }
+tokio-util = { version = "0.7", features = ["io"], optional = true }
+futures-util = { version = "0.3", default-features = false, features = ["sink", "std"], optional = true }
+# core
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time", "fs", "io-util", "net"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+portable-pty = "0.9"
+russh = { version = "0.65", default-features = false, features = ["ring", "rsa", "flate2"] }
+russh-sftp = "3"
+dirs = "6"
+# Remembered SSH passwords: AES-256-GCM (ring is already used by russh)
+ring = "0.17"
+log = { version = "0.4", features = ["std"] }
+# App log timestamps (local time)
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+base64 = "0.22"
+# Serial sessions (no libudev: ports are listed from /sys on Linux)
+serialport = { version = "4", default-features = false }
+# Monitor panel: CPU / memory / network / disks / processes of the local machine
+sysinfo = { version = "0.36", default-features = false, features = ["system", "disk", "network", "user"] }
+
+# Linux: GTK font settings for the webview (gtk is already in Tauri's dependency tree)
+[target.'cfg(target_os = "linux")'.dependencies]
+gtk = { version = "0.18", optional = true }
+# Linux: let the app's own text-field menu (Cut / Copy / Paste) use the clipboard without a WebKit prompt
+webkit2gtk = { version = "2.0", optional = true }
+
+# Monitor panel: stop / kill a local process (kill(2) with its error)
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+# Window opacity (Settings → Window opacity)
+[target.'cfg(windows)'.dependencies]
+# (+ Console: `metroterm --help` / `--web` print to the console they were started from)
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_UI_WindowsAndMessaging", "Win32_System_Console", "Win32_System_Threading", "Win32_System_Diagnostics_Debug", "Win32_System_Diagnostics_ToolHelp", "Wdk_System_Threading"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.6"

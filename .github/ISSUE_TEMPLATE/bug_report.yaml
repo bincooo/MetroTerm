@@ -1,0 +1,53 @@
+name: Bug 反馈
+description: 报告一个问题
+title: "[Bug]: "
+labels: ["bug", "idea", "help"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢你花时间填写 Bug 报告!
+
+  - type: input
+    id: version
+    attributes:
+      label: 版本号
+      placeholder: v1.0.0
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 发生了什么?
+      description: 请详细描述问题
+      placeholder: 告诉我们你看到了什么
+    validations:
+      required: true
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: 使用的浏览器
+      multiple: true
+      options:
+        - Chrome
+        - Firefox
+        - Safari
+        - Edge
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 相关日志
+      render: shell
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: 确认事项
+      options:
+        - label: 我已搜索过现有的 issues
+          required: true
+        - label: 我已阅读贡献指南
+          required: true

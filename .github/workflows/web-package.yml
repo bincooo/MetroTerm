@@ -1,0 +1,155 @@
+name: Browser package
+
+# The browser edition: `metroterm` (web mode only) with the built UI beside it in `www/`, for Linux machines
+# without a desktop (a server reached through an SSH tunnel, a container, a NAS). It needs neither
+# GTK nor WebKit — only the backend and the UI files — so it is built separately from the desktop
+# legs, in a Debian 10 image: a binary links against the glibc it was built with, and 2.28 is old
+# enough for every maintained distribution (Debian 10+, Ubuntu 18.10+, RHEL / Rocky 8+).
+#
+# Called by release.yml for a tag; run it by hand (Actions → Browser package) to try a branch — the
+# packages are then attached to the run only.
+#
+#   MetroTerm_<version>_linux-x86_64-web.tar.gz
+#   MetroTerm_<version>_linux-aarch64-web.tar.gz
+#     metroterm  www/  LICENSE  README.md  README-web.txt
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        description: "Tag (or branch) to build"
+        type: string
+        required: true
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag or branch to build (for example v0.1.0 or main)"
+        required: true
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  ui:
+    name: The UI files
+    # The same files on every architecture: built once, where Node is at home.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ui-dist
+          path: dist
+          if-no-files-found: error
+
+  package:
+    name: Browser package (${{ matrix.arch }})
+    needs: ui
+    runs-on: ${{ matrix.os }}
+    container: debian:10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            os: ubuntu-latest
+          - arch: aarch64
+            os: ubuntu-22.04-arm
+    steps:
+      # Debian 10 has left the mirrors for the archive; its Release files are past their validity
+      # date, which is the archive's normal state rather than a sign of tampering.
+      - name: Point apt at the Debian archive
+        run: |
+          sed -i -e 's|deb.debian.org|archive.debian.org|g' \
+                 -e 's|security.debian.org|archive.debian.org|g' \
+                 -e '/buster-updates/d' /etc/apt/sources.list
+          apt-get -o Acquire::Check-Valid-Until=false update
+          apt-get install -y --no-install-recommends ca-certificates curl git build-essential pkg-config binutils
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Install Rust
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain stable
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-rust -> target
+          key: web-${{ matrix.arch }}
+
+      # The `server` feature alone: no Tauri, no GTK, no WebKit.
+      - name: Build metroterm (web mode only)
+        run: |
+          cargo build --release --locked --manifest-path src-rust/Cargo.toml \
+            --no-default-features --features server --bin metroterm
+
+      # Checked rather than assumed: a dependency that started calling a newer glibc symbol would
+      # otherwise ship a package that refuses to start on exactly the systems it is for.
+      - name: The binary runs on glibc 2.28
+        run: |
+          bin=src-rust/target/release/metroterm
+          needed="$(objdump -T "$bin" | grep -o 'GLIBC_[0-9.]*' | sort -uV | tail -1)"
+          echo "highest glibc symbol: $needed"
+          if [ "$(printf '%s\n' "$needed" GLIBC_2.28 | sort -V | tail -1)" != "GLIBC_2.28" ]; then
+            echo "::error::metroterm needs $needed, newer than glibc 2.28"
+            exit 1
+          fi
+          "$bin" --version
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ui-dist
+          path: ui-dist
+
+      - name: Pack it
+        run: |
+          version="$(sed -n 's/^ *"version": *"\([^"]*\)".*/\1/p' package.json | head -1)"
+          name="MetroTerm_${version}_linux-${{ matrix.arch }}-web"
+          mkdir -p "pack/$name"
+          cp src-rust/target/release/metroterm "pack/$name/"
+          strip "pack/$name/metroterm"
+          cp -r ui-dist "pack/$name/www"
+          cp LICENSE README.md "pack/$name/"
+          cat > "pack/$name/README-web.txt" <<'EOF'
+          MetroTerm browser package
+
+          Run ./metroterm web and open http://127.0.0.1:7681/ in a browser. The UI is served from
+          the www folder beside the program; settings and sessions are kept in ~/.metroterm.
+
+            ./metroterm web --listen 127.0.0.1:8080     another port
+            ./metroterm web --daemon                    in the background (stop: ./metroterm web --stop)
+            ./metroterm --help                          all options
+
+          Anyone who can reach the address gets a shell as the user running it. Keep it on localhost
+          and reach a remote machine through an SSH tunnel:
+            ssh -L 7681:127.0.0.1:7681 user@server      then open http://127.0.0.1:7681/ locally
+          Requests are accepted only from the UI's own pages, at localhost or an IP address.
+
+          浏览器版：运行 ./metroterm web，在浏览器打开 http://127.0.0.1:7681/。界面来自旁边的 www
+          文件夹，设置和会话保存在 ~/.metroterm。能访问这个地址的人就能以当前用户打开 shell：请只监听
+          localhost，远程服务器用 SSH 隧道访问（ssh -L 7681:127.0.0.1:7681 user@server）。
+          EOF
+          mkdir -p out
+          tar -C pack -czf "out/$name.tar.gz" "$name"
+          ls -l out
+          tar -tzf "out/$name.tar.gz" | head -20
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-linux-${{ matrix.arch }}
+          path: out
+          if-no-files-found: error

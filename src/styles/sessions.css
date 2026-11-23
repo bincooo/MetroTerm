@@ -1,0 +1,92 @@
+/* Session panel (open tabs, agent CLI status) and the session dialogs' own fields (session types, jump hosts, serial ports). */
+
+/* ===== Session panel: open tabs ===== */
+.metroterm-shell .open-tabs-bar { justify-content: flex-start; color: var(--muted); font-size: var(--open-tab-small); letter-spacing: 0.08em; text-transform: uppercase; }
+.metroterm-shell .open-tabs { padding-top: 2px; }
+.metroterm-shell .open-tabs .tree-row.open-tab { height: var(--open-tab-line); gap: var(--icon-gap); padding: 0 var(--pad-x); cursor: default; outline: 0; }
+.metroterm-shell .open-tabs .tree-row.open-tab:focus-visible { box-shadow: inset 0 0 0 1px var(--control-line); }
+.metroterm-shell .open-tabs .tree-row.open-tab.is-current { background: var(--active); color: var(--ink); }
+.open-tab-title { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 16px; }
+.metroterm-shell .open-tabs .open-tab-detail { flex: 1 1 0; min-width: 0; margin-left: 0; padding: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right; line-height: 16px; position: relative; top: 1px; color: var(--faint); font-size: var(--open-tab-small); }
+.open-tab-status { flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--n-69); }
+.metroterm-shell .open-tabs .tree-row.open-tab.has-agent { flex-wrap: wrap; align-content: flex-start; row-gap: 0; height: auto; padding-bottom: 6px; }
+.open-tab.has-agent > i { height: var(--open-tab-line); }
+.metroterm-shell .open-tabs .open-tab-agent { flex: 0 0 100%; min-width: 0; height: 18px; padding: 0; display: flex; align-items: center; gap: var(--icon-gap); overflow: hidden; white-space: nowrap; color: var(--muted); font-size: var(--open-tab-small); }
+/* The state as a flat, square-cornered tag in capitals (Metro); it stays whole, a long name is cut instead. */
+.metroterm-shell .open-tabs .open-tab-agent > .open-tab-agent-state { flex: none; height: 16px; padding: 0 5px; border: 1px solid transparent; line-height: 14px; font-size: calc(var(--ui-font-small) - 2px); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+.open-tab-status.online { background: var(--status-online); box-shadow: 0 0 0 2px var(--status-online-glow); }
+.open-tab-status.connecting { background: var(--status-connecting); animation: session-pulse 1s ease-in-out infinite; }
+.metroterm-shell .open-tab-input { flex: 1; min-width: 0; height: 20px; padding: 0 5px; border: 1px solid var(--control-focus); border-radius: 0; background: var(--control-bg); color: var(--ink); font: inherit; outline: 0; }
+.open-tabs-empty { padding: 10px var(--pad-x); color: var(--muted); font-size: var(--ui-font-small); line-height: 1.5; }
+
+/* ===== Agent CLI status ===== */
+@media (prefers-reduced-motion: reduce) {
+  .open-tab-agent .icon, .open-tab-agent .icon path { animation: none !important; }
+}
+.open-tab-agent > b { flex: none; display: inline-flex; align-items: center; justify-content: center; width: var(--icon); height: var(--icon); color: var(--faint); }
+/* Smaller than the tab icon above it (same column); the stroke is thicker so it stays as heavy once scaled down. */
+.open-tab-agent > b .icon { width: 11px; height: 11px; overflow: visible; stroke-width: 1.55; }
+.open-tab-agent > .open-tab-agent-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; line-height: 16px; }
+.open-tab-agent.is-working > .open-tab-agent-state { background: var(--agent-working-bg); color: var(--agent-working-ink); }
+.open-tab-agent.is-blocked > .open-tab-agent-state { background: var(--agent-blocked-bg); color: var(--agent-blocked-ink); }
+.open-tab-agent.is-done > .open-tab-agent-state { background: var(--agent-done-bg); color: var(--agent-done-ink); }
+.open-tab-agent:is(.is-idle, .is-unknown) > .open-tab-agent-state { border-color: var(--agent-idle-line); color: var(--agent-idle-ink); }
+/*
+ * Agent icons and motion. Working: the spark turns a quarter at a time (a step, then a rest — the way Metro moves) and
+ * the small spark blinks between the steps. Needs input: the box gives a short nudge every few seconds, so a waiting
+ * agent catches the eye without moving all the time. Done: the check is drawn in once. Idle: still.
+ */
+.open-tab-agent.is-working > b { color: var(--status-connecting); }
+.open-tab-agent.is-working .agent-spark { transform-box: fill-box; transform-origin: center; animation: agent-turn 1.4s cubic-bezier(0.65, 0, 0.35, 1) infinite; }
+.open-tab-agent.is-working .agent-spark-small { animation: agent-blink 1.4s steps(1, end) infinite; }
+.open-tab-agent.is-blocked > b { color: var(--danger-ink); }
+.open-tab-agent.is-blocked > b .icon { animation: agent-nudge 2.8s ease-in-out infinite; }
+.open-tab-agent.is-done > b { color: var(--status-online); }
+.open-tab-agent.is-done .agent-check { stroke-dasharray: 16; animation: agent-draw 0.45s cubic-bezier(0.3, 0, 0.2, 1) both; }
+.open-tab-agent.is-idle .agent-spark-small { opacity: 0; }
+
+/* ===== Session dialogs: session types, jump hosts ===== */
+.metroterm-shell .connection-dialog .field-label + .jump-list { margin-top: 6px; }
+/* Session Settings → PROXY → Jump host: the chain in connection order (↑ ↓ reorder, × removes), then a select adding the next one. */
+.metroterm-shell .jump-list { margin: 0 var(--dialog-pad); padding: 0; list-style: none; border: 1px solid var(--line-soft); background: var(--panel-2); }
+.metroterm-shell .jump-list li { display: grid; grid-template-columns: 18px minmax(0, auto) minmax(0, 1fr) repeat(3, 24px); align-items: center; column-gap: 6px; min-height: var(--dialog-control); padding: 0 2px 0 8px; font-size: 12px; }
+.metroterm-shell .jump-list li + li { border-top: 1px solid var(--line-soft); }
+.metroterm-shell .jump-list .jump-index { color: var(--tmux-focus-line); font-variant-numeric: tabular-nums; }
+.metroterm-shell .jump-list .jump-name { overflow: hidden; color: var(--ink); white-space: nowrap; text-overflow: ellipsis; }
+.metroterm-shell .jump-list small { overflow: hidden; color: var(--muted); font-size: 11px; white-space: nowrap; text-overflow: ellipsis; }
+.metroterm-shell .jump-list li.is-missing .jump-name { color: var(--error-note-ink); }
+.metroterm-shell .jump-list .icon-button { width: 24px; height: 22px; display: grid; place-items: center; padding: 0; color: var(--muted); }
+.metroterm-shell .jump-list .icon-button:hover:not(:disabled) { color: var(--ink); background: var(--control-hover); }
+.metroterm-shell .jump-list .icon-button:disabled { opacity: 0.3; cursor: default; }
+.metroterm-shell .jump-list .icon-button svg { width: 12px; height: 12px; }
+.metroterm-shell .connection-dialog label.jump-add { padding-top: 6px; }
+.metroterm-shell .connection-dialog label.jump-add:empty { display: none; }
+.metroterm-shell .connection-dialog .segmented.session-types button { min-width: 0; padding: 0 4px; letter-spacing: 0.04em; }
+
+/* ===== Serial ports ===== */
+.metroterm-shell .serial-port-row { display: flex; height: var(--dialog-control); }
+.metroterm-shell .serial-port-row .ui-combobox { flex: 1; min-width: 0; }
+.metroterm-shell .serial-port-row > .icon-button { flex: none; width: var(--dialog-control); height: var(--dialog-control); border: 1px solid var(--control-line); border-left: 0; color: var(--muted); }
+.metroterm-shell .serial-port-row > .icon-button:hover:not(:disabled) { background: var(--control-hover); color: var(--ink); }
+.metroterm-shell .serial-port-row > .icon-button:disabled { opacity: 0.5; cursor: default; }
+
+@keyframes agent-turn {
+  0% { transform: rotate(0deg) scale(1); }
+  45% { transform: rotate(90deg) scale(0.82); }
+  60%, 100% { transform: rotate(90deg) scale(1); }
+}
+@keyframes agent-blink {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+}
+@keyframes agent-nudge {
+  0%, 72%, 100% { transform: translateX(0); }
+  76% { transform: translateX(-1.5px); }
+  80% { transform: translateX(1.5px); }
+  84% { transform: translateX(-1px); }
+  88% { transform: translateX(0.5px); }
+}
+@keyframes agent-draw {
+  from { stroke-dashoffset: 16; }
+  to { stroke-dashoffset: 0; }
+}

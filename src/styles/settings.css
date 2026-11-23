@@ -1,0 +1,106 @@
+/* Preference dialogs: Settings (appearance, fonts, cursor, opacity, lock password, MCP server), Focus Mode Settings, Keyboard Shortcuts, Proxy, Log, About. */
+
+/* ===== Settings dialog: appearance, fonts, cursor, opacity, lock password, MCP server ===== */
+.metroterm-shell .connection-dialog .segmented.cursor-blink { margin-top: 6px; }
+.metroterm-shell .connection-dialog .cursor-shapes button { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.metroterm-shell .connection-dialog .cursor-sample { flex: none; position: relative; width: 8px; height: 13px; }
+.metroterm-shell .connection-dialog .cursor-sample::before { content: ''; position: absolute; left: 0; bottom: 0; width: 8px; height: 13px; background: var(--terminal-cursor-color); }
+.metroterm-shell .connection-dialog .cursor-sample.is-bar::before { width: 2px; }
+.metroterm-shell .connection-dialog .cursor-sample.is-underline::before { height: 3px; }
+.metroterm-shell .lock-password-row { display: flex; height: var(--dialog-control); }
+.metroterm-shell .lock-password-row > span { flex: 1; min-width: 0; display: flex; align-items: center; padding: 0 10px; border: 1px solid var(--control-line); border-right: 0; background: var(--panel-2); color: var(--muted); font-size: 12px; letter-spacing: 0; }
+.metroterm-shell .lock-password-row > span.is-set { color: var(--ink); }
+.metroterm-shell .lock-password-row > button { padding: 0 12px; border: 1px solid var(--control-line); color: var(--control-text); font-size: 11px; letter-spacing: 0.06em; }
+.metroterm-shell .lock-password-row > button:hover { border-color: var(--control-focus); background: var(--control-hover); color: var(--ink); }
+.metroterm-shell .opacity-slider { display: flex; align-items: center; gap: 10px; flex: none; width: 210px; }
+.metroterm-shell .opacity-slider > span { width: 46px; color: var(--muted); font-size: 11px; text-align: right; font-variant-numeric: tabular-nums; }
+.metroterm-shell .connection-dialog .opacity-slider input[type='range'] { flex: 1; margin: 0; border: 0 !important; background: transparent !important; box-shadow: none !important; appearance: none; cursor: pointer; }
+.metroterm-shell .opacity-slider input[type='range']::-webkit-slider-runnable-track { height: 2px; background: var(--control-line); }
+.metroterm-shell .opacity-slider input[type='range']::-webkit-slider-thumb { appearance: none; width: 10px; height: 14px; margin-top: -6px; border: 0; border-radius: 0; background: var(--range-thumb); }
+.metroterm-shell .opacity-slider input[type='range']::-moz-range-track { height: 2px; background: var(--control-line); }
+.metroterm-shell .opacity-slider input[type='range']::-moz-range-thumb { width: 10px; height: 14px; border: 0; border-radius: 0; background: var(--range-thumb); }
+.metroterm-shell .opacity-slider input[type='range']:disabled { cursor: default; }
+.metroterm-shell .settings-opacity { box-sizing: border-box; width: auto; height: var(--dialog-control); margin: 6px var(--dialog-pad) 0; }
+.metroterm-shell .connection-dialog .dialog-note.settings-hint { margin-top: 6px; padding: 5px 11px; }
+.metroterm-shell .connection-dialog .settings-fonts label { padding-top: 6px; }
+.metroterm-shell .font-preview { display: flex; flex-direction: column; gap: 4px; margin: 8px var(--dialog-pad) 0; padding: 8px 10px; overflow: hidden; border: 1px solid var(--line-soft); background: var(--terminal); color: var(--ink); }
+.metroterm-shell .font-preview > span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height: 1.45; }
+.metroterm-shell .font-preview > span + span { color: var(--muted); font-size: 12px; }
+/* Settings → MCP SERVER: token row (value · COPY · NEW), the agent CLI choice and its setup snippet. */
+.metroterm-shell .connection-dialog .form-grid.mcp-prefs { grid-template-columns: minmax(0, 1fr) 110px; padding-top: 6px; }
+.metroterm-shell .connection-dialog .form-grid.mcp-prefs > label { grid-template-columns: minmax(0, 1fr); }
+.metroterm-shell .mcp-token > span { display: block; overflow: hidden; line-height: calc(var(--dialog-control) - 2px); white-space: nowrap; text-overflow: ellipsis; color: var(--ink); font-size: 11px; user-select: all; flex: 1 1 0; min-width: 0; padding: 0 8px; }
+.metroterm-shell .mcp-token > button { flex: none; padding: 0 9px; white-space: nowrap; }
+.metroterm-shell .mcp-token > button + button { border-left: 0; }
+.metroterm-shell .connection-dialog label.dialog-check.mcp-input { width: auto; margin-right: var(--dialog-pad); }
+.metroterm-shell .connection-dialog > .dialog-check + .segmented.mcp-clients { margin-top: var(--dialog-gap); }
+.metroterm-shell .connection-dialog .segmented.mcp-clients button { min-width: 0; padding: 0 4px; letter-spacing: 0.04em; }
+.metroterm-shell .mcp-snippet { position: relative; margin: 6px var(--dialog-pad) 0; border: 1px solid var(--line-soft); background: var(--terminal); }
+.metroterm-shell .mcp-snippet pre { margin: 0; padding: 8px 64px 8px 10px; overflow-x: auto; color: var(--ink); font-family: inherit; font-size: 11px; line-height: 1.55; white-space: pre-wrap; word-break: break-all; user-select: text; }
+.metroterm-shell .mcp-snippet button { position: absolute; top: 6px; right: 6px; height: 22px; padding: 0 8px; border: 1px solid var(--control-line); background: var(--panel-2); color: var(--control-text); font-size: 10px; letter-spacing: 0.06em; }
+.metroterm-shell .mcp-snippet button:hover { border-color: var(--control-focus); background: var(--control-hover); color: var(--ink); }
+.metroterm-shell .connection-dialog .segmented button.theme-gold-option { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.metroterm-shell .theme-gold-option .icon { color: var(--gold-option); }
+
+/* ===== Focus Mode Settings ===== */
+.metroterm-shell .connection-dialog.focus-dialog { width: min(480px, 100%); }
+.metroterm-shell .focus-section { padding: var(--dialog-gap) var(--dialog-pad) 6px; color: var(--muted); font-size: 11px; letter-spacing: 0.08em; }
+.metroterm-shell .focus-group { margin: 0 var(--dialog-pad); border: 1px solid var(--line-soft); background: var(--panel-2); }
+.metroterm-shell .focus-row { display: flex; align-items: center; gap: 10px; min-height: 36px; padding: 0 10px; }
+.metroterm-shell .focus-row + .focus-row { border-top: 1px solid var(--line-soft); }
+.metroterm-shell .focus-row.is-disabled { opacity: 0.5; }
+.metroterm-shell .focus-label { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; color: var(--ink); font-size: 12px; }
+.metroterm-shell .focus-choice { display: flex; flex: none; }
+.metroterm-shell .focus-choice button { min-width: 64px; height: var(--dialog-control); padding: 0 8px; border: 1px solid var(--control-line); color: var(--muted); font-size: 11px; }
+.metroterm-shell .focus-choice button + button { margin-left: -1px; }
+.metroterm-shell .focus-choice button:hover:not(:disabled) { color: var(--ink); background: var(--control-hover); }
+.metroterm-shell .focus-choice button.is-active { color: var(--ink-active); background: var(--focus-choice-active-bg); box-shadow: var(--choice-active-shadow); }
+.metroterm-shell .focus-choice button:disabled { cursor: default; }
+.metroterm-shell .focus-foot { margin-top: var(--dialog-pad); display: flex; flex-direction: column; }
+.metroterm-shell .focus-foot .dialog-check { padding: 0 var(--dialog-pad) var(--dialog-gap); }
+.metroterm-shell .connection-dialog .focus-foot .dialog-actions { margin-top: 0; }
+.metroterm-shell .focus-dialog .dialog-actions .primary-button { display: inline-flex; align-items: center; gap: 6px; }
+.metroterm-shell .keys-row .focus-label { margin-right: 6px; }
+.metroterm-shell .keys-row.is-fixed .focus-label { color: var(--muted); }
+
+/* ===== Keyboard Shortcuts ===== */
+.metroterm-shell .connection-dialog.keys-dialog { width: min(520px, 100%); }
+.metroterm-shell .keys-row { gap: 4px; min-height: 32px; }
+.metroterm-shell .key-capture { flex: none; box-sizing: border-box; min-width: 150px; height: var(--dialog-control); padding: 0 10px; border: 1px solid var(--control-line); background: var(--control-bg); color: var(--ink); font: inherit; font-size: 11.5px; text-align: left; cursor: pointer; }
+.metroterm-shell .key-capture:hover { border-color: var(--control-focus); background: var(--control-hover); }
+.metroterm-shell .key-capture:focus-visible, .metroterm-shell .key-capture.is-recording { outline: 1px solid var(--focus-ring-control); outline-offset: -1px; border-color: var(--control-focus); }
+.metroterm-shell .key-capture.is-recording { color: var(--muted); font-style: italic; }
+.metroterm-shell .key-capture.is-empty { color: var(--muted); }
+.metroterm-shell .keys-row .icon-button { flex: none; color: var(--muted); }
+.metroterm-shell .keys-row .icon-button:hover:not(:disabled) { color: var(--ink); background: var(--control-hover); }
+.metroterm-shell .keys-row .icon-button:disabled { opacity: 0.3; cursor: default; }
+.metroterm-shell .key-fixed { flex: none; color: var(--muted); font: inherit; font-size: 11px; }
+.metroterm-shell .keys-foot { position: sticky; bottom: 0; z-index: 3; margin-top: var(--dialog-pad); background: var(--panel); }
+.metroterm-shell .connection-dialog .keys-foot .dialog-actions { margin-top: var(--dialog-gap); }
+.metroterm-shell .keys-dialog .dialog-note { display: flex; align-items: center; gap: 10px; }
+.metroterm-shell .keys-reassign { flex: none; margin-left: auto; height: 24px; padding: 0 10px; font-size: 10.5px; letter-spacing: 0.06em; }
+.metroterm-shell .keys-dialog .dialog-actions > .keys-reset-all { margin-right: auto; }
+.metroterm-shell .keys-dialog .dialog-actions > .keys-reset-all:disabled { opacity: 0.45; cursor: default; }
+
+/* ===== Proxy ===== */
+.metroterm-shell .connection-dialog .proxy-test button { box-sizing: border-box; width: 100%; height: var(--dialog-control); border: 1px solid var(--control-line); color: var(--control-text); font-size: 11px; letter-spacing: 0.06em; }
+.metroterm-shell .connection-dialog .proxy-test button:hover:not(:disabled) { border-color: var(--control-focus); background: var(--control-hover); color: var(--ink); }
+.metroterm-shell .connection-dialog .proxy-test button:disabled { opacity: 0.5; cursor: default; }
+
+/* ===== Log Settings ===== */
+.metroterm-shell .log-path-row { display: flex; height: var(--dialog-control); }
+.metroterm-shell .log-path-row > input { flex: 1; min-width: 0; }
+.metroterm-shell .log-path-row > .icon-button { flex: none; width: var(--dialog-control); height: var(--dialog-control); border: 1px solid var(--control-line); border-left: 0; color: var(--muted); }
+.metroterm-shell .log-path-row > .icon-button:hover:not(:disabled) { background: var(--control-hover); color: var(--ink); }
+.metroterm-shell .log-path-row > .icon-button:disabled { opacity: 0.5; cursor: default; }
+.metroterm-shell .connection-dialog .log-sample { box-sizing: border-box; margin: 6px var(--dialog-pad) 0; padding: 7px 10px; overflow: hidden; border: 1px solid var(--line-soft); background: var(--terminal); color: var(--muted); font-family: 'RobotoMono Nerd Font', Consolas, 'SFMono-Regular', 'Cascadia Mono', monospace; font-size: 11px; line-height: 1.5; white-space: pre; text-overflow: ellipsis; }
+
+/* ===== About ===== */
+.metroterm-shell .connection-dialog.about-dialog { width: min(400px, 100%); }
+.metroterm-shell .about-head { display: flex; align-items: baseline; gap: 10px; padding: var(--dialog-pad) var(--dialog-pad) 0; }
+.metroterm-shell .about-head b { color: var(--ink-active); font-size: 18px; font-weight: 500; letter-spacing: 0.04em; }
+.metroterm-shell .about-head span { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.metroterm-shell .about-rows { margin: var(--dialog-gap) var(--dialog-pad) 0; border-top: 1px solid var(--line-soft); }
+.metroterm-shell .about-rows > div { display: flex; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--line-soft); font-size: 12px; }
+.metroterm-shell .about-rows dt { flex: none; width: 76px; color: var(--muted); }
+.metroterm-shell .about-rows dd { flex: 1; min-width: 0; margin: 0; color: var(--ink); overflow-wrap: anywhere; }

@@ -1,0 +1,49 @@
+/* Base (loaded first): page and root, global resize states, element defaults (buttons, inputs, radios, checkboxes, textareas), icons, utilities. */
+
+/* ===== Page and root ===== */
+:root { font-family: 'RobotoMono Nerd Font', 'Cascadia Mono', 'SFMono-Regular', Consolas, monospace; color: var(--page-ink); background: var(--page-bg); font-synthesis: none; }
+html, body, #root { width: 100%; min-width: 0; height: 100%; min-height: 0; margin: 0; }
+html, body { background: var(--page-bg); color-scheme: var(--color-scheme); }
+body { overflow: hidden; }
+html { font-size: 100%; }
+.metroterm-shell { width: 100%; height: 100%; overflow: hidden; display: flex; flex-direction: column; color: var(--ink); background: var(--bg); font-size: 15px; --ui-row: 25px; --ui-font-family: 'RobotoMono Nerd Font', 'Cascadia Mono', 'SFMono-Regular', Consolas, monospace; --ui-font: 0.75rem; --ui-font-small: 0.75rem; --ui-line: 1.5; font-family: var(--ui-font-family); --pad-x: 8px; --icon: 14px; --icon-gap: 8px; --btn: 22px; --btn-inset: calc((var(--btn) - var(--icon)) / 2); --indent: calc(var(--icon) + var(--icon-gap)); --file-icon: 18px; --sb-size: 10px; --sb-pad: 2px; --header-input: 28px; --dialog-control: 26px; --dialog-button: 26px; --dialog-pad: 16px; --dialog-gap: 14px; --dialog-max-height: 640px; }
+
+/* ===== Global resize states (splitters, column resizers) ===== */
+body.is-resizing, body.is-resizing * { cursor: inherit; user-select: none !important; }
+body.is-resizing-x, body.is-resizing-x * { cursor: col-resize !important; }
+body.is-resizing-y, body.is-resizing-y * { cursor: row-resize !important; }
+
+/* ===== Element defaults: buttons, inputs, radios, checkboxes, textareas ===== */
+button, input, textarea { font: inherit; }
+button { background: transparent; border: 0; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 1px solid var(--focus-ring); outline-offset: -1px; }
+.metroterm-shell input::placeholder, .metroterm-shell textarea::placeholder { color: var(--muted); opacity: 1; }
+.metroterm-shell input[type='number'] { appearance: textfield; }
+.metroterm-shell input[type='number']::-webkit-inner-spin-button, .metroterm-shell input[type='number']::-webkit-outer-spin-button { margin: 0; appearance: none; }
+.metroterm-shell input[type='radio']::after { content: ''; width: 5px; height: 5px; background: transparent; transform: scale(0); transition: transform 0.1s ease; }
+.metroterm-shell input:not([type='radio']), .metroterm-shell textarea { border: 1px solid var(--control-line); border-radius: 0; transition: border-color 0.12s ease, background-color 0.12s ease, box-shadow 0.12s ease; border-color: var(--control-line); color: var(--control-text); background-color: var(--control-bg); box-shadow: none; caret-color: var(--control-text); }
+.metroterm-shell input:not([type='radio']):hover, .metroterm-shell textarea:hover { border-color: var(--control-focus); background-color: var(--control-hover); }
+.metroterm-shell input:not([type='radio']):focus, .metroterm-shell textarea:focus { outline: 0; border-color: var(--control-focus); background-color: var(--control-hover); box-shadow: none; }
+.metroterm-shell input[type='radio'] { appearance: none; width: 12px; height: 12px; margin: 0; display: inline-grid; place-content: center; border: 1px solid var(--control-line); border-radius: 0; cursor: pointer; border-color: var(--control-line); background: var(--control-bg); }
+.metroterm-shell input[type='radio']:hover, .metroterm-shell input[type='radio']:checked { border-color: var(--control-focus); }
+.metroterm-shell input[type='radio']:checked::after { transform: scale(1); background: var(--radio-dot); }
+.metroterm-shell input[type='radio']:focus-visible { outline: 1px solid var(--focus-ring-control); outline-offset: 2px; outline-color: var(--focus-ring-control); }
+.metroterm-shell input, .metroterm-shell textarea, .metroterm-shell [contenteditable='true'] { caret-color: var(--caret) !important; }
+.metroterm-shell input:not([type]), .metroterm-shell input[type='text'], .metroterm-shell input[type='search'], .metroterm-shell input[type='number'], .metroterm-shell input[type='password'], .metroterm-shell textarea { cursor: text; }
+.metroterm-shell input[type='checkbox'] { appearance: none; width: 12px; height: 12px; margin: 0; flex: none; display: inline-grid; place-content: center; border: 1px solid var(--control-line); border-radius: 0; background: var(--control-bg); cursor: pointer; }
+.metroterm-shell input[type='checkbox']::after { content: ''; width: 6px; height: 6px; background: transparent; transform: scale(0); transition: transform 0.1s ease; }
+.metroterm-shell input[type='checkbox']:hover, .metroterm-shell input[type='checkbox']:checked { border-color: var(--control-focus); }
+.metroterm-shell input[type='checkbox']:checked { border-color: var(--checkbox-checked-line); }
+.metroterm-shell input[type='checkbox']:checked::after { background: var(--checkbox-mark); transform: scale(1); }
+.metroterm-shell input[type='checkbox']:focus-visible { outline: 1px solid var(--focus-ring-control); outline-offset: 2px; }
+
+/* ===== Icons ===== */
+.icon { display: block; flex: 0 0 auto; overflow: visible; }
+
+/* ===== Utilities ===== */
+* { box-sizing: border-box; }
+/* Popups (menus, menu search, tooltips, dialogs, transfer notices) animate in and out from lib/ui/popupMotion; a closing one keeps .is-leaving while it fades. */
+.is-leaving { pointer-events: none; }
+/* Waiting text ("Connecting…", "Reading …", "Loading…"): fades in only when the wait lasts, so a quick start or switch never flashes it. */
+.is-pending { animation: pending-in 0.2s ease-out 1s both; }
+@keyframes pending-in { from { opacity: 0; } }

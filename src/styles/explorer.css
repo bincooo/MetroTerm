@@ -1,0 +1,82 @@
+/* Explorer: panel, filter / NEW quickbar, session tree rows, drag & drop, tree dialogs. */
+
+/* ===== Panel ===== */
+.tree-list { flex: 1; overflow: auto; padding-bottom: 4px; }
+.session-explorer, .tree-list { min-width: 0; min-height: 0; }
+.session-explorer { display: flex; flex-direction: column; border-bottom: 0; }
+/* Reserve the bar's space like a native (non-overlay) scrollbar: a transparent border outside the
+   scrollport, so content, the caret and the last line never slide under the bar. */
+.sb-custom:is(.tree-list, .filer-list, .monitor-body, textarea) { --sb-reserve: 1; }
+.sb-custom.sb-has-y:is(.tree-list, .filer-list, .monitor-body, textarea) { border-right: var(--sb-size) solid transparent !important; }
+.sb-custom.sb-has-x:is(.tree-list, .filer-list, .monitor-body, textarea) { border-bottom: var(--sb-size) solid transparent !important; }
+
+/* ===== Filter and NEW quickbar ===== */
+.session-quickbar button:first-child { color: var(--strong-ink); }
+.session-quickbar button:first-of-type { color: var(--quickbar-first-ink); }
+.session-quickbar button:hover { color: var(--quickbar-hover-ink); background: var(--active); }
+.session-quickbar button, .group-row, .tree-row { font-size: var(--ui-font); }
+.session-quickbar button, .tree-row-actions button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; line-height: 1; }
+.session-quickbar button { color: var(--muted); min-width: var(--btn); padding: 0 var(--btn-inset); gap: var(--icon-gap); }
+.session-quickbar { display: flex; align-items: center; border-bottom: 1px solid var(--line-soft); background: var(--session-quickbar-bg); overflow: hidden; flex-shrink: 1; }
+/* ---------- Explorer: the session filter in the New Session row ---------- */
+.metroterm-shell .session-quickbar { height: calc(var(--header-input) + 10px); min-height: calc(var(--header-input) + 10px); flex-wrap: nowrap; justify-content: flex-start; gap: 4px; padding: 0 calc(var(--pad-x) - var(--btn-inset)) 0 var(--pad-x); }
+.metroterm-shell .session-quickbar .session-filter { min-width: 0; flex: 1; height: var(--header-input); padding: 0 8px; border: 1px solid var(--field-line); background: var(--field-bg); color: var(--ink); font-size: var(--ui-font); line-height: calc(var(--header-input) - 2px); }
+.metroterm-shell .session-quickbar .session-filter::placeholder { color: var(--n-66); }
+.metroterm-shell .session-quickbar button { flex: none; height: var(--header-input); }
+.metroterm-shell .session-quickbar .session-filter:hover { background-color: var(--field-hover-bg); border-color: var(--field-hover-line); }
+.metroterm-shell .session-quickbar .session-filter:focus { background-color: var(--field-focus-bg); border-color: var(--field-focus-line); }
+
+/* ===== Tree rows ===== */
+.tree-row:hover { color: var(--tree-row-hover-ink); }
+.tree-row i { color: var(--icon-session); font-size: 8px; font-style: normal; }
+.tree-row i.session-online { color: var(--status-online); }
+.tree-row span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.group-row:hover { color: var(--ink); background: var(--group-row-hover-bg); }
+.group-row i { width: 12px; color: var(--muted); font-style: normal; text-align: center; }
+.group-row span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tree-row:hover .tree-row-actions { opacity: 1; }
+.session-online { color: var(--accent-online) !important; }
+.session-connecting { color: var(--session-connecting-ink) !important; animation: session-pulse 1s ease-in-out infinite; }
+.tree-row > i, .group-row > i { display: inline-flex; align-items: center; justify-content: center; font-size: 0; line-height: 0; }
+.tree-row-actions button:hover { color: var(--row-action-hover-ink); background: var(--row-action-hover-bg); }
+.tree-row > i .icon, .group-row > i .icon { width: var(--icon); height: var(--icon); }
+.group-row { width: 100%; height: 23px; display: flex; align-items: center; color: var(--group-row-ink); text-align: left; gap: var(--icon-gap); padding: 0 var(--pad-x) 0 calc(var(--pad-x) + var(--indent)); }
+.group-row > i { color: var(--muted); width: var(--icon); }
+.group-row small { color: var(--group-row-small-ink); font-size: 9px; margin-left: auto; padding-right: calc(var(--btn-inset)); }
+.tree-row > i { width: var(--icon); }
+.tree-row-actions button { padding: 0; font-size: 11px; color: var(--row-dim-ink); width: var(--btn); height: var(--btn); }
+.tree-row-actions { opacity: 0; display: flex; align-items: center; gap: 0; padding-right: 0; margin-left: 0; }
+.tree-row small { color: var(--tree-row-small-ink); font-size: 9px; padding-right: 4px; margin-left: auto; }
+.tree-row { display: flex; align-items: center; width: 100%; height: 25px; color: var(--row-ink); text-align: left; position: relative; cursor: pointer; gap: var(--icon-gap); padding: 0 calc(var(--pad-x) - var(--btn-inset)) 0 calc(var(--pad-x) + 2 * var(--indent) - 2px); border-left: 0; padding-left: calc(var(--pad-x) + 2 * var(--indent)); user-select: none; }
+/* Unified row hover (Explorer = reference; SFTP file rows and Filer rows match it) */
+.metroterm-shell .tree-row:hover { background: var(--hover); }
+.metroterm-shell .tree-row.is-missing > span, .metroterm-shell .tree-row.is-missing > i { opacity: 0.45; }
+/* Session rows have no trailing label: the hover actions sit at the right edge, the name takes the rest */
+.metroterm-shell .tree-row > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.metroterm-shell .tree-row > .tree-row-actions { margin-left: auto; flex: none; }
+/* One indent step per level: a folder's chevron and a session's icon sit in the same column at the same depth */
+.metroterm-shell .session-tree .group-row, .metroterm-shell .session-tree .tree-row { padding-left: calc(var(--pad-x) + var(--depth, 0) * var(--indent)); }
+.metroterm-shell .session-tree .group-row { cursor: default; user-select: none; outline: 0; }
+.metroterm-shell .session-tree .group-row > span { flex: 1; min-width: 0; }
+.metroterm-shell .session-tree { position: relative; flex: 1; overflow: auto; outline: 0; }
+.metroterm-shell .session-tree .tree-empty { padding: 12px var(--pad-x); color: var(--muted); font-size: var(--ui-font-small); line-height: 1.5; }
+.metroterm-shell .session-tree .is-dragged { opacity: 0.4; }
+.metroterm-shell .session-tree .drop-into { background: var(--active); box-shadow: inset 0 0 0 1px var(--control-focus); color: var(--ink); }
+.metroterm-shell .session-tree .drop-before { box-shadow: inset 0 2px 0 var(--control-focus); }
+.metroterm-shell .session-tree .drop-after { box-shadow: inset 0 -2px 0 var(--control-focus); }
+.metroterm-shell .session-tree.drop-root { box-shadow: inset 0 0 0 1px var(--control-focus); }
+
+/* ===== Drag & drop ===== */
+body.is-tree-dragging, body.is-tree-dragging * { cursor: grabbing !important; user-select: none !important; }
+.tree-drag-ghost { position: fixed; z-index: 300; display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border: 1px solid var(--tip-line); background: var(--tip-bg); color: var(--tip-ink); box-shadow: var(--tip-shadow); font-family: var(--ui-font-family); font-size: var(--ui-font-small); pointer-events: none; white-space: nowrap; }
+.tree-drag-ghost .icon { color: var(--tip-key); }
+.tree-drag-ghost.is-blocked { opacity: 0.55; }
+
+/* ===== Tree dialogs ===== */
+/* Explorer dialogs */
+.tree-dialog .auth-message code { word-break: break-all; }
+.tree-dialog .primary-button:disabled { opacity: 0.45; cursor: default; }
+
+@keyframes session-pulse {
+  50% { opacity: 0.35; }
+}

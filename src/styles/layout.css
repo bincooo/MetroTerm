@@ -1,0 +1,176 @@
+/* Workbench layout (loaded second, right after base.css): frameless title bar, split panes, panels (title row, tabs, filter bar, empty panel), the terminal tab strip, tmux panes, status bar, tab / file drag & drop. */
+
+/* ===== Window chrome (frameless title bar) ===== */
+.window-name { text-align: center; color: var(--window-name-ink); }
+.window-controls { height: 100%; display: flex; justify-content: flex-end; }
+.window-controls button:hover { background: var(--window-button-hover-bg); color: var(--window-button-hover-ink); }
+.window-chrome { height: 26px; min-height: 26px; display: grid; grid-template-columns: 240px 1fr 150px; align-items: center; border-bottom: 1px solid var(--window-chrome-line); background: var(--chrome); color: var(--window-chrome-ink); user-select: none; font-size: 14px; }
+.window-controls button, .pane-title button, .pane-filter button, .status-bar button, .status-bar span { display: inline-flex; align-items: center; justify-content: center; gap: 6px; line-height: 1; }
+.window-controls button { color: var(--window-button-ink); font-size: 12px; width: 40px; height: 100%; }
+/* Title bar: logo mark only, no product text. */
+.app-mark { padding-left: 10px; color: var(--n-e0); letter-spacing: 0.02em; display: flex; align-items: center; gap: 8px; min-width: 0; padding-right: 4px; }
+/* Window controls: clear hover / pressed states (esp. light theme) */
+.metroterm-shell .window-controls button { transition: background-color 0.08s linear, color 0.08s linear; }
+.metroterm-shell .window-controls button:active { background: var(--window-button-active-bg); color: var(--n-ff); }
+.metroterm-shell .window-controls button:last-child:hover { background: var(--window-close-hover); color: var(--window-close-ink); }
+.metroterm-shell .window-controls button:last-child:active { background: var(--window-close-active); color: var(--window-close-ink); }
+
+/* ===== Workbench and split panes ===== */
+/* Nested split layout: [left: top/bottom] | [right: top/bottom] */
+.workbench-split { flex: 1; min-width: 0; min-height: 0; display: flex; background: var(--terminal); overflow: hidden; }
+.split { flex: 1; width: 100%; height: 100%; min-width: 0; min-height: 0; display: grid; overflow: hidden; }
+.split-horizontal { grid-template-rows: minmax(0, 1fr); }
+.split-vertical { grid-template-columns: minmax(0, 1fr); }
+.split-cell { min-width: 0; min-height: 0; display: flex; overflow: hidden; }
+.split-cell.is-hidden { display: none; }
+.split-cell > .panel, .split-cell > .split { flex: 1; }
+.split-handle { position: relative; z-index: 4; min-width: 0; min-height: 0; background: var(--line-soft); touch-action: none; will-change: transform; transform: translateZ(0); }
+.split-horizontal > .split-handle { cursor: col-resize; grid-column: 2; grid-row: 1; }
+.split-handle::after { content: ''; position: absolute; inset: 0; }
+.split-horizontal > .split-handle::after { left: -3px; right: -3px; }
+.split-vertical > .split-handle::after { top: -3px; bottom: -3px; }
+.split-handle:hover, .split-handle:active { background: var(--split-handle-hover-bg); }
+/* Explicit track placement: a hidden (display:none) cell must not shift the others into its track. */
+.split-horizontal > .split-first { grid-column: 1; grid-row: 1; }
+.split-horizontal > .split-second { grid-column: 3; grid-row: 1; }
+.split-vertical > .split-first { grid-row: 1; grid-column: 1; }
+.split-vertical > .split-handle { cursor: row-resize; grid-row: 2; grid-column: 1; }
+.split-vertical > .split-second { grid-row: 3; grid-column: 1; }
+.panel-host > .panel, .workbench-split > .panel-slot { flex: 1; min-width: 0; min-height: 0; }
+/* Split-created splitters disappear completely while one side is hidden. */
+.split-handle.is-hidden { visibility: hidden; pointer-events: none; }
+
+/* ===== Panels: shell, title row and tabs, filter bar, empty panel ===== */
+.pane-title span { display: flex; gap: 6px; align-items: center; }
+.pane-title i { color: var(--n-7a); font-style: normal; }
+.pane-title button:hover { background: var(--active); color: var(--ink); }
+.pane-filter input { min-width: 0; flex: 1; background: var(--field-bg); border: 1px solid var(--field-line); color: var(--ink); }
+.panel { min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; background: var(--panel); }
+.pane-filter input, .pane-title { font-size: var(--ui-font); }
+.pane-title > span .icon { color: var(--muted); }
+/* panel headers */
+.pane-title { height: 27px; min-height: 27px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--bar-line); background: var(--pane-title-bg); color: var(--pane-title-ink); padding: 0 calc(var(--pad-x) - var(--btn-inset)) 0 var(--pad-x); }
+.pane-title > div { display: flex; align-items: center; gap: 0; }
+.pane-title button { color: var(--muted); width: var(--btn); height: var(--btn); }
+.pane-filter { display: flex; align-items: center; border-bottom: 1px solid var(--line-soft); overflow: hidden; flex-shrink: 1; gap: 4px; padding: 0 calc(var(--pad-x) - var(--btn-inset)) 0 var(--pad-x); }
+.pane-filter button { color: var(--muted); font-size: 13px; width: var(--btn); height: var(--btn); }
+/* Panel title marker: a plain color block instead of an icon (keeps the 14px icon column). */
+.pane-title > span { display: inline-flex; align-items: center; gap: 0; }
+.pane-swatch { margin-right: 6px; background: var(--pane-swatch); }
+.panel-slot, .panel-host { flex: 1; min-width: 0; min-height: 0; display: flex; overflow: hidden; }
+/* Empty panel (new Split halves / closed panels) */
+.pane-title-empty { color: var(--faint); }
+.empty-pane { background: var(--panel); }
+.panel-empty { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: var(--faint); font-size: var(--ui-font); user-select: none; }
+.panel-empty > div { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.panel-empty > span { max-width: 340px; padding: 0 16px; text-align: center; line-height: 1.5; }
+.panel-empty button { height: 24px; padding: 0 10px; border: 1px solid var(--panel-empty-button-line); background: transparent; color: var(--muted); font-size: var(--ui-font); }
+.panel-empty button:hover { border-color: var(--line); background: var(--button-hover-bg); color: var(--ink); }
+.content-pane > .pane-title { padding-left: 0; gap: 8px; }
+.pane-tabs { min-width: 0; height: 100%; display: flex; align-items: stretch; overflow: hidden; }
+.pane-tabs > .pane-title-empty { display: inline-flex; align-items: center; padding-left: var(--pad-x); }
+.pane-title .pane-tab:hover { color: var(--ink); background: var(--button-hover-bg); }
+.pane-title .pane-tab:hover > b, .pane-title .pane-tab.active > b { visibility: visible; }
+.pane-title .pane-tab > b:hover { color: var(--ink); background: var(--active); }
+.pane-actions { flex: 0 0 auto; }
+.pane-tab-body { flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; border: 0; }
+.pane-tab-body[hidden], .tmux-pane[hidden] { display: none !important; }
+.tmux-pane { position: absolute; inset: 0; min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; background: var(--terminal); }
+.tmux-stage.is-split .tmux-pane:not(.is-focused) .session-tab.active { color: var(--tmux-idle-tab-ink); }
+/* Tabs shrink (label ellipsis) when the panel is narrow, instead of being cut off. */
+.pane-title .pane-tab { width: auto; height: 100%; display: inline-flex; align-items: center; gap: 0; padding: 0 4px 0 var(--pad-x); border-right: 1px solid var(--line-soft); color: var(--muted); white-space: nowrap; flex: 0 1 auto; min-width: 52px; overflow: hidden; }
+.pane-title .pane-tab > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.pane-title .pane-tab > b, .pane-title .pane-tab > .pane-swatch { flex: 0 0 auto; }
+/* Close × only takes space on the active tab, so inactive labels keep their room. */
+.pane-title .pane-tab > b { width: 16px; height: 16px; margin-left: 6px; align-items: center; justify-content: center; color: var(--muted); visibility: hidden; display: none; }
+.pane-title .pane-tab.active > b { display: inline-flex; visibility: visible; }
+.pane-title .pane-tab.active { color: var(--ink-active); background: var(--panel); flex-shrink: 0; }
+.pane-title .pane-tab:not(.active) { padding-right: 8px; min-width: 40px; }
+.metroterm-shell .pane-filter { height: calc(var(--header-input) + 10px); min-height: calc(var(--header-input) + 10px); }
+.sessions-pane { min-height: 0; --open-tab-line: 28px; --open-tab-small: calc(var(--ui-font-small) - 1px); }
+.metroterm-shell .pane-swatch { width: 10px; height: 10px; flex: none; }
+.metroterm-shell .pane-filter input { height: var(--header-input); padding: 0 8px; line-height: calc(var(--header-input) - 2px); font-size: var(--ui-font); background-color: var(--filter-bg); border-color: var(--filter-line); }
+.metroterm-shell .pane-filter input:hover { background-color: var(--field-hover-bg); border-color: var(--field-hover-line); }
+.metroterm-shell .pane-filter input:focus { background-color: var(--field-focus-bg); border-color: var(--field-focus-line); }
+
+/* ===== Terminal tab strip ===== */
+.session-tab:hover { background: var(--session-tab-hover-bg); color: var(--session-tab-hover-ink); }
+/* Active tab's top edge: a light runs across it (Gold: --session-tab-flow; other themes have none). */
+.session-tab.active { color: var(--ink-active); background: var(--session-tab-active-bg); box-shadow: var(--session-tab-active-shadow); overflow: hidden; }
+/* clips the light below */
+.session-tab.active::before { content: ''; position: absolute; top: 0; left: 0; width: 400%; height: 2px; background: var(--session-tab-flow); background-size: 50% 100%; animation: session-tab-flow 2.6s linear infinite; animation-name: var(--session-tab-flow-animation); will-change: transform; pointer-events: none; }
+.session-tab span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.session-tab em.online { background: var(--accent-online); box-shadow: 0 0 0 2px var(--status-dot-glow); }
+.session-tab em.connecting { background: var(--session-connecting-ink); animation: session-pulse 1s ease-in-out infinite; }
+.tab-bar { height: 27px; min-height: 27px; display: flex; border-bottom: 1px solid var(--bar-line); background: var(--tab-bar-bg); user-select: none; flex: 0 0 27px; min-width: 0; overflow: hidden; }
+.session-tabs { flex: 1 1 0; min-width: 0; display: flex; align-items: stretch; overflow: hidden; }
+.session-tab i { color: var(--icon-terminal-tab); font-style: normal; font-size: 9px; line-height: 1; }
+.session-tab em { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--status-dot-bg); margin: 0; }
+.session-tab em.placeholder { visibility: hidden; }
+.session-tab b:hover { color: var(--tab-close-hover-ink); background: var(--tab-close-hover-bg); }
+.session-tab > i, .status-bar i { display: inline-flex; align-items: center; justify-content: center; font-size: 0; line-height: 0; }
+.session-tab b { font-weight: 400; width: 16px; height: 16px; margin: 0; display: grid; place-items: center; font-size: 12px; line-height: 1; color: var(--muted); }
+.session-tab b .icon { width: 11px; height: 11px; }
+.session-tab > i .icon { width: var(--icon); height: var(--icon); }
+.session-tab { position: relative; gap: 7px; border-right: 1px solid var(--line-soft); color: var(--session-tab-ink); flex: 0 1 148px; min-width: 88px; max-width: 148px; padding: 0 6px 0 9px; display: grid; grid-template-columns: auto minmax(0, 1fr) 6px 16px; align-items: center; font-size: 12px; text-align: left; padding-left: var(--pad-x); column-gap: var(--icon-gap); }
+@media (prefers-reduced-motion: reduce) {
+  .session-tab.active::before { animation: none; }
+}
+.metroterm-shell .session-tab-input { flex: 1; min-width: 0; padding: 0 5px; border: 1px solid var(--control-focus); border-radius: 0; background: var(--control-bg); color: var(--ink); font: inherit; outline: 0; width: 100%; height: 18px; }
+
+/* ===== tmux panes ===== */
+/* tmux panes (lib/workspace/tmux.ts): each pane is a tab group with its own tab bar and toolbar */
+/* Panes are placed by App (tmuxStyle); a pane off the left / top edge leaves 1px that shows --tmux-line. */
+.tmux-stage { position: relative; background: var(--tmux-line); }
+.tmux-body { flex: 1 1 0; min-width: 0; min-height: 0; display: flex; }
+.tmux-splitter { position: absolute; z-index: 7; }
+.tmux-splitter.is-row { width: 6px; margin-left: -3px; cursor: col-resize; }
+.tmux-splitter.is-column { height: 6px; margin-top: -3px; cursor: row-resize; }
+/* No visible handle: only the resize cursor (kept on the whole page while dragging). */
+html.is-tmux-resizing-row, html.is-tmux-resizing-row * { cursor: col-resize !important; user-select: none; }
+html.is-tmux-resizing-column, html.is-tmux-resizing-column * { cursor: row-resize !important; user-select: none; }
+
+/* ===== Status bar ===== */
+.status-bar span:first-child { color: var(--n-7a); }
+.status-spacer { flex: 1; }
+.status-bar { height: 26px; min-height: 26px; display: flex; align-items: center; gap: 17px; border-top: 1px solid var(--status-bar-line); background: var(--status-bar-bg); color: var(--status-bar-ink); white-space: nowrap; font-size: 11px; padding: 0 calc(var(--pad-x) - var(--btn-inset)) 0 var(--pad-x); }
+@media (max-width: 1150px) {
+  .status-bar { gap: 9px; }
+  .status-bar span:nth-of-type(5), .status-bar span:nth-of-type(6) { display: none; }
+}
+.status-bar span { gap: 5px; }
+.status-bar span > span { display: inline; }
+.status-bar i, .status-bar .icon { color: var(--muted); }
+.status-bar button { width: 22px; height: 22px; color: var(--muted); }
+.status-bar button:hover { color: var(--ink); }
+.status-bar .status-theme { color: var(--status-theme-ink); }
+.status-bar .status-theme:hover { color: var(--status-theme-hover-ink); }
+.status-bar .status-prefix { padding: 1px 6px; font-style: normal; font-weight: 600; color: var(--status-prefix-ink); background: var(--status-prefix-bg); }
+/* status bar: the Local / Remote Mode switch is a text button (Lock Screen is an icon button like Theme) */
+.metroterm-shell .status-bar .status-mode { width: auto; height: 100%; display: inline-flex; align-items: center; gap: 5px; padding: 0 2px; font-size: inherit; }
+/* Window menu: the windows in the status bar (click = show, double-click = rename, + = New Window). */
+.metroterm-shell .status-bar .status-windows { height: 100%; display: flex; align-items: center; gap: 1px; }
+.metroterm-shell .status-bar .status-windows[hidden] { display: none; }
+.metroterm-shell .status-bar .status-window { width: auto; max-width: 140px; height: 20px; padding: 0 8px; display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 20px; font-size: inherit; color: var(--status-window-ink); }
+.metroterm-shell .status-bar .status-window:hover { color: var(--status-window-hover-ink); background: var(--status-window-hover-bg); }
+.metroterm-shell .status-bar .status-window.is-active { color: var(--status-window-active-ink); background: var(--status-window-active-bg); }
+.metroterm-shell .status-bar .status-window-new { width: 20px; height: 20px; }
+.metroterm-shell .status-bar[hidden] { display: none !important; }
+
+/* ===== Drag & drop: tab ghost, drop marker, file drop overlay ===== */
+/* Files from the file manager hovering a drop target (lib/ui/fileDrop): a mask over the target with what dropping does, no outline. */
+.file-drop-overlay { position: fixed; z-index: 900; display: flex; align-items: center; justify-content: center; padding: 12px; background: var(--file-drop-mask); color: var(--file-drop-ink); pointer-events: none; text-align: center; font-family: var(--ui-font-family); font-size: var(--ui-font); animation: file-drop-in 0.08s ease-out; }
+.file-drop-overlay[hidden] { display: none; }
+.file-drop-overlay span { max-width: 100%; font-size: var(--ui-font-small); letter-spacing: 0.02em; overflow-wrap: anywhere; }
+.metroterm-shell .is-tab-dragged { opacity: 0.4; }
+body.is-tab-dragging, body.is-tab-dragging * { cursor: grabbing !important; user-select: none !important; }
+body.is-tab-dragging.is-tab-drop-blocked, body.is-tab-dragging.is-tab-drop-blocked * { cursor: no-drop !important; }
+.tab-drag-ghost { position: fixed; left: 0; top: 0; z-index: 300; display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border: 1px solid var(--tip-line); background: var(--tip-bg); color: var(--tip-ink); box-shadow: var(--tip-shadow); font-family: var(--ui-font-family); font-size: var(--ui-font-small); pointer-events: none; white-space: nowrap; will-change: transform; }
+body.is-tab-drop-blocked .tab-drag-ghost { opacity: 0.55; }
+.tab-drop-marker { position: fixed; z-index: 299; background: var(--control-focus); pointer-events: none; }
+
+@keyframes session-tab-flow { /* moved, not repainted (a transform runs on the compositor): one 200%-wide gradient tile per loop */
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes file-drop-in { from { opacity: 0; } }

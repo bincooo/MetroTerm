@@ -1,0 +1,38 @@
+/* Tunnels dialog: tunnel list and the edit form. */
+
+/* ===== Dialog and tunnel list ===== */
+.metroterm-shell .connection-dialog.tunnels-dialog { width: min(640px, 100%); }
+.tunnels-list { min-height: 120px; max-height: min(360px, calc(100vh - 260px)); margin: var(--dialog-pad) var(--dialog-pad) 0; overflow-y: auto; border: 1px solid var(--line-soft); background: var(--panel-2); }
+.tunnels-empty { padding: 28px 18px; color: var(--muted); font-size: 12px; line-height: 1.7; text-align: center; }
+.tunnels-empty b { color: var(--ink); font-weight: 600; }
+.tunnel-row { display: grid; grid-template-columns: 8px minmax(0, 1fr) auto auto; align-items: center; column-gap: 12px; min-height: 52px; padding: 7px 8px 7px 12px; border-bottom: 1px solid var(--line-soft); }
+.tunnel-row:hover { background: var(--hover); }
+.tunnel-dot { width: 8px; height: 8px; background: var(--faint); }
+.tunnel-row.is-running .tunnel-dot { background: var(--tunnel-running); }
+.tunnel-row.is-starting .tunnel-dot { background: var(--tunnel-starting); animation: tunnel-blink 0.9s steps(2, start) infinite; }
+.tunnel-row.is-error .tunnel-dot { background: var(--tunnel-error); }
+.tunnel-main { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.tunnel-title { display: flex; align-items: center; gap: 7px; min-width: 0; }
+.tunnel-title em { flex: 0 0 auto; padding: 1px 4px; border: 1px solid var(--line); color: var(--muted); font-size: 10px; font-style: normal; line-height: 1.2; }
+.tunnel-title b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); font-size: 12px; font-weight: 600; }
+.tunnel-rule, .tunnel-message { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 11px; }
+.tunnel-missing { color: var(--tunnel-missing-ink); }
+.tunnel-message.is-error { color: var(--error-note-ink); }
+.tunnel-traffic { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tunnel-row.is-running .tunnel-traffic span:first-child { color: var(--ink); }
+.tunnel-buttons { display: flex; align-items: center; gap: 2px; }
+.tunnel-buttons button { width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; padding: 0; border: 0; background: transparent; color: var(--muted); }
+.tunnel-buttons button:hover:not(:disabled) { color: var(--ink); background: var(--active); }
+.tunnel-buttons button:disabled { opacity: 0.4; cursor: default; }
+.metroterm-shell .dialog-actions.tunnels-actions { justify-content: space-between; }
+.metroterm-shell .tunnels-actions .tunnels-new { display: inline-flex; align-items: center; gap: 6px; height: var(--dialog-button); padding: 0 12px; border: 1px solid var(--line); color: var(--ink); font-size: 11px; letter-spacing: 0.06em; }
+.metroterm-shell .tunnels-actions .tunnels-new:hover { background: var(--active); }
+
+/* ===== Edit form ===== */
+.metroterm-shell .connection-dialog.tunnel-form { width: min(520px, 100%); }
+.metroterm-shell .tunnel-form .segmented button small { margin-left: 4px; color: var(--faint); font-size: 10px; }
+.metroterm-shell .tunnel-form .dialog-note code { padding: 0 4px; background: var(--active); color: var(--ink); font-size: 11px; }
+
+@keyframes tunnel-blink {
+  to { visibility: hidden; }
+}

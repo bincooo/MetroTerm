@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#171717" />
+    <style>
+      html,
+      body {
+        background: #171717;
+      }
+    </style>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <title>MetroTerm</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      // The interface failed to start (for example a browser engine too old for some code): show the
+      // error instead of an empty window. Plain old JavaScript, so this part runs everywhere.
+      (function () {
+        function show(message) {
+          var root = document.getElementById('root');
+          if (!root || root.childNodes.length) return;
+          var box = document.createElement('pre');
+          box.style.cssText =
+            'margin:0;padding:24px;color:#d6d6d6;font:13px/1.6 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word';
+          box.textContent = 'MetroTerm could not start.\n\n' + message + '\n\n' + navigator.userAgent;
+          root.appendChild(box);
+        }
+        window.addEventListener('error', function (event) {
+          show(String((event.error && event.error.stack) || event.message || event.error));
+        });
+        window.addEventListener('unhandledrejection', function (event) {
+          var reason = event.reason;
+          show(String((reason && reason.stack) || reason));
+        });
+      })();
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

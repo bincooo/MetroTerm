@@ -1,0 +1,675 @@
+/*
+ * MetroTerm color palette — the only place where colors and theme differences are defined.
+ *
+ * One class works in every theme: src/styles/app.css writes each rule once with var(--…) from this file. It never
+ * contains a color value or a theme selector (.light, .gold, html.theme-…). When a part has to look different
+ * in one theme, give it a token here and set that token's value in the theme's block.
+ *
+ * Themes are classes on <html> (lib/platform/tauri.ts applyWindowBackground): theme-dark | theme-light, plus
+ * theme-gold for Gold (which is the dark theme with gold accents, so it only overrides what differs).
+ * A token missing from a theme block inherits the dark value.
+ *
+ * Each block: semantic tokens (surfaces, text, lines, controls, menus, accents …), the neutral grey scale, then
+ * component tokens (per-theme values of individual UI parts). A new panel should only need the semantic ones
+ * (--panel, --panel-2, --ink, --muted, --faint, --line, --line-soft, --hover, --active, --control-*, --menu-*).
+ * The color table in wiki/style-css.md lists these tokens; update it when you change this file.
+ */
+
+/* ---------- Dark (default) ---------- */
+:root {
+  /* Page (html / body) */
+  --page-ink: #dbdbdb;
+  --page-bg: #171717;
+  --color-scheme: dark;
+  /* Surfaces and text */
+  --bg: #191919;
+  --chrome: #292929;
+  --chrome-2: #202020;
+  --panel: #1d1d1d;
+  --panel-2: #171717;
+  --terminal: #171717;
+  --line: #3a3a3a;
+  --line-soft: #2a2a2a;
+  --ink: #dedede;
+  --muted: #898989;
+  --faint: #5a5a5a;
+  --active: #333333;
+  --violet: #8a8a8a;
+  --xterm-bg: var(--terminal);
+  --hover: #262626;
+  /* Form controls */
+  --control-bg: #1b1b1b;
+  --control-hover: #222;
+  --control-line: #383838;
+  --control-focus: #626262;
+  --control-text: #bcbcbc;
+  /* Menus and tooltips */
+  --menu-bg: #1e1e1e;
+  --menu-line: #3a3a3a;
+  --menu-hover: #2c2c2c;
+  --menu-selected: #262626;
+  --menu-shadow: 0 6px 18px #0009;
+  --tip-bg: #232323;
+  --tip-line: #484848;
+  --tip-ink: #e2e2e2;
+  --tip-key: #9a9a9a;
+  --tip-shadow: 0 4px 12px #000a;
+  /* Scrollbars */
+  --sb-track: transparent;
+  --sb-thumb: rgba(255, 255, 255, 0.2);
+  --sb-thumb-near: rgba(255, 255, 255, 0.3);
+  --sb-thumb-hover: rgba(255, 255, 255, 0.42);
+  --sb-thumb-active: rgba(255, 255, 255, 0.55);
+  /* Terminal */
+  --gutter-current: #e06666;
+  /* Time / line number of the clicked (highlighted) line. */
+  --gutter-picked: #f2f2f2;
+  --terminal-line-highlight: rgba(255, 255, 255, 0.08);
+  --terminal-same-text: #3a3a3a; /* opaque #rrggbb: drawn by xterm's renderer as the cells' background (lib/terminal/selectionMarks) */
+  --find-current-bg: #23718a; /* terminal find: background of the current match, opaque #rrggbb (drawn by xterm's renderer, lib/terminal/find); per theme: teal (dark), yellow (light), amber (gold) */
+  --find-other-bg: #1f3f4b; /* Find all: the other matches */
+  --find-empty-ink: #d86a6a;
+  --shadow-find: rgba(0, 0, 0, 0.35);
+  --terminal-cursor-color: #ffaa5c;
+  --match-bg: rgba(255, 255, 255, 0.17);
+  /* Accents and status */
+  --accent-online: #c9d25e;
+  --icon-terminal-tab: #e27e39;
+  --icon-session: #db904d;
+  --status-online: #c9d25e;
+  --sender-play: #73b26f;
+  --status-connecting: #e3a853;
+  --status-online-glow: #c9d22b22;
+  --sender-stop: #d06a5f;
+  --tunnel-running: #5fae6e;
+  --tunnel-starting: #c9a34a;
+  --tunnel-error: #c45c55;
+  --gold-option: #d9b45a;
+  /* Errors and danger */
+  --window-close-hover: #c42b1c;
+  --window-close-active: #a1251a;
+  --error-dot: #d9534f;
+  --file-error-ink: #d9534f;
+  --danger: #c4314b;
+  --danger-hover: #a92a40;
+  --error-note-ink: #e0796d;
+  --error-note-border: #6b3a35;
+  --danger-ink: #e06666;
+  /* Folder tree (Filer destination, path menu) */
+  --ft-guide: #3d3d3d;
+  --ft-folder: #8a8a8a;
+  /* Monitor charts */
+  --mon-cpu: #6f9a7c;
+  --mon-mem: #6a8fb0;
+  --mon-rx: #6a8fb0;
+  --mon-tx: #b88a5c;
+  --mon-hot: #c45c55;
+  --mon-track: #262626;
+  /* Overlays and shadows */
+  --backdrop: #000a;
+  --shadow-dialog: #0008;
+  --file-drop-mask: rgba(0, 0, 0, 0.42); /* files from the file manager over a drop target (lib/ui/fileDrop) */
+  --file-drop-ink: var(--muted); /* the quiet hint in the middle of the mask */
+  --transfer-bar: var(--control-focus); /* Filer transfers: progress bars */
+  --transfer-track: var(--line-soft);
+  --transfer-ok-ink: var(--accent-online); /* finished without errors */
+  --transfer-error-ink: var(--file-error-ink);
+  --lock-screen-bg: #101010;
+  --shadow-focus-exit: #0007;
+  /* Neutral scale: --n-XX is step XX of the grey ramp (00 = background end, ff = text end). Dark: #XXXXXX; light: the mirror image (#ffffff − XX). Used where a rule needs a plain grey; the gold theme uses the dark values. */
+  --n-00: #000000;
+  --n-11: #111;
+  --n-17: #171717;
+  --n-1a: #1a1a1a;
+  --n-20: #202020;
+  --n-23: #232323;
+  --n-28: #282828;
+  --n-2f: #2f2f2f;
+  --n-33: #333;
+  --n-3d: #3d3d3d;
+  --n-42: #424242;
+  --n-4a: #4a4a4a;
+  --n-5a: #5a5a5a;
+  --n-5c: #5c5c5c;
+  --n-61: #616161;
+  --n-65: #656565;
+  --n-66: #666;
+  --n-69: #696969;
+  --n-6a: #6a6a6a;
+  --n-72: #727272;
+  --n-73: #737373;
+  --n-74: #747474;
+  --n-77: #777;
+  --n-7a: #7a7a7a;
+  --n-85: #858585;
+  --n-8a: #8a8a8a;
+  --n-90: #909090;
+  --n-91: #919191;
+  --n-93: #939393;
+  --n-95: #959595;
+  --n-98: #989898;
+  --n-9a: #9a9a9a;
+  --n-a0: #a0a0a0;
+  --n-a4: #a4a4a4;
+  --n-a6: #a6a6a6;
+  --n-a7: #a7a7a7;
+  --n-aa: #aaa;
+  --n-b0: #b0b0b0;
+  --n-b8: #b8b8b8;
+  --n-b9: #b9b9b9;
+  --n-bb: #bbbbbb;
+  --n-bd: #bdbdbd;
+  --n-c2: #c2c2c2;
+  --n-c5: #c5c5c5;
+  --n-c7: #c7c7c7;
+  --n-c9: #c9c9c9;
+  --n-cc: #cccccc;
+  --n-d0: #d0d0d0;
+  --n-d3: #d3d3d3;
+  --n-e0: #e0e0e0;
+  --n-ee: #eee;
+  --n-ff: #fff;
+  /* ===== Components: per-theme values of individual UI parts ===== */
+  /* Shared by many parts */
+  --ink-active: var(--ink);
+  --strong-ink: var(--n-b8);
+  --button-hover-bg: var(--active);
+  --bar-line: var(--line);
+  --row-ink: var(--n-b9);
+  --row-dim-ink: var(--muted);
+  --field-bg: var(--n-17);
+  --field-line: var(--n-28);
+  --field-focus-line: var(--control-focus);
+  --field-hover-bg: var(--control-hover);
+  --field-hover-line: var(--control-focus);
+  --field-focus-bg: var(--control-hover);
+  --filter-bg: var(--control-bg);
+  --filter-line: var(--control-line);
+  --focus-ring: var(--n-c7);
+  --focus-ring-control: var(--control-focus);
+  --caret: var(--ink);
+  --checkbox-mark: var(--n-91);
+  --checkbox-checked-line: var(--control-focus);
+  --radio-dot: var(--n-91);
+  --range-thumb: var(--ink);
+  --primary-button-bg: var(--n-c9);
+  --primary-button-ink: var(--n-11);
+  --primary-button-hover-bg: var(--n-ee);
+  --primary-button-disabled-hover-bg: var(--n-ee);
+  --choice-active-shadow: none;
+  --focus-choice-active-bg: var(--active);
+  --status-dot-bg: var(--n-69);
+  --status-dot-glow: var(--status-online-glow);
+  --session-connecting-ink: var(--status-connecting);
+  /* Session panel: the agent state tag (flat block, Metro); blocked is a solid block, the others a tint */
+  --agent-working-bg: #e3a85326;
+  --agent-working-ink: var(--status-connecting);
+  --agent-blocked-bg: var(--danger);
+  --agent-blocked-ink: var(--n-ff);
+  --agent-done-bg: #c9d25e24;
+  --agent-done-ink: var(--status-online);
+  --agent-idle-line: var(--line);
+  --agent-idle-ink: var(--muted);
+  --menu-check: currentColor;
+  /* Window frame, menu bar, status bar */
+  --window-chrome-line: var(--n-11);
+  --window-chrome-ink: var(--n-c2);
+  --window-name-ink: var(--n-d3);
+  --window-button-ink: var(--n-bd);
+  --window-button-hover-bg: var(--n-3d);
+  --window-button-hover-ink: var(--n-ff);
+  --window-button-active-bg: var(--n-4a);
+  --window-close-ink: var(--n-ff);
+  --menu-bar-line: var(--line);
+  --menu-bar-bg: var(--chrome-2);
+  --menu-item-ink: var(--n-b9);
+  --menu-item-open-ink: var(--ink);
+  --status-bar-bg: var(--n-23);
+  --status-bar-line: var(--n-11);
+  --status-bar-ink: var(--n-a0);
+  --status-theme-ink: var(--muted);
+  --status-theme-hover-ink: var(--ink);
+  --status-window-ink: var(--status-bar-ink); /* Window menu windows in the status bar: neutral in every theme */
+  --status-window-hover-ink: var(--ink);
+  --status-window-hover-bg: var(--hover);
+  --status-window-active-ink: var(--ink);
+  --status-window-active-bg: var(--active);
+  --split-handle-hover-bg: var(--violet);
+  /* Panels */
+  --terminal-main-bg: var(--terminal);
+  --pane-title-bg: var(--n-20);
+  --pane-title-ink: var(--n-a7);
+  --pane-swatch: var(--muted);
+  --panel-empty-button-line: var(--line-soft);
+  /* Terminal: tabs, toolbar, gutter */
+  --tab-bar-bg: var(--n-1a);
+  --session-tab-ink: var(--n-98);
+  --session-tab-hover-bg: var(--panel);
+  --session-tab-hover-ink: var(--session-tab-ink);
+  --session-tab-active-bg: var(--active);
+  --session-tab-active-shadow: none;
+  --tmux-line: var(--line); /* 1px divider between tmux panes */
+  --tmux-focus-line: var(--accent-online); /* focused tmux pane: its letter (green like tmux) */
+  --tmux-letter-ink: var(--muted); /* pane letter A / B / C … in a pane's tab bar */
+  --tmux-idle-tab-ink: var(--session-tab-ink); /* shown tab of a pane that doesn't have the focus */
+  --status-prefix-bg: var(--accent-online); /* status bar: tmux prefix Ctrl+B waiting for its key */
+  --status-prefix-ink: var(--n-11);
+  /* Active tab: a light running along its top edge (animation off while the name is none). */
+  --session-tab-flow: none;
+  --session-tab-flow-animation: none;
+  --tab-close-hover-bg: var(--line);
+  --tab-close-hover-ink: var(--n-ff);
+  --terminal-toolbar-bg: var(--n-20);
+  --terminal-breadcrumb-line: var(--n-33);
+  --terminal-breadcrumb-bg: var(--n-1a);
+  --terminal-breadcrumb-ink: var(--n-93);
+  --gutter-ink: var(--n-5a);
+  --gutter-time-ink: var(--n-74);
+  /* Explorer */
+  --session-quickbar-bg: color-mix(in srgb, var(--panel) 88%, var(--n-11));
+  --quickbar-first-ink: var(--muted);
+  --quickbar-hover-ink: var(--ink);
+  --group-row-ink: var(--n-a6);
+  --group-row-small-ink: var(--n-72);
+  --group-row-hover-bg: var(--n-28);
+  --tree-row-small-ink: var(--n-77);
+  --tree-row-hover-ink: var(--row-ink);
+  --row-action-hover-ink: var(--ink);
+  --row-action-hover-bg: var(--active);
+  /* Filer */
+  --filer-head-ink: var(--muted);
+  --filer-foot-ink: var(--n-90);
+  --filer-icon-ink: var(--n-8a);
+  --filer-row-hover-ink: var(--n-b9);
+  --filer-selected-bg: var(--active);
+  --filer-sort-ink: var(--faint);
+  --filer-sorted-ink: var(--ink); /* sorted column name: plain ink in every theme (no gold) */
+  /* Sender */
+  --sender-controls-ink: var(--n-9a);
+  --sender-button-hover-ink: var(--ink);
+  --sender-bg: var(--n-1a);
+  --sender-text-bg: var(--control-bg);
+  --sender-text-active-bg: var(--control-hover);
+  --sender-span-ink: var(--n-6a);
+  --sender-stop-disabled-ink: var(--faint);
+  /* Dialogs */
+  --dialog-line: var(--n-61);
+  --dialog-title-bg: var(--chrome);
+  --dialog-title-b-ink: currentColor;
+  --dialog-title-span-ink: var(--n-11);
+  --dialog-title-span-bg: var(--n-d0);
+  --dialog-input-line: var(--line);
+  --danger-button-bg: var(--danger);
+  --danger-button-ink: var(--n-ff);
+  --danger-button-hover-bg: var(--danger-hover);
+  /* Tunnels */
+  --tunnel-missing-ink: var(--tunnel-error);
+}
+
+/* ---------- Light ---------- */
+:root.theme-light {
+  /* Page (html / body) */
+  --page-bg: #ececea;
+  --color-scheme: light;
+  /* Surfaces and text */
+  --bg: #f3f3f3;
+  --chrome: #e8e8e8;
+  --chrome-2: #eeeeee;
+  --panel: #fafafa;
+  --panel-2: #f0f0f0;
+  --terminal: #f3f3f3;
+  --line: #cfcfcf;
+  --line-soft: #e1e1e1;
+  --ink: #1e1e1e;
+  --muted: #5c5c5c;
+  --faint: #8e8e8e;
+  --active: #e3e3e3;
+  --violet: #9a9a9a;
+  --xterm-bg: var(--panel); /* light: the terminal uses the panel white, not --terminal */
+  --hover: #ececec;
+  /* Form controls */
+  --control-bg: #ffffff;
+  --control-hover: #f6f6f6;
+  --control-line: #c9c9c9;
+  --control-focus: #707070;
+  --control-text: #1e1e1e;
+  /* Menus and tooltips */
+  --menu-bg: #ffffff;
+  --menu-line: #d4d4d4;
+  --menu-hover: #efefef;
+  --menu-selected: #f5f5f5;
+  --menu-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --tip-bg: #fbfbf9;
+  --tip-line: #b4b4af;
+  --tip-ink: #1d1d1d;
+  --tip-key: #6b6b6b;
+  --tip-shadow: 0 4px 12px #0002;
+  /* Scrollbars */
+  --sb-thumb: rgba(0, 0, 0, 0.11);
+  --sb-thumb-near: rgba(0, 0, 0, 0.17);
+  --sb-thumb-hover: rgba(0, 0, 0, 0.26);
+  --sb-thumb-active: rgba(0, 0, 0, 0.35);
+  /* Terminal */
+  --gutter-current: #c43c3c;
+  --gutter-picked: #111111;
+  --terminal-line-highlight: rgba(0, 0, 0, 0.06);
+  --terminal-same-text: #e2e2e2;
+  --find-current-bg: #f0c84a;
+  --find-other-bg: #f6e7b4;
+  --shadow-find: rgba(0, 0, 0, 0.12);
+  --terminal-cursor-color: #ff8a2e;
+  --match-bg: rgba(0, 0, 0, 0.085);
+  /* Accents and status */
+  --accent-online: #6f8f00;
+  --icon-terminal-tab: #c8621b;
+  --icon-session: #c8621b;
+  --sender-play: #2f8a3a;
+  --sender-stop: #c0392b;
+  --gold-option: #a8801f;
+  /* Errors and danger */
+  --file-error-ink: #b52a1c;
+  --error-note-ink: #b3392b;
+  --error-note-border: #e3b2ab;
+  --danger-ink: #c4314b;
+  /* Session panel agent state tag: the dark theme's yellow inks are too light on white */
+  --agent-working-bg: #e3a85338;
+  --agent-working-ink: #8a5208;
+  --agent-blocked-ink: #ffffff;
+  --agent-done-bg: #c9d25e4d;
+  --agent-done-ink: #5c6310;
+  /* Folder tree (Filer destination, path menu) */
+  --ft-guide: #c8c8c4;
+  --ft-folder: #7a7a7a;
+  /* Monitor charts */
+  --mon-cpu: #3f7d52;
+  --mon-mem: #2f6a9a;
+  --mon-rx: #2f6a9a;
+  --mon-tx: #a5662a;
+  --mon-hot: #b43c34;
+  --mon-track: #e6e6e6;
+  /* Overlays and shadows */
+  --backdrop: rgba(30, 30, 30, 0.28);
+  --shadow-dialog: rgba(0, 0, 0, 0.16);
+  --file-drop-mask: rgba(255, 255, 255, 0.6);
+  --lock-screen-bg: #ececea;
+  --shadow-focus-exit: #0003;
+  /* Neutral scale: --n-XX is step XX of the grey ramp (00 = background end, ff = text end). Dark: #XXXXXX; light: the mirror image (#ffffff − XX). Used where a rule needs a plain grey; the gold theme uses the dark values. */
+  --n-00: #fff;
+  --n-11: #eeeeee;
+  --n-17: #e8e8e8;
+  --n-1a: #e5e5e5;
+  --n-20: #dfdfdf;
+  --n-23: #dcdcdc;
+  --n-28: #d7d7d7;
+  --n-2f: #d0d0d0;
+  --n-33: #cccccc;
+  --n-3d: #c2c2c2;
+  --n-42: #bdbdbd;
+  --n-4a: #b5b5b5;
+  --n-5a: #a5a5a5;
+  --n-5c: #a3a3a3;
+  --n-61: #9e9e9e;
+  --n-65: #9a9a9a;
+  --n-66: #999999;
+  --n-69: #969696;
+  --n-6a: #959595;
+  --n-72: #8d8d8d;
+  --n-73: #8c8c8c;
+  --n-74: #8b8b8b;
+  --n-77: #888888;
+  --n-7a: #858585;
+  --n-85: #7a7a7a;
+  --n-8a: #757575;
+  --n-90: #6f6f6f;
+  --n-91: #6e6e6e;
+  --n-93: #6c6c6c;
+  --n-95: #6a6a6a;
+  --n-98: #676767;
+  --n-9a: #656565;
+  --n-a0: #5f5f5f;
+  --n-a4: #5b5b5b;
+  --n-a6: #595959;
+  --n-a7: #585858;
+  --n-aa: #555555;
+  --n-b0: #4f4f4f;
+  --n-b8: #474747;
+  --n-b9: #464646;
+  --n-bb: #444;
+  --n-bd: #424242;
+  --n-c2: #3d3d3d;
+  --n-c5: #3a3a3a;
+  --n-c7: #383838;
+  --n-c9: #363636;
+  --n-cc: #333;
+  --n-d0: #2f2f2f;
+  --n-d3: #2c2c2c;
+  --n-e0: #1f1f1f;
+  --n-ee: #111111;
+  --n-ff: #000000;
+  /* ===== Components: per-theme values of individual UI parts ===== */
+  /* Shared by many parts */
+  --strong-ink: var(--ink);
+  --button-hover-bg: var(--hover);
+  --bar-line: var(--line-soft);
+  --row-ink: var(--n-cc);
+  --row-dim-ink: var(--faint);
+  --field-bg: var(--control-bg);
+  --field-line: var(--control-line);
+  --field-focus-line: var(--control-line);
+  --field-hover-bg: var(--control-bg);
+  --field-hover-line: var(--control-line);
+  --field-focus-bg: var(--control-bg);
+  --caret: var(--n-cc);
+  --checkbox-mark: var(--n-aa);
+  --radio-dot: var(--n-aa);
+  --focus-choice-active-bg: #d6d6d2;
+  --status-dot-bg: var(--n-4a);
+  --status-dot-glow: rgba(111, 143, 0, 0.15);
+  --session-connecting-ink: #b7791f;
+  --menu-check: var(--n-95);
+  /* Window frame, menu bar, status bar */
+  --window-chrome-line: var(--line);
+  --window-chrome-ink: var(--muted);
+  --window-name-ink: var(--ink);
+  --window-button-ink: var(--n-bb);
+  --window-button-hover-bg: var(--n-2f);
+  --window-button-hover-ink: var(--n-ee);
+  --window-button-active-bg: var(--n-42);
+  --window-close-ink: var(--n-00);
+  --menu-bar-line: var(--line-soft);
+  --menu-item-ink: var(--n-cc);
+  --status-bar-bg: var(--chrome);
+  --status-bar-line: var(--line);
+  --status-bar-ink: var(--muted);
+  /* Panels */
+  --terminal-main-bg: var(--panel);
+  --pane-title-bg: var(--panel-2);
+  --pane-title-ink: var(--muted);
+  --pane-swatch: #8a8a86;
+  --panel-empty-button-line: var(--line);
+  /* Terminal: tabs, toolbar, gutter */
+  --tab-bar-bg: var(--panel-2);
+  --session-tab-ink: var(--muted);
+  --session-tab-hover-bg: var(--hover);
+  --session-tab-hover-ink: var(--ink);
+  --session-tab-active-bg: var(--panel);
+  --tab-close-hover-bg: var(--active);
+  --tab-close-hover-ink: var(--ink);
+  --terminal-toolbar-bg: var(--panel);
+  --terminal-breadcrumb-line: var(--control-line);
+  --terminal-breadcrumb-bg: var(--control-bg);
+  --terminal-breadcrumb-ink: var(--muted);
+  --gutter-ink: var(--n-5c);
+  --gutter-time-ink: var(--n-65);
+  /* Explorer */
+  --quickbar-hover-ink: var(--muted);
+  --session-quickbar-bg: var(--panel);
+  --group-row-ink: var(--n-bb);
+  --group-row-small-ink: var(--faint);
+  --group-row-hover-bg: var(--hover);
+  --tree-row-small-ink: var(--faint);
+  --tree-row-hover-ink: var(--ink);
+  --row-action-hover-ink: #b7791f;
+  --row-action-hover-bg: var(--line-soft);
+  /* Filer */
+  --filer-sort-ink: var(--n-85);
+  --filer-foot-ink: var(--muted);
+  --filer-icon-ink: var(--n-85);
+  --filer-row-hover-ink: var(--ink);
+  /* Sender */
+  --sender-button-hover-ink: var(--muted);
+  --sender-controls-ink: var(--muted);
+  --sender-bg: var(--panel);
+  --sender-text-bg: var(--panel);
+  --sender-text-active-bg: var(--panel);
+  --sender-span-ink: var(--ink);
+  --sender-stop-disabled-ink: var(--n-4a);
+  /* Dialogs */
+  --dialog-line: var(--n-73);
+  --dialog-title-bg: var(--panel-2);
+  --dialog-title-span-ink: var(--n-00);
+  --dialog-title-span-bg: var(--n-c5);
+  --dialog-input-line: var(--control-line);
+  /* Tunnels */
+  --tunnel-missing-ink: var(--error-note-ink);
+}
+
+/* ---------- Gold ---------- */
+:root.theme-gold {
+  /* Page (html / body) */
+  --page-bg: #141310;
+  /* Surfaces and text */
+  --bg: #171613;
+  --chrome: #24211b;
+  --chrome-2: #1d1b17;
+  --panel: #1b1a17;
+  --panel-2: #151411;
+  --terminal: #141310;
+  --line: #3b3529;
+  --line-soft: #2a2720;
+  --ink: #ece5d5;
+  --muted: #998f7a;
+  --faint: #5f584b;
+  --active: #352e21;
+  --violet: var(--gold-dim);
+  --hover: #27231c;
+  /* Form controls */
+  --control-bg: #181612;
+  --control-hover: #221f19;
+  --control-line: #3e372a;
+  --control-focus: #a88a45;
+  --control-text: #c9bfa9;
+  /* Menus and tooltips */
+  --menu-bg: #1d1b17;
+  --menu-line: var(--gold-line);
+  --menu-hover: #2f291f;
+  --menu-selected: #26221b;
+  --tip-bg: #221f19;
+  --tip-line: #5c4d2e;
+  --tip-ink: #ece5d5;
+  --tip-key: #a8997a;
+  /* Scrollbars */
+  --sb-thumb: rgba(217, 180, 90, 0.22);
+  --sb-thumb-near: rgba(217, 180, 90, 0.32);
+  --sb-thumb-hover: rgba(217, 180, 90, 0.45);
+  --sb-thumb-active: rgba(217, 180, 90, 0.6);
+  /* Terminal */
+  --gutter-current: #e0bd5c;
+  --gutter-picked: #f6efe0;
+  --terminal-line-highlight: rgba(232, 191, 90, 0.08);
+  --terminal-same-text: #3a3324;
+  --find-current-bg: #9a7420;
+  --find-other-bg: #4a3d1c;
+  --terminal-cursor-color: #ffaa5c; /* the dark theme's orange cursor */
+  /* Folder tree (Filer destination, path menu) */
+  --ft-guide: #3e372a;
+  --ft-folder: #b0924f;
+  /* Monitor charts */
+  --mon-cpu: #d9b45a;
+  --mon-mem: #b89a62;
+  --mon-rx: #d9b45a;
+  --mon-tx: #9c8a66;
+  --mon-hot: #c8664a;
+  --mon-track: #2a2720;
+  /* Accents and status */
+  --icon-terminal-tab: var(--gold);
+  --tunnel-running: var(--gold);
+  /* Overlays and shadows */
+  --shadow-dialog: #000a;
+  /* Gold accents */
+  --gold: #d9b45a;
+  --gold-bright: #f0d48a;
+  --gold-dim: #8a6f35;
+  --gold-line: #4a3f28;
+  --gold-soft: rgba(217, 180, 90, 0.14);
+  --gold-ink: #1a1408;
+  /* ===== Components: per-theme values of individual UI parts ===== */
+  /* Shared by many parts */
+  --ink-active: var(--gold-bright);
+  --field-bg: #141310;
+  --field-line: #2f2a20;
+  --field-focus-line: var(--gold-dim);
+  --field-hover-bg: var(--field-bg);
+  --field-hover-line: var(--field-line);
+  --field-focus-bg: var(--field-bg);
+  --filter-bg: var(--field-bg);
+  --filter-line: var(--field-line);
+  --focus-ring: var(--gold);
+  --focus-ring-control: var(--gold);
+  --checkbox-mark: var(--gold);
+  --checkbox-checked-line: var(--gold-dim);
+  --range-thumb: var(--gold);
+  --primary-button-bg: var(--gold);
+  --primary-button-ink: var(--gold-ink);
+  --primary-button-hover-bg: var(--gold-bright);
+  --primary-button-disabled-hover-bg: var(--gold);
+  --choice-active-shadow: inset 0 -2px 0 var(--gold);
+  --menu-check: var(--gold);
+  /* Window frame, menu bar, status bar */
+  --window-chrome-line: #0d0c0a;
+  --window-chrome-ink: #cfc6b3;
+  --window-name-ink: var(--gold-bright);
+  --menu-bar-line: var(--gold-line);
+  --menu-bar-bg:
+    linear-gradient(180deg, rgba(240, 212, 138, 0.1), rgba(240, 212, 138, 0) 55%),
+    linear-gradient(90deg, #1d1912 0%, #3a2e17 22%, #5a4620 50%, #3a2e17 78%, #1d1912 100%);
+  --menu-item-ink: #c3baa6;
+  --menu-item-open-ink: var(--menu-item-ink);
+  --status-bar-bg: #1f1c17;
+  --status-bar-line: var(--gold-line);
+  --status-bar-ink: #a89e88;
+  --status-theme-ink: var(--gold);
+  --status-theme-hover-ink: var(--gold);
+  --split-handle-hover-bg: var(--gold);
+  /* Terminal: tabs, toolbar, gutter */
+  --tab-bar-bg: #181713;
+  --session-tab-ink: #a0967f;
+  --session-tab-active-shadow: none;
+  --session-tab-flow: linear-gradient(
+    90deg,
+    var(--gold-dim) 0%,
+    var(--gold-dim) 25%,
+    var(--gold) 40%,
+    #fff3cc 50%,
+    var(--gold) 60%,
+    var(--gold-dim) 75%,
+    var(--gold-dim) 100%
+  );
+  --session-tab-flow-animation: session-tab-flow;
+  /* Explorer */
+  --session-quickbar-bg: #1a1814;
+  --quickbar-first-ink: var(--gold);
+  --quickbar-hover-ink: var(--gold-bright);
+  --group-row-hover-bg: var(--hover);
+  /* Filer */
+  --filer-head-ink: #a89e88;
+  --filer-selected-bg: var(--gold-soft);
+  /* Dialogs */
+  --dialog-line: var(--gold-dim);
+  --dialog-title-b-ink: var(--gold-bright);
+  --dialog-title-span-ink: var(--gold-ink);
+  --dialog-title-span-bg: var(--gold);
+  --danger-button-bg: var(--gold);
+  --danger-button-ink: var(--gold-ink);
+  --danger-button-hover-bg: var(--gold-bright);
+}

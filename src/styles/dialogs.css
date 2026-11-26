@@ -1,0 +1,104 @@
+/* Dialogs: backdrop and frame (DialogFrame, .connection-dialog), title, fields (with the PasswordInput field), notes and errors, footer buttons, small confirm dialogs (auth-dialog / file-op-dialog). */
+
+/* ===== Backdrop and frame ===== */
+.modal-backdrop { position: fixed; z-index: 20; inset: 0; display: grid; place-items: center; padding: 20px; background: var(--backdrop); }
+.connection-dialog { border: 1px solid var(--dialog-line); background: var(--panel); box-shadow: 8px 8px 0 var(--shadow-dialog); }
+/* --dialog-button: footer buttons (OK / Cancel …); --dialog-max-height: no dialog is taller (a longer one scrolls between its title and buttons), however tall the window */
+.metroterm-shell .connection-dialog { width: min(440px, 100%); max-height: min(var(--dialog-max-height), calc(100vh - 40px)); display: flex; flex-direction: column; overflow: auto; scroll-padding-block: 48px 64px; /* a focused field is never left under the sticky title / buttons */; }
+.metroterm-shell .connection-dialog > * { flex: none; }
+.metroterm-shell .connection-dialog:focus { outline: none; }
+
+/* ===== Title ===== */
+.dialog-title { height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-bottom: 1px solid var(--bar-line); background: var(--dialog-title-bg); }
+.dialog-title span { color: var(--dialog-title-span-ink); background: var(--dialog-title-span-bg); }
+.dialog-title b { color: var(--dialog-title-b-ink); }
+.dialog-title button { margin-left: auto; font-size: 19px; }
+.icon-button, .primary-button, .dialog-title button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; line-height: 1; }
+.icon-button, .dialog-title button { width: 24px; height: 24px; }
+/* Every dialog keeps its title bar and its button row on screen: when the window is too low and the dialog scrolls, only what is between them moves (sticky in the scrolling dialog; the custom scrollbar runs between them, see customScrollbars stickyInsets). */
+.metroterm-shell .connection-dialog > .dialog-title { position: sticky; top: 0; z-index: 3; }
+/* title bar */
+.metroterm-shell .connection-dialog .dialog-title { height: 42px; min-height: 42px; gap: 10px; padding: 0 7px 0 var(--dialog-pad); }
+.metroterm-shell .dialog-title span { padding: 2px 6px; font-size: 10px; letter-spacing: 0.06em; line-height: 16px; }
+.metroterm-shell .dialog-title b { font-size: 12px; letter-spacing: 0.08em; }
+.metroterm-shell .dialog-title button { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; color: var(--muted); }
+.metroterm-shell .dialog-title button:hover { color: var(--ink); background: var(--control-hover); }
+
+/* ===== Fields: labels, grid, inputs, segmented buttons, check rows ===== */
+.connection-dialog input { padding: 0 8px; border: 1px solid var(--dialog-input-line); border-radius: 0; color: var(--ink); background: var(--field-bg); }
+.form-grid { display: grid; grid-template-columns: 1fr 105px; }
+.connection-dialog .segmented { display: flex; border: 1px solid var(--control-line); }
+.connection-dialog .segmented button { flex: 1; color: var(--muted); letter-spacing: 0.06em; }
+.connection-dialog .segmented button + button { border-left: 1px solid var(--control-line); }
+.connection-dialog .segmented button:hover { color: var(--ink); background: var(--control-hover); }
+.connection-dialog .segmented button.is-active { color: var(--ink-active); background: var(--active); box-shadow: var(--choice-active-shadow); }
+.connection-dialog label { display: grid; }
+.connection-dialog p { padding: 4px 12px 0; color: var(--muted); line-height: 1.6; font-size: 11px; }
+.metroterm-shell .connection-dialog label { gap: 6px; padding: var(--dialog-gap) var(--dialog-pad) 0; color: var(--muted); font-size: 11px; letter-spacing: 0.06em; }
+.metroterm-shell .connection-dialog .form-grid { grid-template-columns: minmax(0, 1fr) 110px; column-gap: 12px; padding: 0 var(--dialog-pad); }
+.metroterm-shell .connection-dialog .form-grid label { padding-left: 0; padding-right: 0; }
+.metroterm-shell .connection-dialog input:not([type='checkbox']):not([type='radio']) { box-sizing: border-box; width: 100%; height: var(--dialog-control); min-height: var(--dialog-control); padding: 0 10px; border: 1px solid var(--control-line); border-radius: 0; background: var(--control-bg); color: var(--control-text); font-family: inherit; font-size: 12px; letter-spacing: 0; outline: 0; }
+.metroterm-shell .connection-dialog input:not([type='checkbox']):not([type='radio']):hover { background: var(--control-hover); }
+.metroterm-shell .connection-dialog input:not([type='checkbox']):not([type='radio']):focus { border-color: var(--control-focus); background: var(--control-bg); }
+.metroterm-shell .connection-dialog input::placeholder { color: var(--faint); }
+/* SSH | LOCAL SHELL switch: same outer height as the inputs */
+.metroterm-shell .connection-dialog .segmented { box-sizing: border-box; height: var(--dialog-control); margin: var(--dialog-pad) var(--dialog-pad) 0; }
+.metroterm-shell .connection-dialog .segmented button { height: 100%; font-size: 11px; }
+.metroterm-shell .connection-dialog .field-label { padding: var(--dialog-gap) var(--dialog-pad) 0; color: var(--muted); font-size: 11px; letter-spacing: 0.06em; }
+.metroterm-shell .connection-dialog .field-label + .segmented { margin-top: 6px; }
+.metroterm-shell .connection-dialog .form-grid.even { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.metroterm-shell .connection-dialog .ui-number { box-sizing: border-box; width: 100%; height: var(--dialog-control); }
+.metroterm-shell .connection-dialog .ui-number input:not([type='checkbox']):not([type='radio']) { height: 100%; min-height: 0; padding: 0 2px 0 10px; border: 0; background: transparent; text-align: left; }
+.metroterm-shell .connection-dialog .ui-number input:not([type='checkbox']):not([type='radio']):hover, .metroterm-shell .connection-dialog .ui-number input:not([type='checkbox']):not([type='radio']):focus { border: 0; background: transparent; }
+.metroterm-shell .connection-dialog .ui-number-suffix { padding-right: 6px; }
+.metroterm-shell .connection-dialog label.dialog-check { display: flex; align-items: center; gap: 8px; width: max-content; color: var(--ink); letter-spacing: 0; font-size: 12px; cursor: pointer; user-select: none; }
+.metroterm-shell .connection-dialog input:disabled { opacity: 0.55; cursor: not-allowed; }
+.metroterm-shell .connection-dialog label.dialog-check input[type='checkbox'] { width: 12px; min-width: 12px; height: 12px; min-height: 12px; padding: 0; }
+.metroterm-shell .connection-dialog .ui-combobox.is-open > input { border-color: var(--control-focus); }
+.metroterm-shell .connection-dialog > .dialog-check { margin-top: var(--dialog-gap); }
+.metroterm-shell .connection-dialog label.dialog-check.is-disabled { color: var(--muted); cursor: default; }
+.metroterm-shell .password-field { position: relative; display: flex; width: 100%; min-width: 0; }
+.metroterm-shell .password-field > input:not([type='checkbox']):not([type='radio']) { flex: 1; width: 100%; min-width: 0; padding-right: 30px; }
+
+/* ===== Notes and errors ===== */
+.metroterm-shell .connection-dialog .dialog-note { margin: var(--dialog-gap) var(--dialog-pad) 0; padding: 9px 11px; border: 1px solid var(--line-soft); background: var(--panel-2); color: var(--muted); font-size: 11px; line-height: 1.6; }
+.metroterm-shell .connection-dialog .dialog-note.is-error { color: var(--error-note-ink); border-color: var(--error-note-border); }
+.metroterm-shell .connection-dialog .dialog-error { margin: var(--dialog-gap) var(--dialog-pad) 0; padding: 0; min-height: 0; color: var(--danger-ink); font-size: 12px; display: none; }
+.metroterm-shell .connection-dialog .dialog-error.is-shown { display: block; }
+
+/* ===== Small confirm dialogs (auth-dialog / file-op-dialog) ===== */
+.auth-backdrop { z-index: 40; }
+.auth-dialog .auth-target { display: flex; align-items: center; gap: 8px; margin: 12px 12px 0; padding: 8px 10px; border: 1px solid var(--line-soft); color: var(--ink); font-size: 12px; }
+.auth-dialog .auth-target .icon { color: var(--muted); }
+.auth-dialog .auth-target small { margin-left: auto; color: var(--muted); font-size: 11px; }
+.connection-dialog .auth-message { color: var(--ink); white-space: normal; word-break: break-word; }
+.auth-dialog .auth-message code { padding: 0 4px; background: var(--active); font-size: 11px; }
+.auth-dialog .auth-actions { display: flex; justify-content: flex-end; align-items: center; gap: 6px; padding: 12px; }
+.file-op-backdrop { z-index: 30; }
+.file-op-dialog .auth-target span { flex: none; }
+.file-op-dialog .auth-target small { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.metroterm-shell .connection-dialog .auth-message { padding: var(--dialog-gap) var(--dialog-pad) 0; font-size: 12px; line-height: 1.65; }
+.metroterm-shell .connection-dialog .auth-target { box-sizing: border-box; min-height: var(--dialog-control); margin: var(--dialog-pad) var(--dialog-pad) 0; padding: 0 10px; background: var(--panel-2); }
+
+/* ===== Footer buttons ===== */
+.primary-button:hover { background: var(--primary-button-hover-bg); }
+.primary-button:hover:disabled { background: var(--primary-button-disabled-hover-bg); }
+.primary-button { width: calc(100% - 24px); height: 34px; margin: 12px; color: var(--primary-button-ink); background: var(--primary-button-bg); font-size: 10px; letter-spacing: 0.06em; gap: 8px; }
+.auth-dialog .auth-actions > button:not(.primary-button) { height: var(--dialog-button, 26px); padding: 0 12px; border: 1px solid var(--line); color: var(--muted); font-size: 10px; letter-spacing: 0.06em; }
+.auth-dialog .auth-actions > button:not(.primary-button):hover { color: var(--ink); background: var(--active); }
+.auth-dialog .auth-actions .primary-button { width: auto; margin: 0; padding: 0 14px; display: inline-flex; align-items: center; }
+.file-op-dialog .primary-button.is-danger { background: var(--danger-button-bg); color: var(--danger-button-ink); }
+.file-op-dialog .primary-button.is-danger:hover { background: var(--danger-button-hover-bg); }
+.metroterm-shell .connection-dialog > .dialog-actions { position: sticky; bottom: 0; z-index: 3; }
+/* action bar: Cancel + primary on the right, separated from the content */
+.metroterm-shell .dialog-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin: 0; padding: 10px var(--dialog-pad); border-top: 1px solid var(--line-soft); background: var(--panel-2); }
+.metroterm-shell .connection-dialog .dialog-actions { margin-top: var(--dialog-pad); }
+.metroterm-shell .dialog-actions > button, .metroterm-shell .connection-dialog .dialog-actions > button:not(.primary-button) { box-sizing: border-box; height: var(--dialog-button); min-width: 72px; margin: 0; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 10.5px; letter-spacing: 0.06em; }
+.metroterm-shell .dialog-actions > button:not(.primary-button) { border: 1px solid var(--control-line); background: transparent; color: var(--control-text); }
+.metroterm-shell .dialog-actions > button:not(.primary-button):hover { border-color: var(--control-focus); background: var(--control-hover); color: var(--ink); }
+.metroterm-shell .dialog-actions > .primary-button { width: auto; border: 1px solid transparent; }
+.metroterm-shell .dialog-actions > .primary-button:focus-visible, .metroterm-shell .dialog-actions > button:focus-visible { outline: 1px solid var(--focus-ring-control); outline-offset: 2px; }
+.metroterm-shell .dialog-actions > .primary-button:focus-visible { outline-color: var(--control-focus); }
+.metroterm-shell .dialog-actions > .primary-button.is-danger { background: var(--danger-button-bg); color: var(--danger-button-ink); }
+.metroterm-shell .dialog-actions > .primary-button.is-danger:hover { background: var(--danger-button-hover-bg); }
+.metroterm-shell .dialog-actions > .primary-button:disabled { opacity: 0.45; cursor: default; }

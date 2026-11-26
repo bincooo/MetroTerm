@@ -1,0 +1,28 @@
+/* Lock Screen and the Focus Mode exit zone. */
+
+/* ===== Lock Screen ===== */
+.metroterm-shell .lock-screen { position: fixed; inset: 0; z-index: 1500; display: grid; place-items: center; background: var(--lock-screen-bg); color: var(--ink); outline: 0; user-select: none; }
+.metroterm-shell .lock-card { width: min(340px, calc(100vw - 40px)); display: flex; flex-direction: column; align-items: center; text-align: center; }
+.metroterm-shell .lock-icon { width: 56px; height: 56px; display: grid; place-items: center; margin-bottom: 18px; border: 1px solid var(--line); color: var(--muted); }
+.metroterm-shell .lock-time { font-size: 64px; font-weight: 300; line-height: 1; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
+.metroterm-shell .lock-date { margin-top: 10px; color: var(--muted); font-size: 13px; }
+.metroterm-shell .lock-title { margin: 30px 0 14px; color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; }
+.metroterm-shell .lock-field { width: 100%; display: flex; }
+.metroterm-shell .lock-field input { box-sizing: border-box; flex: 1; min-width: 0; height: 34px; padding: 0 10px; font-size: 13px; }
+.metroterm-shell .lock-field .primary-button { width: 34px; height: 34px; margin: 0 0 0 -1px; display: grid; place-items: center; }
+.metroterm-shell .lock-field .primary-button:disabled { opacity: 0.5; }
+.metroterm-shell .lock-field .password-field { flex: 1; min-width: 0; }
+.metroterm-shell .lock-error { min-height: 18px; margin-top: 8px; color: var(--danger-ink); font-size: 12px; visibility: hidden; }
+.metroterm-shell .lock-error.is-shown { visibility: visible; }
+.metroterm-shell .lock-unlock { width: 160px; margin: 0; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.metroterm-shell .lock-hint { margin-top: 14px; color: var(--muted); font-size: 11px; line-height: 1.6; }
+.metroterm-shell .is-danger-text { color: var(--danger-ink); }
+.metroterm-shell .lock-dialog .dialog-check { margin-top: var(--dialog-gap); padding: 0 var(--dialog-pad); }
+
+/* ===== Focus mode: exit zone ===== */
+.metroterm-shell .focus-exit-zone { position: fixed; top: 0; left: 50%; z-index: 900; width: 360px; height: 8px; transform: translateX(-50%); display: flex; justify-content: center; }
+.metroterm-shell .focus-exit-zone:hover { height: 48px; }
+.metroterm-shell .focus-exit-zone button { height: 30px; display: inline-flex; align-items: center; gap: 8px; padding: 0 12px; border: 1px solid var(--line); border-top: 0; background: var(--chrome); color: var(--ink); font-size: 12px; box-shadow: 0 4px 12px var(--shadow-focus-exit); transform: translateY(-100%); opacity: 0; transition: transform 0.14s ease, opacity 0.14s ease; }
+.metroterm-shell .focus-exit-zone:hover button, .metroterm-shell .focus-exit-zone button:focus-visible { transform: translateY(0); opacity: 1; }
+.metroterm-shell .focus-exit-zone button:hover { background: var(--active); }
+.metroterm-shell .focus-exit-zone small { color: var(--muted); font-size: 11px; }

@@ -1,0 +1,99 @@
+# MetroTerm: screen signatures of agent CLIs.
+#
+# A local terminal names its agent from its foreground process (agents/process.rs). Where processes
+# can't be seen — an SSH, Telnet or serial terminal, `ssh host` / `docker exec` inside a local
+# shell, Windows — the agent is recognised from the screen with these signatures. They use the gates
+# and regions of the detection manifests (agents/manifest.rs) and only look at the bottom of the
+# screen, where the agent draws its prompt and footer (output scrolled up after the agent has quit
+# must not keep it "running"), or at the window title an agent sets with its own name. The agent
+# counts as running while its signature or one of its own on-screen rules matches; three seconds
+# without either (or the end of a full-screen agent's alternate screen) and it is gone.
+#
+# Override: ~/.metroterm/agents/identify.toml (same format).
+
+# Claude Code: the prompt box (❯ between two horizontal rules) with Claude's footer hints.
+[[signatures]]
+agent = "claude"
+region = "bottom_non_empty_lines(10)"
+line_regex = ['^\s*─{3,}', '^\s*❯']
+any = [
+  { contains = ["? for shortcuts"] },
+  { contains = ["shift+tab to cycle"] },
+  { contains = ["esc to interrupt"] },
+  { contains = ["accept edits on"] },
+  { contains = ["plan mode on"] },
+  { contains = ["bypass permissions on"] },
+  { contains = ["ctrl+g to edit"] },
+]
+
+# Claude Code: a permission / question dialog.
+[[signatures]]
+agent = "claude"
+region = "bottom_non_empty_lines(14)"
+contains = ["esc to cancel"]
+any = [
+  { contains = ["do you want to proceed?"] },
+  { contains = ["do you want to make this edit"] },
+  { contains = ["do you want to create"] },
+]
+
+# Codex: the composer line (› …) above the footer.
+[[signatures]]
+agent = "codex"
+region = "bottom_non_empty_lines(8)"
+line_regex = ['^›(?: |$)']
+any = [
+  { contains = ["context left"] },
+  { contains = ["? for shortcuts"] },
+  { contains = [" to interrupt)"] },
+  { contains = ["esc to interrupt"] },
+]
+
+# opencode: full-screen TUI, its footer key hints.
+[[signatures]]
+agent = "opencode"
+region = "bottom_non_empty_lines(6)"
+any = [
+  { contains = ["ctrl+p commands"] },
+  { contains = ["tab agents"] },
+  { contains = ["tab switch agent"] },
+  { contains = ["opencode"], any = [{ contains = ["esc interrupt"] }, { contains = ["ctrl+x"] }, { contains = ["enter send"] }] },
+]
+
+# Agents that name themselves — in their own footer, or in the window title (OSC 0/2) they set.
+# The phrases are the ones the manifests match (manifests/*.toml), nothing generic: an agent
+# whose screens only show common key hints ("esc to cancel") is recognised from its process alone.
+# A title signature holds while the title stays; shells that set the title at their prompt (the
+# usual PS1 of Debian / Ubuntu, Fedora …) end it when the agent quits.
+
+# Devin CLI: the footer while it works, and its first prompt.
+[[signatures]]
+agent = "devin"
+region = "bottom_non_empty_lines(8)"
+any = [
+  { contains = ["guide devin while it works"] },
+  { line_regex = ['^\s*❭ Ask Devin to build'] },
+]
+
+# Kiro CLI: the footer while it works, or its spinner title ("◐ kiro: …").
+[[signatures]]
+agent = "kiro"
+region = "bottom_non_empty_lines(4)"
+contains = ["kiro is working", "type to steer"]
+
+[[signatures]]
+agent = "kiro"
+region = "osc_title"
+regex = ['(?i)^[◐◓◑◒/|\\-]\s+kiro:']
+
+# Amp: its window title ("<thread> - amp - <folder>").
+[[signatures]]
+agent = "amp"
+region = "osc_title"
+contains = [" - amp - "]
+
+# Grok CLI: its window title ("grok", "<task> - grok").
+[[signatures]]
+agent = "grok"
+region = "osc_title"
+regex = ['(?:^| - )grok$']

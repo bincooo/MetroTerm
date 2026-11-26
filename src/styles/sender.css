@@ -1,0 +1,57 @@
+/* Sender: panel, toolbar, editor and gutter, targets column. */
+
+/* ===== Panel ===== */
+.sender-pane, .sender-editor { min-width: 0; min-height: 0; }
+.sender-pane { display: flex; flex-direction: column; background: var(--panel); overflow: hidden; border-top: 0; font-family: var(--ui-font-family); font-size: var(--ui-font); }
+.sender-pane *, .sender-pane .ui-select-menu * { font-family: inherit !important; font-size: inherit !important; }
+.sender-pane .ui-select-menu li i { font-size: 7px !important; }
+
+/* ===== Toolbar ===== */
+.sender-controls .play { color: var(--sender-play); }
+.sender-controls > i { height: 14px; width: 1px; margin: 0 3px; background: var(--line); }
+.sender-controls input[type='radio'] { margin: 0; accent-color: var(--n-a0); }
+.sender-controls label { display: flex; align-items: center; gap: 5px; padding: 0 2px; cursor: pointer; }
+body.is-resizing .sender-controls label { cursor: inherit; }
+.sender-target { width: 200px; }
+.sender-controls .ui-number-steppers button { flex: 1; width: 16px; height: auto; min-height: 0; display: grid; place-items: center; padding: 0; color: var(--muted); background: transparent; }
+.sender-count { width: 64px; }
+.sender-interval { width: 84px; }
+.sender-controls > button:hover { color: var(--sender-button-hover-ink); background: var(--active); }
+.sender-controls > button.play { color: var(--sender-play); }
+.sender-controls { display: flex; align-items: center; border-bottom: 1px solid var(--line-soft); color: var(--sender-controls-ink); white-space: nowrap; overflow: hidden; flex-shrink: 1; font-size: var(--ui-font); gap: 7px; padding: 0 var(--pad-x) 0 calc(var(--pad-x) - var(--btn-inset)); }
+.sender-controls > button { font-size: 13px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; line-height: 1; color: var(--muted); width: var(--btn); height: var(--btn); }
+/* Sender: Stop (right of Send) — cancels the lines / repeats not typed yet. */
+.metroterm-shell .sender-controls > button.stop { color: var(--sender-stop); }
+.metroterm-shell .sender-controls > button.stop:disabled { color: var(--sender-stop-disabled-ink); opacity: 0.6; cursor: default; background: transparent; }
+/* Sender toolbar: every control stays (Interval was hidden below 1150px); a narrow panel wraps the row onto a second line instead of cutting it off. */
+.metroterm-shell .sender-controls { height: auto; min-height: 32px; flex-wrap: wrap; row-gap: 4px; padding-top: 4px; padding-bottom: 4px; }
+
+/* ===== Editor and gutter ===== */
+.sender-editor > span { padding: 5px 7px; color: var(--sender-span-ink); text-align: right; background: var(--sender-bg); }
+.sender-editor textarea:focus { border-width: 0; border-style: none; box-shadow: none; }
+.sender-editor { display: grid; color: var(--n-a4); flex: 1 1 0; grid-template-columns: auto minmax(0, 1fr); font-size: 12px; --sender-pad-y: 5px; }
+.sender-gutter-lines { will-change: transform; }
+.sender-editor textarea { width: 100%; height: 100%; resize: none; border-width: 0; border-style: none; box-shadow: none; padding: var(--sender-pad-y) 8px; font-family: 'RobotoMono Nerd Font', Consolas, 'SFMono-Regular', 'Cascadia Mono', monospace; font-size: 12px; white-space: pre; overflow: auto; }
+/* Sender → Targets: Select Session — the ticked open sessions, in a column right of the editor. */
+.sender-editor.has-targets { grid-template-columns: auto minmax(0, 1fr) minmax(150px, 30%); }
+.sender-gutter, .sender-editor textarea { line-height: calc(var(--ui-line) * 1em) !important; }
+.sender-gutter span { display: block; height: calc(var(--ui-line) * 1em); }
+/* one top padding for the line numbers and the text: their rows line up */
+.sender-gutter { min-width: 34px; padding: var(--sender-pad-y) 7px 0 8px; overflow: hidden; border-right: 1px solid var(--line-soft); background: var(--sender-bg); color: var(--gutter-ink); text-align: right; font-family: 'RobotoMono Nerd Font', Consolas, 'SFMono-Regular', 'Cascadia Mono', monospace; font-size: 12px; user-select: none; padding-left: var(--pad-x); }
+/* Sender editor background (--sender-text-*): light theme = its gutter's background, with no hover / focus change. */
+.metroterm-shell .sender-editor textarea { background-color: var(--sender-text-bg); }
+.metroterm-shell .sender-editor textarea:hover, .metroterm-shell .sender-editor textarea:focus { background-color: var(--sender-text-active-bg); }
+
+/* ===== Targets column ===== */
+.sender-targets { min-width: 0; min-height: 0; display: flex; flex-direction: column; border-left: 1px solid var(--line-soft); background: var(--panel); color: var(--ink); }
+.sender-targets label { display: flex; align-items: center; gap: 7px; min-width: 0; padding: 0 var(--pad-x); cursor: pointer; }
+.sender-targets-head { flex: none; height: 26px; border-bottom: 1px solid var(--line-soft); color: var(--muted); }
+.sender-targets-head span { flex: 1; min-width: 0; }
+.sender-targets-head em { color: var(--faint); font-style: normal; font-variant-numeric: tabular-nums; }
+.sender-targets-list { flex: 1; min-height: 0; overflow: auto; padding: 2px 0; }
+.sender-targets-list label { height: 24px; }
+.sender-targets-list label:hover { background: var(--hover); }
+.sender-targets-list label span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sender-targets-list label.is-current span { color: var(--ink-active); }
+.sender-targets-list p { margin: 0; padding: 6px var(--pad-x); color: var(--faint); }
+.sender-targets input[type='checkbox'] { flex: none; margin: 0; }

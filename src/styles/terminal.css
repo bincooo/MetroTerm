@@ -1,0 +1,108 @@
+/* Terminal: host and xterm, toolbar and breadcrumb, gutter (time / line numbers), find bar, empty terminal and WebGL notice, pane letters, auth prompt queue. */
+
+/* ===== Terminal host and xterm ===== */
+.terminal-shell { flex: 1; height: 100%; display: flex; flex-direction: column; background: var(--terminal); }
+.xterm-host { flex: 1; min-width: 0; min-height: 0; padding: 8px 9px; overflow: hidden; }
+.xterm { height: 100%; }
+.terminal-main { grid-template-rows: 39px minmax(0, 1fr); overflow: hidden; display: flex; flex-direction: column; }
+.terminal-main, .terminal-stage, .terminal-shell { min-width: 0; min-height: 0; }
+.terminal-stage { display: flex; overflow: hidden; flex: 1 1 0; }
+.panel.terminal-main { background: var(--terminal-main-bg); }
+.panel.terminal-main .terminal-stage { flex: 1; }
+.terminal-body { position: relative; flex: 1; min-width: 0; min-height: 0; display: flex; background: var(--terminal); }
+.terminal-body .xterm-host { --terminal-pad-x: 8px; padding: 4px var(--terminal-pad-x); background: var(--xterm-bg); }
+/* The terminal's scrollbar (lib/ui/customScrollbars on .xterm-viewport) sits on the pane's right edge: moved out over the host's right padding. */
+.terminal-body .xterm-viewport { --sb-outset-right: var(--terminal-pad-x); }
+/* xterm 6 draws its own scrollbar (VS Code's); the app's bar above replaces it. */
+/* xterm 6's viewport is an empty layer behind the rows, black in xterm.css (5.5 painted it the theme background): it showed as a bar under the last row. */
+.terminal-body .xterm .xterm-viewport { background-color: transparent; }
+.terminal-body .xterm-scrollable-element > .scrollbar { display: none; }
+.terminal-body.has-renderer-error .xterm-host { visibility: hidden; }
+.terminal-instance[hidden] { display: none !important; }
+/* Each terminal is placed over its pane's body (measured), above the pane frames. */
+.terminal-instance { position: absolute; z-index: 1; min-width: 0; min-height: 0; display: flex; background: var(--terminal); }
+/* FitAddon reads the host's computed width/height; with border-box that includes the host's padding and the terminal overflowed it by one or two columns/rows. */
+.metroterm-shell .xterm-host { position: relative; box-sizing: content-box; }
+.metroterm-shell .xterm-helper-textarea { caret-color: transparent !important; }
+
+/* ===== Toolbar and breadcrumb ===== */
+.toolbar-icons button { min-width: 16px; font-size: 12px; }
+.terminal-breadcrumb strong { color: var(--strong-ink); font-weight: 400; }
+.toolbar-right button { font-size: 11px; }
+.terminal-breadcrumb em.online { background: var(--accent-online); box-shadow: 0 0 0 2px var(--status-dot-glow); }
+.terminal-breadcrumb em.connecting { background: var(--session-connecting-ink); animation: session-pulse 1s ease-in-out infinite; }
+.terminal-breadcrumb em { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--status-dot-bg); margin-left: 2px; }
+.toolbar-icons button, .toolbar-right button, .terminal-empty button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; line-height: 1; }
+.toolbar-icons button, .toolbar-right button { width: 26px; height: 26px; color: var(--muted); }
+.toolbar-icons button:hover, .toolbar-right button:hover { color: var(--ink); background: var(--button-hover-bg); }
+.toolbar-right .menu-button.is-open > button { color: var(--ink); background: var(--active); }
+.toolbar-icons i { height: 16px; width: 1px; margin: 0 5px; background: var(--line); }
+.terminal-breadcrumb b { display: inline-flex; align-items: center; color: var(--faint); }
+.toolbar-icons { display: flex; align-items: center; gap: 2px; padding: 0 0 0 calc(var(--pad-x) - 6px); }
+.toolbar-right { display: flex; gap: 2px; padding: 0 calc(var(--pad-x) - 6px) 0 0; margin-left: auto; }
+/* Terminal toolbar: icon groups wrap to new rows when the panel is narrow */
+.terminal-toolbar { display: flex; border-bottom: 1px solid var(--bar-line); background: var(--terminal-toolbar-bg); font-size: 13px; height: auto; min-height: 39px; flex: 0 0 auto; flex-wrap: wrap; align-items: center; align-content: center; row-gap: 6px; padding: 6px 0; overflow: visible; }
+.toolbar-icons, .toolbar-right { height: auto; flex: 0 0 auto; flex-wrap: wrap; row-gap: 4px; }
+.terminal-breadcrumb > span, .terminal-breadcrumb > strong { overflow: hidden; text-overflow: ellipsis; }
+.terminal-breadcrumb { height: 25px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border: 1px solid var(--terminal-breadcrumb-line); background: var(--terminal-breadcrumb-bg); color: var(--terminal-breadcrumb-ink); font-size: 12px; flex: 1 1 220px; min-width: 160px; overflow: hidden; white-space: nowrap; margin: 0 8px; }
+/* ---------- Terminal header: Fullscreen on ---------- */
+.metroterm-shell .toolbar-icons button.is-on { color: var(--ink); background: var(--active); }
+.metroterm-shell .terminal-toolbar[hidden] { display: none !important; }
+.metroterm-shell .toolbar-right .menu-button > button { display: inline-flex; align-items: center; justify-content: center; }
+
+/* ===== Gutter (time / line numbers) ===== */
+/* Gutter left of the terminal (lib/terminal/gutter): [time] + line number per terminal row, the cursor's line in --gutter-current. Rows are as tall as the terminal's rows (--gutter-row-h) and moved to the screen's top edge. */
+.terminal-gutter { flex: 0 0 auto; position: relative; z-index: 0; overflow: hidden; padding: 0 6px 0 8px; border-right: 1px solid var(--line-soft); background: var(--xterm-bg); color: var(--gutter-ink); font-family: 'RobotoMono Nerd Font', Consolas, 'SFMono-Regular', 'Cascadia Mono', monospace; font-size: 13px; user-select: none; cursor: default; }
+.terminal-gutter[hidden] { display: none; }
+.terminal-gutter-rows { position: relative; z-index: 1; }
+.terminal-gutter-rows > div { display: grid; grid-template-columns: 10ch calc(var(--line-digits, 3) * 1ch); column-gap: 10px; height: var(--gutter-row-h, 18px); line-height: var(--gutter-row-h, 18px); white-space: nowrap; }
+.terminal-gutter time { color: var(--gutter-time-ink); text-align: left; }
+.terminal-gutter span { text-align: right; }
+/* Digits' ink in the row's vertical middle (lib/terminal/gutter `centerText`). */
+.terminal-gutter time, .terminal-gutter span { transform: translateY(var(--gutter-text-dy, 0px)); }
+.terminal-gutter-probe { position: absolute; top: 0; left: 0; visibility: hidden; pointer-events: none; line-height: var(--gutter-row-h, 18px); white-space: nowrap; }
+.terminal-gutter-probe i { display: inline-block; width: 0; height: 0; vertical-align: baseline; }
+.terminal-gutter-rows > div.is-picked time, .terminal-gutter-rows > div.is-picked span { color: var(--gutter-picked); }
+.terminal-gutter-rows > div.is-current time, .terminal-gutter-rows > div.is-current span { color: var(--gutter-current); }
+.terminal-gutter.no-time .terminal-gutter-rows > div { grid-template-columns: calc(var(--line-digits, 3) * 1ch); }
+.terminal-gutter.no-line .terminal-gutter-rows > div { grid-template-columns: 10ch; }
+.terminal-gutter.no-time time, .terminal-gutter.no-line span { display: none; }
+/* Clicked line: one full-width band in the terminal (over the text, translucent) and one in the gutter (under the labels), placed from the same row geometry. */
+.terminal-gutter-band, .terminal-line-highlight { position: absolute; left: 0; right: 0; pointer-events: none; background: var(--terminal-line-highlight); }
+.terminal-gutter-band { z-index: 0; }
+.terminal-line-highlight { z-index: 10; }
+.terminal-gutter-band[hidden], .terminal-line-highlight[hidden] { display: none; }
+
+/* ===== Find bar ===== */
+/* Find (Ctrl+F, lib/terminal/find): a bar on the terminal's top-right edge, and 1px frames around the matches (xterm decoration elements, placed by xterm on its own cell grid). */
+.metroterm-shell .terminal-find { position: absolute; top: 0; right: 14px; z-index: 30; display: flex; align-items: center; gap: 2px; height: 32px; padding: 0 4px 0 6px; background: var(--panel); border: 1px solid var(--line); border-top: 0; box-shadow: 0 4px 12px var(--shadow-find); font-size: var(--ui-font); }
+.metroterm-shell .terminal-find input { width: 210px; height: 22px; padding: 0 6px; border: 1px solid var(--line); background: var(--terminal); color: var(--ink); font: inherit; font-size: 12px; outline: none; }
+.metroterm-shell .terminal-find input:focus { border-color: var(--muted); }
+.metroterm-shell .terminal-find-count { min-width: 64px; padding: 0 6px; color: var(--muted); font-size: 11px; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.metroterm-shell .terminal-find-count.is-empty { color: var(--find-empty-ink); }
+.metroterm-shell .terminal-find button { width: 24px; height: 24px; display: grid; place-items: center; color: var(--muted); }
+.metroterm-shell .terminal-find button:hover:not(:disabled) { color: var(--ink); background: var(--active); }
+.metroterm-shell .terminal-find button.is-on { color: var(--ink); background: var(--active); }
+.metroterm-shell .terminal-find button:disabled { opacity: 0.4; }
+
+/* ===== Empty terminal, WebGL notice ===== */
+.terminal-empty { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background: var(--terminal); color: var(--muted); font-size: 12px; }
+.terminal-empty b { color: var(--ink); font-size: 13px; font-weight: 500; letter-spacing: 0.04em; }
+.terminal-empty div { display: flex; gap: 6px; margin-top: 6px; }
+.terminal-empty button:hover { background: var(--active); }
+.terminal-renderer-error { position: absolute; inset: 0; z-index: 20; display: grid; place-content: center; gap: 6px; padding: 24px; background: var(--xterm-bg); color: var(--muted); font-size: var(--ui-font); text-align: center; }
+.terminal-renderer-error b { color: var(--find-empty-ink); font-weight: normal; }
+.terminal-renderer-error code { color: var(--ink); font-family: inherit; word-break: break-word; }
+.terminal-empty button { height: 26px; padding: 0 12px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 12px; gap: 6px; }
+
+/* ===== Pane letters ===== */
+/* Pane letter (split only) at the right of the pane toolbar, before ☆: a 26px cell like the icon buttons, glyph centred. */
+/* Pane letter (components/terminal/PaneLetter): an SVG in the 26px button grid, its glyph placed from the measured ink so it centres on the icons' point whatever the font. */
+.tmux-letter { width: 26px; height: 26px; display: inline-flex; flex: none; font-size: 12px; color: var(--tmux-letter-ink); user-select: none; }
+.tmux-letter svg { display: block; overflow: visible; }
+.tmux-letter text { font: inherit; }
+.tmux-stage.is-split .tmux-pane.is-focused .tmux-letter { color: var(--tmux-focus-line); font-weight: 600; }
+
+/* ===== Auth prompt queue ===== */
+.auth-dialog .auth-queue { display: block; padding: 0 12px 10px; color: var(--faint); font-size: 10px; }
+.metroterm-shell .connection-dialog .auth-queue { padding: 8px var(--dialog-pad) 0; }

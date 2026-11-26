@@ -1,0 +1,77 @@
+/* Monitor panel: toolbar, meters and sparklines, cores and disks, process list. */
+
+/* ===== Panel and toolbar ===== */
+.monitor-pane { font-family: var(--ui-font-family); font-size: var(--ui-font); }
+.monitor { flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; outline: 0; background: var(--panel); color: var(--ink); }
+.monitor-toolbar { height: 30px; min-height: 30px; display: flex; align-items: center; gap: 6px; padding: 0 6px 0 var(--pad-x, 10px); border-bottom: 1px solid var(--line-soft); }
+.monitor-target { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); }
+.monitor-target em { margin-left: 8px; color: var(--muted); font-style: normal; }
+.monitor-interval { width: 64px; flex: 0 0 64px; }
+.monitor-interval .ui-select-trigger { height: 22px; }
+.monitor-toolbar > button { width: 24px; height: 22px; display: inline-flex; align-items: center; justify-content: center; padding: 0; border: 1px solid var(--control-line); background: var(--control-bg); color: var(--muted); }
+.monitor-toolbar > button:hover:not(:disabled), .monitor-toolbar > button.on { background: var(--control-hover); color: var(--ink); }
+.monitor-toolbar > button:disabled { opacity: 0.4; }
+.monitor-error { padding: 4px var(--pad-x, 10px); border-bottom: 1px solid var(--line-soft); color: var(--mon-hot); font-size: var(--ui-font-small, 11px); overflow-wrap: anywhere; }
+.monitor-body { --sb-inset-top: 0; flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 6px var(--pad-x, 10px) 10px; }
+.monitor-info { display: flex; flex-wrap: wrap; gap: 2px 12px; padding-bottom: 6px; color: var(--muted); font-size: var(--ui-font-small, 11px); }
+.monitor-info span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.monitor section { padding: 7px 0 8px; border-top: 1px solid var(--line-soft); }
+.monitor section header { display: flex; align-items: baseline; gap: 8px; min-width: 0; margin-bottom: 5px; }
+.monitor section header.sub { margin: 8px 0 5px; }
+.monitor section header b { flex: 0 0 auto; color: var(--ink); font-weight: 600; }
+.monitor section header span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: var(--ui-font-small, 11px); }
+.monitor section header span i { font-style: normal; margin-right: 8px; }
+.monitor section header strong { flex: 0 0 auto; font-weight: 600; font-variant-numeric: tabular-nums; }
+.monitor i.rx { color: var(--mon-rx); }
+.monitor i.tx { color: var(--mon-tx); }
+.monitor section.mem .monitor-meter i { background: var(--mon-mem); }
+.monitor section.mem .monitor-meter.hot i { background: var(--mon-hot); }
+.monitor section.monitor-procs-section { padding-bottom: 0; }
+.monitor .monitor-procs-head { position: sticky; top: -6px; z-index: 2; height: 32px; margin: 0; align-items: center; background: var(--panel); }
+.metroterm-shell .monitor .pane-filter.monitor-procs-searchbar { position: sticky; top: 26px; z-index: 2; height: 34px; min-height: 34px; padding: 0 0 6px; border-bottom: 0; background: var(--panel); }
+.monitor .monitor-procs-head > em { flex: 0 0 auto; color: var(--muted); font-size: var(--ui-font-small, 11px); font-style: normal; font-variant-numeric: tabular-nums; }
+
+/* ===== Meters, sparklines, cores, disks ===== */
+.monitor-meter { display: block; height: 6px; background: var(--mon-track); overflow: hidden; }
+.monitor-meter i { display: block; height: 100%; background: var(--mon-cpu); transition: width 0.3s ease; }
+.monitor-meter.hot i { background: var(--mon-hot); }
+.monitor-spark { display: block; width: 100%; height: 36px; margin-top: 5px; background: var(--panel-2); fill: none; stroke-width: 1.4; stroke-linejoin: round; }
+.monitor-spark.cpu polyline { stroke: var(--mon-cpu); }
+.monitor-spark.mem polyline { stroke: var(--mon-mem); }
+.monitor-spark.net .s0 { stroke: var(--mon-rx); }
+.monitor-spark.net .s1 { stroke: var(--mon-tx); }
+.monitor-cores { display: flex; gap: 2px; height: 22px; margin-top: 5px; }
+.monitor-cores span { flex: 1; min-width: 2px; display: flex; align-items: flex-end; background: var(--mon-track); }
+.monitor-cores i { display: block; width: 100%; background: var(--mon-cpu); transition: height 0.3s ease; }
+.monitor-cores i.hot { background: var(--mon-hot); }
+.monitor-disk { display: grid; grid-template-columns: minmax(40px, 1fr) minmax(40px, 1.4fr) auto; align-items: center; gap: 8px; height: 20px; }
+.monitor-disk > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.monitor-disk > em { color: var(--muted); font-size: var(--ui-font-small, 11px); font-style: normal; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* ===== Process list ===== */
+.monitor-procs-spacer { flex: 1; }
+.metroterm-shell .monitor-procs-searchbar button { display: inline-flex; align-items: center; justify-content: center; margin-right: -4px; padding: 0; border: 0; background: transparent; color: var(--muted); }
+.metroterm-shell .monitor-procs-searchbar button:hover { color: var(--ink); background: var(--active); }
+.monitor-procs-section.is-searching .monitor-procs-th { top: 60px; }
+.monitor-procs-search { flex: 0 0 22px; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; margin-right: -4px; padding: 0; border: 0; background: transparent; color: var(--muted); }
+.monitor-procs-search:hover, .monitor-procs-search.on { color: var(--ink); background: var(--active); }
+.monitor-procs { outline: 0; font-variant-numeric: tabular-nums; }
+.monitor-procs-row { scroll-margin: 50px 0 4px; display: grid; grid-template-columns: 54px minmax(40px, 1fr) minmax(36px, 72px) 46px 64px; column-gap: 6px; align-items: center; height: 21px; padding: 0 4px; cursor: default; user-select: none; }
+.monitor-procs-row > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.monitor-procs-row:not(.monitor-procs-th):hover { background: var(--hover); }
+.monitor-procs-row.is-selected, .monitor-procs-row.is-selected:hover { background: var(--active); color: var(--ink); }
+.monitor-procs:focus-visible .monitor-procs-row.is-selected { box-shadow: inset 0 0 0 1px var(--control-line); }
+.monitor-procs-row.is-busy { opacity: 0.5; }
+.monitor-procs-row .col-pid, .monitor-procs-row .col-user { color: var(--muted); }
+.monitor-procs-row .col-cpu, .monitor-procs-row .col-memory { text-align: right; }
+.monitor-procs-row .col-cpu.hot { color: var(--mon-hot); }
+.monitor-procs-th { position: sticky; top: 26px; z-index: 1; height: 22px; border-bottom: 1px solid var(--line-soft); background: var(--panel); color: var(--muted); font-size: var(--ui-font-small, 11px); }
+.monitor-procs-th > span { display: flex; align-items: center; gap: 3px; height: 100%; cursor: pointer; }
+.monitor-procs-th > span > b { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-weight: 400; }
+.monitor-procs-th > span:hover, .monitor-procs-th > span.is-sorted { color: var(--ink); }
+.monitor-procs-th > span.col-cpu, .monitor-procs-th > span.col-memory { justify-content: flex-end; }
+.monitor-sort { flex: none; display: inline-flex; align-items: center; color: var(--muted); }
+.monitor-sort .icon { transform: rotate(180deg); }
+.monitor-sort.is-descending .icon { transform: none; }
+.monitor-procs mark.filer-match { color: var(--ink); background: var(--match-bg); padding: 0; }
+.monitor-procs-empty { padding: 14px 4px; color: var(--faint); text-align: center; }

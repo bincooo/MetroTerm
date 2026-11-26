@@ -1,0 +1,181 @@
+/* Filer: panel, path bar, file list and column headers, name search, footer, messages, transfers, Move to / Copy to dialog. */
+
+/* ===== Panel ===== */
+.filer-pane, .filer-list { min-width: 0; min-height: 0; }
+.filer-pane * { font-family: inherit !important; font-size: inherit !important; }
+.filer-pane { display: flex; flex-direction: column; overflow: hidden; font-family: var(--ui-font-family); font-size: var(--ui-font); container-type: inline-size; }
+.metroterm-shell .filer-browser { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; --filer-cols: minmax(150px, 1fr) 124px 104px 64px 88px 68px 68px; --filer-min: 760px; }
+.metroterm-shell .filer-pane .filer-list { container-type: inline-size; }
+/* Error banner sits between the path bar and the table */
+.metroterm-shell .filer-browser > .file-message.is-error { flex: none; }
+
+/* ===== Path bar ===== */
+.filer-path, .filer-head, .filer-foot { min-height: 0; overflow: hidden; flex-shrink: 1; }
+.filer-path, .filer-head, .filer-list button, .filer-foot { font-size: var(--ui-font); }
+.filer-path button, .filer-foot-actions button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; line-height: 1; }
+.filer-path button:hover { color: var(--ink); background: var(--active); }
+.filer-path button { font-size: 13px; color: var(--muted); width: var(--btn); height: var(--btn); }
+/* Filer path input */
+.filer-path { display: flex; align-items: center; color: var(--muted); border-bottom: 1px solid var(--line-soft); padding: 0 calc(var(--pad-x) - var(--btn-inset)) 0 var(--pad-x); gap: 2px; }
+.filer-path .filer-path-input { flex: 1; min-width: 0; margin-right: 4px; font: inherit; font-size: inherit; }
+.filer-path button:disabled { cursor: default; background: transparent; }
+.metroterm-shell .filer-path button.is-on { color: var(--ink); background: var(--active); }
+.metroterm-shell .filer-path .menu-button > button { width: var(--btn); height: var(--btn); display: inline-flex; align-items: center; justify-content: center; color: var(--muted); }
+.metroterm-shell .filer-path .menu-button > button:hover, .metroterm-shell .filer-path .menu-button.is-open > button { color: var(--ink); background: var(--active); }
+.metroterm-shell .filer-path button:disabled { opacity: 0.35; }
+.metroterm-shell .filer-path { height: calc(var(--header-input) + 10px); min-height: calc(var(--header-input) + 10px); }
+/* Text stays at the system UI size (Filer fonts follow the system setting); only the box grows. */
+.metroterm-shell .filer-path .filer-path-input { height: var(--header-input); padding: 0 8px; line-height: calc(var(--header-input) - 2px); }
+
+/* ===== List and column headers ===== */
+.filer-list { flex: 1; }
+.filer-list span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.filer-list time, .filer-list i { font-size: var(--ui-font-small); }
+.filer-head { align-items: center; height: var(--ui-row); min-height: var(--ui-row); }
+.filer-list button { width: 100%; display: grid; align-items: center; text-align: left; height: var(--ui-row); grid-template-columns: minmax(0, 1fr) 132px; }
+.filer-list button > span i { display: inline-flex; position: relative; }
+.filer-list time { white-space: nowrap; color: var(--row-dim-ink); }
+.filer-head, .filer-list button { padding: 0 var(--pad-x); }
+.filer-list i { font-style: normal; display: inline-flex; align-items: center; justify-content: center; font-size: 0; line-height: 0; color: var(--filer-icon-ink); width: var(--icon); margin-right: var(--icon-gap); }
+/* Larger file / folder icons in Filer */
+.metroterm-shell .filer-list i .icon { width: var(--file-icon); height: var(--file-icon); }
+.metroterm-shell .filer-list button > span i { width: var(--file-icon); height: var(--file-icon); margin-right: var(--icon-gap); vertical-align: middle; top: 0; }
+/* Rows show selection by their background only (no outline / border, also with several picked). */
+.metroterm-shell .filer-list button:focus-visible { outline: 0; }
+.metroterm-shell .filer-list button > time { color: var(--muted); font-size: var(--ui-font-small); white-space: nowrap; }
+.metroterm-shell .filer-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.metroterm-shell .filer-name.is-hidden-file { opacity: 0.62; }
+.metroterm-shell .filer-list .file-message { white-space: normal; }
+.metroterm-shell .filer-list { position: relative; outline: 0; overflow: auto; scroll-padding-top: var(--ui-row); }
+.metroterm-shell .filer-head, .metroterm-shell .filer-list > button { display: grid; grid-template-columns: var(--filer-cols); column-gap: 12px; min-width: var(--filer-min); }
+.metroterm-shell .filer-head { position: sticky; top: 0; z-index: 1; border-bottom: 1px solid var(--line-soft); background: var(--panel); color: var(--filer-head-ink); }
+.metroterm-shell .filer-list > button > span, .metroterm-shell .filer-list > button > time { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.metroterm-shell .filer-list > button .filer-col-size, .metroterm-shell .filer-list > button .filer-col-modified { text-align: right; }
+.metroterm-shell .filer-list > button > :not(.filer-col-name) { color: var(--muted); font-size: var(--ui-font-small); }
+.metroterm-shell .filer-list .filer-col-permissions { font-family: 'RobotoMono Nerd Font', Consolas, 'SFMono-Regular', 'Cascadia Mono', monospace !important; letter-spacing: 0.02em; }
+.metroterm-shell .filer-list > .file-message { position: sticky; left: 0; width: 100cqw; box-sizing: border-box; }
+.metroterm-shell .filer-list mark.filer-match { color: var(--ink); background: var(--match-bg); border-radius: 0; padding: 0; }
+/* Filer text colours follow the Explorer tree */
+.metroterm-shell .filer-list button, .metroterm-shell .filer-list button:hover { color: var(--n-b9); }
+.metroterm-shell .filer-list button:hover { background: var(--hover); color: var(--filer-row-hover-ink); }
+.metroterm-shell .filer-list button { color: var(--row-ink); }
+.metroterm-shell .filer-list button.selected, .metroterm-shell .filer-list button.selected:hover { background: var(--filer-selected-bg); color: var(--ink); }
+/* Filer hover: background only — text colour and weight stay as they are. */
+.metroterm-shell .filer-list > button:hover:not(.selected) { color: var(--row-ink); }
+/* Filer: file and folder names in medium weight (text colour / weight unchanged on hover). */
+.metroterm-shell .filer-list .filer-name { font-weight: 500; }
+/* Filer column headers: separator lines, click to sort (again = reverse), drag a line to resize, double-click a line for the default width. Widths and sort live in sessions.json → filer. */
+.metroterm-shell .filer-head .filer-th { position: relative; min-width: 0; align-self: stretch; display: flex; align-items: center; gap: 4px; color: var(--muted); cursor: default; user-select: none; }
+.metroterm-shell .filer-head .filer-th > b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: inherit; }
+.metroterm-shell .filer-head .filer-th:hover { color: var(--ink); }
+.metroterm-shell .filer-head .filer-th.filer-col-name { padding-left: 0; }
+/* Size and Date Modified: header and values right-aligned. The sort chevron stays at the end of the column like in every other column; the label sits right-aligned just before it. */
+.metroterm-shell .filer-head .filer-th.filer-col-size, .metroterm-shell .filer-head .filer-th.filer-col-modified { justify-content: flex-end; text-align: right; }
+.metroterm-shell .filer-list .filer-head .filer-th.filer-col-size > i.filer-sort, .metroterm-shell .filer-list .filer-head .filer-th.filer-col-modified > i.filer-sort { margin-left: 0; }
+/* Sorted column: its name is highlighted, with a small chevron for the direction. */
+.metroterm-shell .filer-head .filer-th.is-sorted { color: var(--filer-sorted-ink); }
+.metroterm-shell .filer-sort { flex: none; display: inline-flex; align-items: center; color: var(--filer-sort-ink); opacity: 0.75; }
+.metroterm-shell .filer-th:hover .filer-sort { opacity: 1; }
+/* (`.filer-list i` sizes the file icons: 14px box + 8px gap — not for this arrow.) */
+.metroterm-shell .filer-list .filer-head .filer-th > i.filer-sort { width: auto; min-width: 0; margin: 0 -3px 0 auto; /* the chevron keeps its distance from the separator line, in the column gap */ padding-left: 4px; justify-content: flex-end; }
+.metroterm-shell .filer-sort .icon { transform: rotate(180deg); }
+.metroterm-shell .filer-list .filer-head .filer-sort .icon { width: 12px; height: 12px; }
+.metroterm-shell .filer-sort.is-descending .icon { transform: none; }
+/* The handle sits centred in the 12px column gap, the line in its middle. */
+.metroterm-shell .filer-col-resizer { position: absolute; top: 0; bottom: 0; right: -10.5px; margin: 0; /* not the file icons' gap from `.filer-list i`: it pulled every line 8px into its column */ width: 9px; z-index: 1; cursor: col-resize; touch-action: none;; }
+.metroterm-shell .filer-col-resizer::after { content: ''; position: absolute; left: 4px; top: 5px; bottom: 5px; width: 1px; background: var(--line); }
+.metroterm-shell .filer-col-resizer:hover::after, .metroterm-shell .filer-head.is-resizing .filer-col-resizer:active::after { top: 0; bottom: 0; background: var(--muted); }
+.metroterm-shell .filer-head.is-resizing, .metroterm-shell .filer-head.is-resizing .filer-th { cursor: col-resize; }
+
+/* ===== Name search ===== */
+.metroterm-shell .filer-search { border-bottom: 1px solid var(--line-soft); }
+.metroterm-shell .filer-search button { display: inline-flex; align-items: center; justify-content: center; color: var(--muted); }
+.metroterm-shell .filer-search button:hover { color: var(--ink); background: var(--active); }
+
+/* ===== Footer ===== */
+.filer-foot span { margin-left: auto; color: var(--n-b0); }
+.filer-foot-actions button:hover { color: var(--ink); background: var(--active); }
+.filer-foot { height: 28px; display: flex; align-items: center; border-top: 1px solid var(--bar-line); color: var(--filer-foot-ink); padding: 0 calc(var(--pad-x) - var(--btn-inset)) 0 var(--pad-x); }
+.filer-foot-actions { margin-left: auto; display: inline-flex; gap: 0; }
+.filer-foot-actions button { color: var(--muted); width: var(--btn); height: var(--btn); }
+.metroterm-shell .filer-foot { position: relative; gap: 6px; }
+.metroterm-shell .filer-foot-text { min-width: 0; flex: 1; display: flex; align-items: center; gap: 6px; overflow: hidden; color: var(--muted); text-overflow: ellipsis; white-space: nowrap; }
+.metroterm-shell .filer-foot .filer-foot-actions { flex: none; margin-left: 0; color: inherit; }
+.metroterm-shell .filer-foot .menu-button > button { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; color: var(--muted); }
+.metroterm-shell .filer-foot .menu-button > button:hover, .metroterm-shell .filer-foot .menu-button.is-open > button { color: var(--ink); background: var(--active); }
+/* Filer footer: "Follow terminal" is a toggle — on = pressed background + full-contrast icon. */
+.metroterm-shell .filer-foot-actions button.is-on { color: var(--ink); background: var(--active); }
+.metroterm-shell .filer-foot-actions button.is-on:hover { background: var(--active); }
+.metroterm-shell .filer-foot-actions button:disabled { opacity: 0.4; }
+
+/* ===== Messages ===== */
+.metroterm-shell .file-message { display: flex; align-items: center; gap: 8px; padding: 14px 12px; color: var(--muted); font-size: var(--ui-font); }
+.metroterm-shell .file-message.is-error b { font-weight: 400; }
+.metroterm-shell .file-message button { margin-left: auto; height: 22px; padding: 0 8px; border: 1px solid var(--line); color: var(--muted); font-size: var(--ui-font); white-space: nowrap; }
+.metroterm-shell .file-message button:hover { color: var(--ink); background: var(--active); }
+/* SFTP error banner: sits above the listing, which still shows the folder in the path box */
+.metroterm-shell .file-message.is-error { color: var(--file-error-ink); line-height: 1.5; padding: 7px 8px 7px 12px; border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--error-dot) 9%, transparent); align-items: center; }
+.metroterm-shell .file-message.is-error .file-message-text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.metroterm-shell .file-message.is-error button { margin-left: 0; }
+/* Close button: same as the panel tab close (16 × 16 box, 12 px icon, centred) */
+.metroterm-shell .file-message .file-message-close { flex: none; width: 16px; height: 16px; min-width: 16px; padding: 0; border: 0; display: inline-flex; align-items: center; justify-content: center; align-self: center; color: var(--muted); background: transparent; line-height: 0; }
+.metroterm-shell .file-message .file-message-close:hover { color: var(--ink); background: var(--active); }
+.metroterm-shell .file-message .file-message-close .icon { width: 12px; height: 12px; display: block; }
+
+/* ===== Transfers ===== */
+/* Filer transfers (components/filer/FilerTransfers): one notice per batch above the footer — title, overall bar, the files (multi-file), then the result. */
+.metroterm-shell .filer-transfers:empty { display: none; }
+.metroterm-shell .filer-transfers { flex: none; display: flex; flex-direction: column; container-type: inline-size; border-top: 1px solid var(--bar-line); font-size: var(--ui-font-small); }
+.metroterm-shell .filer-transfer + .filer-transfer { border-top: 1px solid var(--line-soft); }
+.metroterm-shell .filer-transfer header { height: 28px; display: flex; align-items: center; gap: 6px; padding: 0 calc(var(--pad-x) - var(--btn-inset)) 0 var(--pad-x); }
+.metroterm-shell .filer-transfer-title { flex: 1 1 auto; min-width: 0; height: 22px; display: inline-flex; align-items: center; gap: 6px; padding: 0; color: var(--ink); font-size: var(--ui-font-small); text-align: left; }
+.metroterm-shell .filer-transfer-title:disabled { cursor: default; opacity: 1; }
+.metroterm-shell .filer-transfer-title span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.metroterm-shell .filer-transfer-title svg { flex: none; color: var(--muted); }
+.metroterm-shell .filer-transfer-icon { flex: none; width: 12px; display: inline-flex; justify-content: center; color: var(--transfer-bar); font-style: normal; }
+.metroterm-shell .filer-transfer.is-done .filer-transfer-icon { color: var(--transfer-ok-ink); }
+.metroterm-shell .filer-transfer.is-error .filer-transfer-icon, .metroterm-shell .filer-transfer.is-error .filer-transfer-title span { color: var(--transfer-error-ink); }
+.metroterm-shell .filer-transfer.is-warning .filer-transfer-icon { color: var(--muted); }
+.metroterm-shell .filer-transfer header small { flex: none; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.metroterm-shell .filer-transfer-action { flex: none; height: 20px; padding: 0 7px; border: 1px solid var(--line); color: var(--muted); font-size: var(--ui-font-small); white-space: nowrap; }
+.metroterm-shell .filer-transfer-action:hover:not(:disabled) { color: var(--ink); background: var(--active); }
+.metroterm-shell .filer-transfer-close { flex: none; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; color: var(--muted); }
+.metroterm-shell .filer-transfer-close:hover { color: var(--ink); background: var(--active); }
+.metroterm-shell .filer-transfer-bar { height: 2px; margin: 0 var(--pad-x); background: var(--transfer-track); }
+.metroterm-shell .filer-transfer-bar i { display: block; height: 100%; background: var(--transfer-bar); transition: width 0.15s linear; }
+.metroterm-shell .filer-transfer.is-done .filer-transfer-bar i { background: var(--transfer-ok-ink); }
+.metroterm-shell .filer-transfer.is-error .filer-transfer-bar i { background: var(--transfer-error-ink); }
+.metroterm-shell .filer-transfer-list { max-height: 132px; margin: 4px 0 0; padding: 0 0 4px; overflow-y: auto; overscroll-behavior: contain; list-style: none; }
+.metroterm-shell .filer-transfer-list li { position: relative; height: 22px; display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; align-items: center; column-gap: 6px; padding: 0 var(--pad-x); color: var(--muted); }
+.metroterm-shell .filer-transfer-list li > i { font-style: normal; text-align: center; }
+.metroterm-shell .filer-transfer-list li > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.metroterm-shell .filer-transfer-list li > small { max-width: 60cqi; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.metroterm-shell .filer-transfer-list li.is-running { color: var(--ink); }
+.metroterm-shell .filer-transfer-list li.is-running > i::before { content: ''; display: inline-block; width: 7px; height: 7px; border: 1.5px solid var(--transfer-track); border-top-color: var(--transfer-bar); border-radius: 50%; animation: transfer-spin 0.8s linear infinite; }
+.metroterm-shell .filer-transfer-list li.is-done > i { color: var(--transfer-ok-ink); }
+.metroterm-shell .filer-transfer-list li.is-error, .metroterm-shell .filer-transfer-list li.is-error > i { color: var(--transfer-error-ink); }
+.metroterm-shell .filer-transfer-item-bar { position: absolute; left: var(--pad-x); bottom: 1px; height: 1px; background: var(--transfer-bar); transition: width 0.15s linear; }
+.metroterm-shell .filer-transfer-reason { margin: 4px 0 0; padding: 0 var(--pad-x) 6px calc(var(--pad-x) + 18px); color: var(--transfer-error-ink); overflow-wrap: anywhere; }
+/* Narrow Filer: the title wins over the byte count. */
+@container (max-width: 340px) { .metroterm-shell .filer-transfer header small { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .filer-transfer-list li.is-running > i::before { animation: none; }
+}
+
+/* ===== Move to / Copy to dialog ===== */
+/* Filer → Move to… / Copy to…: destination folder picker (path box + ↑, folder list, resulting path) */
+.file-dest-dialog .file-dest-path { display: flex; align-items: center; gap: 4px; }
+.file-dest-dialog .file-dest-path input { flex: 1; min-width: 0; }
+.file-dest-dialog .file-dest-path .icon-button { flex: none; width: 28px; height: 28px; }
+.file-dest-dialog .file-dest-list { height: 220px; margin: 6px 16px 0; overflow: auto; border: 1px solid var(--line-soft); background: var(--panel); }
+.file-dest-dialog .file-dest-list > button { display: flex; align-items: center; gap: 8px; width: 100%; height: var(--ui-row, 24px); padding: 0 8px; border: 0; background: transparent; color: var(--ink); font-size: 12px; text-align: left; }
+.file-dest-dialog .file-dest-list > button:hover:not(:disabled) { background: var(--hover); }
+.file-dest-dialog .file-dest-list > button:disabled { color: var(--faint); }
+.file-dest-dialog .file-dest-list > button .icon { flex: none; color: var(--muted); }
+.file-dest-dialog .file-dest-list > button span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-dest-dialog .file-dest-empty { margin: 0; padding: 10px; color: var(--muted); font-size: 12px; }
+.file-dest-dialog .file-dest-empty.is-error, .file-dest-dialog .file-dest-result.is-problem { color: var(--danger-ink); }
+.file-dest-dialog .file-dest-result { margin: 0; padding: 8px 16px 0; overflow: hidden; color: var(--muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.file-dest-dialog .file-dest-result code { color: var(--ink); font-size: 11px; }
+
+@keyframes transfer-spin { to { transform: rotate(360deg); } }

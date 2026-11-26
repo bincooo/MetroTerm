@@ -1,0 +1,27 @@
+/*
+ * MetroTerm's style sheet: layout, fonts and sizes. Colours are variables from colors.css (one class
+ * works in every theme; see wiki/style-css.md).
+ *
+ * One file per widget. Only the first three are ordered: colors.css (the variables), base.css (element
+ * defaults) and layout.css (the workbench). The widget files after them DO NOT depend on their order:
+ * no rule of one widget file overrides a rule of another by coming later — each widget's rules live in
+ * its own file, merged into one place, and a rule that must win says so by specificity
+ * (.metroterm-shell …), not by position. They are listed alphabetically.
+ * Compact layout (one rule per line), not Prettier-formatted (.prettierignore).
+ */
+@import './colors.css';
+@import './base.css';
+@import './layout.css';
+
+@import './controls.css';
+@import './dialogs.css';
+@import './explorer.css';
+@import './filer.css';
+@import './lock-focus.css';
+@import './menus.css';
+@import './monitor.css';
+@import './sender.css';
+@import './sessions.css';
+@import './settings.css';
+@import './terminal.css';
+@import './tunnels.css';

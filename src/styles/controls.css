@@ -1,0 +1,131 @@
+/* Controls: Select, folder picker (FolderTreeSelect), NumberInput, ComboBox, PasswordInput eye button, status dot, app-drawn caret and scrollbars, tooltips. */
+
+/* ===== Select ===== */
+.ui-select { position: relative; display: inline-flex; }
+.ui-select-trigger { width: 100%; height: 24px; display: flex; align-items: center; gap: 8px; padding: 0 8px 0 9px; border: 1px solid var(--control-line); background: var(--control-bg); color: var(--control-text); font-size: var(--ui-font, 12px); text-align: left; cursor: pointer; }
+.ui-select-trigger span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ui-select-trigger svg { flex: 0 0 10px; width: 10px; height: 10px; stroke: var(--muted); stroke-width: 1.4; transition: transform 0.12s ease; }
+.ui-select-trigger:hover, .ui-select.is-open .ui-select-trigger { border-color: var(--control-focus); background: var(--control-hover); }
+.ui-select.is-open .ui-select-trigger svg { transform: rotate(180deg); }
+.ui-select-trigger:focus-visible { outline: 0; border-color: var(--control-focus); }
+.ui-select-menu { position: fixed; z-index: 1000; max-height: 260px; margin: 0; padding: 4px 0; overflow-y: auto; list-style: none; border: 1px solid var(--menu-line); background: var(--menu-bg); box-shadow: var(--menu-shadow); }
+.ui-select-menu li i { color: var(--muted); font-size: 7px; font-style: normal; text-align: center; }
+.ui-select-menu li span { overflow: hidden; text-overflow: ellipsis; }
+.ui-select-menu li small { color: var(--muted); font-size: var(--ui-font-small, 11px); }
+.ui-select-menu li.is-selected { background: var(--menu-selected); color: var(--ink); }
+.ui-select-menu li.is-active { background: var(--menu-hover); color: var(--ink-active); border-left: 0; }
+.ui-select-menu li.is-disabled { color: var(--faint); cursor: default; }
+.ui-select-menu li { height: 30px; display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; align-items: center; column-gap: 8px; padding: 0 12px 0 9px; color: var(--control-text); font-size: var(--ui-font, 12px); white-space: nowrap; cursor: pointer; border-left: 0; padding-left: 11px; }
+/* Select options (e.g. Targets / Current Session): no marker block on the left; the selected option is shown by its background only. (Panel Settings menus keep their own check column.) */
+.ui-select-menu:not(.ui-menu) li { grid-template-columns: minmax(0, 1fr) auto; padding-left: 11px; }
+.connection-dialog .ui-select { width: 100%; }
+.metroterm-shell .connection-dialog .ui-select-trigger { box-sizing: border-box; width: 100%; height: var(--dialog-control); min-height: var(--dialog-control); padding: 0 10px; border: 1px solid var(--control-line); border-radius: 0; background: var(--control-bg); color: var(--control-text); font-family: inherit; font-size: 12px; letter-spacing: 0; outline: 0; }
+.metroterm-shell .connection-dialog .ui-select.is-open .ui-select-trigger { border-color: var(--control-focus); background: var(--control-bg); }
+.metroterm-shell .connection-dialog .ui-select.is-default .ui-select-trigger span { color: var(--faint); }
+.metroterm-shell .folder-tree-select .ui-select-trigger { gap: 8px; }
+.metroterm-shell .folder-tree-select .ui-select-trigger .folder-tree-icon svg, .metroterm-shell .folder-tree-select .ui-select-trigger .folder-tree-path svg { flex: none; width: auto; height: auto; stroke: currentColor; transform: none; }
+.ui-select-menu.folder-tree-menu { padding: 5px 0; letter-spacing: 0; overscroll-behavior: contain; }
+.ui-select-menu.folder-tree-menu li { position: relative; height: 26px; display: flex; align-items: stretch; gap: 0; padding: 0 10px 0 8px; border-left: 0; color: var(--control-text); }
+.ui-select-menu.folder-tree-menu li > * { flex: none; }
+.ui-select-menu.folder-tree-menu li > .ft-name { flex: 1 1 auto; }
+.ui-select-menu.folder-tree-menu li.is-active { background: var(--menu-hover); color: var(--ink-active); }
+.ui-select-menu.folder-tree-menu li.is-selected { background: var(--menu-selected); color: var(--ink); }
+.ui-select-menu.folder-tree-menu li.is-selected.is-active { background: var(--menu-hover); color: var(--ink-active); }
+.ui-select-menu.folder-tree-menu li small { display: flex; align-items: center; min-width: 16px; justify-content: flex-end; color: var(--faint); font-size: 10px; }
+.ui-select-menu.ui-combobox-menu li small { font-family: inherit; overflow: hidden; text-overflow: ellipsis; max-width: 260px; }
+
+/* ===== Folder picker (FolderTreeSelect) ===== */
+.folder-tree-select .folder-tree-icon { flex: none; display: inline-flex; color: var(--ft-folder); }
+.folder-tree-select .folder-tree-path { flex: 1; min-width: 0; display: flex; align-items: center; gap: 2px; overflow: hidden; white-space: nowrap; letter-spacing: 0; }
+.folder-tree-select .folder-tree-path em { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-style: normal; color: var(--muted); }
+.folder-tree-select .folder-tree-path em:last-child { flex: none; max-width: 100%; color: var(--control-text); }
+.folder-tree-select .folder-tree-path em.is-root { color: var(--control-text); }
+.folder-tree-select .folder-tree-path b { flex: none; display: inline-flex; color: var(--faint); font-weight: normal; }
+.folder-tree-menu .ft-guide { position: relative; width: 16px; }
+.folder-tree-menu .ft-guide.line::before, .folder-tree-menu .ft-guide.tee::before, .folder-tree-menu .ft-guide.end::before { content: ''; position: absolute; left: 7px; top: 0; bottom: 0; border-left: 1px solid var(--ft-guide); }
+.folder-tree-menu .ft-guide.end::before { bottom: 50%; }
+.folder-tree-menu .ft-guide.tee::after, .folder-tree-menu .ft-guide.end::after { content: ''; position: absolute; left: 7px; right: 1px; top: 50%; border-top: 1px solid var(--ft-guide); }
+.folder-tree-menu li:first-child .ft-guide { display: none; }
+.folder-tree-menu .ft-twisty { width: 14px; display: inline-flex; align-items: center; justify-content: center; color: var(--muted); cursor: pointer; }
+.folder-tree-menu .ft-twisty:hover { color: var(--ink); background: var(--control-hover); }
+.folder-tree-menu .ft-twisty.is-leaf { cursor: inherit; background: none; }
+.folder-tree-menu .ft-twisty.is-leaf::before { content: ''; width: 3px; height: 3px; background: var(--ft-guide); }
+.folder-tree-menu .ft-icon { width: 16px; margin: 0 6px 0 4px; display: inline-flex; align-items: center; justify-content: center; color: var(--ft-folder); font-style: normal; }
+.folder-tree-menu li.is-root .ft-icon { color: var(--muted); }
+.folder-tree-menu .ft-name { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 14px; }
+.folder-tree-menu li.is-root .ft-name { color: var(--muted); }
+.folder-tree-menu li.is-root.is-active .ft-name, .folder-tree-menu li.is-root.is-selected .ft-name { color: var(--ink); }
+.folder-tree-menu .ft-check { width: 18px; display: inline-flex; align-items: center; justify-content: flex-end; color: var(--ink); }
+.folder-tree-menu li:not(.is-selected) small { margin-right: 18px; }
+
+/* ===== NumberInput ===== */
+.ui-number { position: relative; height: 24px; display: inline-flex; align-items: stretch; border: 1px solid var(--control-line); background: var(--control-bg); color: var(--control-text); }
+.ui-number:hover { border-color: var(--control-focus); background: var(--control-hover); }
+.ui-number.is-focused { border-color: var(--control-focus); background: var(--control-hover); }
+.metroterm-shell .ui-number input { flex: 1; min-width: 0; height: 100%; padding: 0 2px 0 8px; border: 0; background: transparent; color: inherit; font-size: var(--ui-font, 12px); font-variant-numeric: tabular-nums; text-align: right; box-shadow: none; }
+.metroterm-shell .ui-number input:hover, .metroterm-shell .ui-number input:focus { border: 0; background: transparent; box-shadow: none; outline: 0; }
+.ui-number-suffix { display: flex; align-items: center; padding: 0 2px 0 1px; color: var(--muted); font-size: var(--ui-font, 12px); }
+.ui-number-steppers { flex: 0 0 16px; display: flex; flex-direction: column; margin-left: 4px; border-left: 1px solid var(--control-line); }
+.ui-number-steppers button { flex: 1; width: 16px; height: auto; min-height: 0; display: grid; place-items: center; padding: 0; color: var(--muted); background: transparent; }
+.ui-number-steppers button + button { border-top: 1px solid var(--control-line); }
+.ui-number-steppers button:hover:not(:disabled) { color: var(--ink); background: var(--menu-hover); }
+.ui-number-steppers button:active:not(:disabled) { background: var(--control-line); }
+.ui-number-steppers button:disabled { opacity: 0.35; cursor: default; }
+.ui-number-steppers svg { width: 8px; height: 5px; stroke: currentColor; stroke-width: 1.3; }
+
+/* ===== ComboBox ===== */
+.metroterm-shell .ui-combobox { position: relative; display: flex; width: 100%; }
+.metroterm-shell .ui-combobox > input { flex: 1; width: 100%; min-width: 0; padding-right: 32px; }
+.metroterm-shell .ui-combobox-toggle { position: absolute; top: 1px; right: 1px; bottom: 1px; width: 30px; display: grid; place-items: center; padding: 0; border: 0; background: transparent; color: var(--muted); cursor: pointer; }
+.metroterm-shell .ui-combobox-toggle svg { width: 10px; height: 10px; stroke: var(--muted); stroke-width: 1.4; transition: transform 0.12s ease; }
+.metroterm-shell .ui-combobox-toggle:hover svg { stroke: var(--ink); }
+.metroterm-shell .ui-combobox.is-open .ui-combobox-toggle svg { transform: rotate(180deg); }
+
+/* ===== PasswordInput eye button ===== */
+.metroterm-shell .password-eye { position: absolute; top: 1px; right: 1px; bottom: 1px; width: 26px; display: grid; place-items: center; padding: 0; border: 0; background: transparent; color: var(--muted); cursor: pointer; }
+.metroterm-shell .password-eye:hover:not(:disabled), .metroterm-shell .password-eye[aria-pressed='true'] { color: var(--ink); }
+.metroterm-shell .password-eye:disabled { opacity: 0.4; cursor: default; }
+
+/* ===== Status dot ===== */
+.metroterm-shell .status-dot { display: inline-block; flex: 0 0 auto; width: 6px; height: 6px; border-radius: 50%; background: var(--faint); }
+.metroterm-shell .status-dot.online { background: var(--accent-online); }
+.metroterm-shell .status-dot.error { background: var(--error-dot); }
+
+/* ===== App-drawn caret (lib/ui/appCaret) ===== */
+html.app-caret-on input:is([type='text'], [type='search'], [type='password'], [type='url'], [type='tel'], :not([type])), html.app-caret-on textarea:not(.xterm-helper-textarea) { caret-color: transparent !important; }
+.app-caret { position: fixed; left: 0; top: 0; width: 2px; z-index: 2147483000; pointer-events: none; will-change: transform; }
+.app-caret[hidden] { display: none; }
+.app-caret.app-caret-blink { animation: app-caret-blink 1.06s steps(1, end) infinite; }
+
+/* ===== App-drawn scrollbars (lib/ui/customScrollbars) ===== */
+/* ---------- Scrollbars: drawn by the app (src/lib/ui/customScrollbars.ts) ---------- The native scrollbar of every scrolling area is hidden and replaced by a square track + thumb in `.sb-layer`, so the look is identical in Chromium, WebView2, WebKit and Firefox. 10px track with a 6px thumb that keeps its width; hover / drag only change its colour. No arrows, no radius. */
+.sb-custom { scrollbar-width: none !important; }
+.sb-custom::-webkit-scrollbar { display: none; width: 0; height: 0; }
+/* Static on purpose: a fixed (or z-indexed) layer would form a stacking context of its own, and the bars' z-index (the surface they belong to: menus, dialogs) would then only count inside it — a dialog
+   or menu would cover its own scrollbar. The tracks themselves are position: fixed. */
+.sb-layer { --sb-size: 10px; --sb-pad: 2px; position: static; width: 0; height: 0; overflow: visible; pointer-events: none; }
+.sb-track { position: fixed; display: none; box-sizing: border-box; background: var(--sb-track); pointer-events: auto; cursor: default; touch-action: none; user-select: none; }
+.sb-thumb { position: absolute; box-sizing: border-box; background: var(--sb-thumb); transition: background-color 0.12s ease; }
+.sb-y .sb-thumb { left: var(--sb-pad); right: var(--sb-pad); }
+.sb-x .sb-thumb { top: var(--sb-pad); bottom: var(--sb-pad); }
+.sb-track.is-near .sb-thumb { background: var(--sb-thumb-near); }
+.sb-track:hover .sb-thumb, .sb-track.is-dragging .sb-thumb { background: var(--sb-thumb-hover); }
+.sb-track.is-dragging .sb-thumb, .sb-thumb:active { background: var(--sb-thumb-active); }
+/* While dragging a scrollbar: no text selection. Body only — a `body.x *` rule restyled the whole document at the start and end of every drag; pointer capture keeps the cursor on the thumb. */
+body.is-scrollbar-dragging { -webkit-user-select: none !important; user-select: none !important; cursor: default !important; }
+
+/* ===== Tooltips (TooltipLayer) ===== */
+.ui-tip { position: fixed; z-index: 200; display: flex; align-items: center; gap: 12px; max-width: min(420px, calc(100vw - 12px)); min-height: 24px; padding: 4px 8px; border: 1px solid var(--tip-line); border-radius: 0; background: var(--tip-bg); color: var(--tip-ink); box-shadow: var(--tip-shadow); font-family: var(--ui-font-family); font-size: var(--ui-font-small); line-height: 16px; pointer-events: none; user-select: none; }
+.ui-tip-text { min-width: 0; white-space: pre-line; overflow-wrap: anywhere; }
+.ui-tip kbd { flex: none; margin-left: auto; padding: 0 4px; border: 1px solid var(--tip-line); color: var(--tip-key); font: inherit; font-size: 10px; line-height: 14px; }
+/* Property-table tooltip (Filer rows): labels right-aligned on the left, values on the right */
+.ui-tip.is-table { padding: 6px 10px; }
+.ui-tip-table { margin: 0; display: grid; grid-template-columns: max-content minmax(0, auto); column-gap: 12px; row-gap: 2px; }
+.ui-tip-table > div { display: contents; }
+.ui-tip-table dt { color: var(--tip-key); text-align: right; white-space: nowrap; }
+.ui-tip-table dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+
+@keyframes app-caret-blink {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+}
